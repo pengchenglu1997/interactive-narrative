@@ -1,9 +1,31 @@
-// viz_map.js — Two IKEAs viz 1: store timeline map
-// Equirectangular world map drawn in p5 (single-canvas template constraint).
-// Reads manager.data.stores. Uses scroll progress to walk the year forward.
+// viz_map.js — Two IKEAs viz 1
+// Three Leaflet maps side-by-side (North America / Europe / East Asia),
+// each showing IKEA stores. A shared year state advances automatically
+// from 1958 to 2026 when Act 1 is in view.
+//
+// Because Leaflet uses its own DOM (not the p5 canvas), this module also
+// handles the show/hide swap between the p5 canvas (#vis) and the Leaflet
+// container (#leaflet-stage). sketch_renderer calls VizMap.activate() when
+// activeIndex is in Act 1 and VizMap.deactivate() when leaving.
 (function () {
     var MIN_YEAR = 1958;
     var MAX_YEAR = 2026;
+    var TICK_MS = 200;   // ms per year advance during auto-play
+    var REGIONS = [
+        { id: 'na', label: 'North America', center: [40, -95], zoom: 3 },
+        { id: 'eu', label: 'Europe',        center: [50, 10],   zoom: 3 },
+        { id: 'ea', label: 'East Asia',     center: [33, 120],  zoom: 3 },
+    ];
+
+    var state = {
+        ready: false,
+        active: false,
+        maps: {},           // id -> Leaflet map instance
+        markerLayers: {},   // id -> L.layerGroup
+        year: MIN_YEAR,
+        timer: null,
+        stores: [],
+    };
 
     function regimeColor(rt) {
         switch ((rt || '').toLowerCase()) {
@@ -14,126 +36,165 @@
         }
     }
 
-    window.VizMap = {
-        draw: function (p, manager, ai, progress) {
-            var data = (manager.data && manager.data.stores) || [];
-            if (!data.length) {
-                p.push();
-                p.fill('#888'); p.textSize(13);
-                p.textAlign(p.CENTER, p.CENTER);
-                p.text('Loading store data…', manager.width / 2, manager.height / 2);
-                p.pop();
-                return;
-            }
-
-            // Current displayed year: drift from MIN_YEAR to MAX_YEAR as scroll progresses
-            // through this section. progress is 0..1 within the active section.
-            var pr = progress || 0;
-            var year = Math.round(MIN_YEAR + pr * (MAX_YEAR - MIN_YEAR));
-
-            var W = manager.width, H = manager.height;
-            var padL = (manager.margin && manager.margin.left) || 80;
-            var padT = (manager.margin && manager.margin.top) || 0;
-
-            // Background panel
-            p.push();
-            p.translate(padL, padT);
-            p.noStroke();
-            p.fill('#F7F3EC');
-            p.rect(0, 0, W, H, 4);
-
-            // World projection bounds (covers IKEA's footprint)
-            var lonMin = -135, lonMax = 145;
-            var latMin = 5, latMax = 62;
-            function projX(lon) { return p.map(lon, lonMin, lonMax, 30, W - 30); }
-            function projY(lat) { return p.map(lat, latMax, latMin, 30, H - 60); }
-
-            // Graticule
-            p.stroke('#E5DDD0'); p.strokeWeight(1);
-            for (var lon = -120; lon <= 140; lon += 30) p.line(projX(lon), 30, projX(lon), H - 60);
-            for (var lat = 10; lat <= 60; lat += 10) p.line(30, projY(lat), W - 30, projY(lat));
-
-            // Rough continent outlines
-            p.noStroke();
-            p.fill('#EFE7D6');
-            // North America
-            p.beginShape();
-            [[60,-130],[55,-90],[48,-70],[28,-80],[20,-105],[35,-125]].forEach(function (pt) {
-                p.vertex(projX(pt[1]), projY(pt[0]));
-            });
-            p.endShape(p.CLOSE);
-            // Europe
-            p.beginShape();
-            [[60,-10],[58,15],[55,40],[40,42],[36,15],[44,-5]].forEach(function (pt) {
-                p.vertex(projX(pt[1]), projY(pt[0]));
-            });
-            p.endShape(p.CLOSE);
-            // East Asia
-            p.beginShape();
-            [[50,80],[50,135],[35,140],[20,120],[20,95],[35,80]].forEach(function (pt) {
-                p.vertex(projX(pt[1]), projY(pt[0]));
-            });
-            p.endShape(p.CLOSE);
-
-            // Stores
-            var visibleCount = 0, closedCount = 0;
-            data.forEach(function (s) {
-                if (s.opening_year == null || s.opening_year > year) return;
-                if (s.latitude == null || s.longitude == null) return;
-                var x = projX(s.longitude), y = projY(s.latitude);
-                var closed = s.closure_year != null && s.closure_year <= year;
-                var col = regimeColor(s.region_type);
-                p.noStroke();
-                p.fill(col + (closed ? '55' : 'CC'));
-                var sz = 8;
-                switch (s.store_format) {
-                    case 'big-box':
-                        p.rectMode(p.CENTER); p.rect(x, y, sz * 1.4, sz * 1.4);
-                        break;
-                    case 'city_store':
-                        p.ellipse(x, y, sz * 1.6, sz * 1.6);
-                        break;
-                    case 'planning_studio':
-                        p.push(); p.translate(x, y); p.rotate(p.PI / 4);
-                        p.rectMode(p.CENTER); p.rect(0, 0, sz * 1.3, sz * 1.3);
-                        p.pop();
-                        break;
-                    case 'plan_order_point':
-                        p.triangle(x, y - sz, x - sz, y + sz * 0.7, x + sz, y + sz * 0.7);
-                        break;
-                    default:
-                        p.ellipse(x, y, sz * 1.4, sz * 1.4);
-                }
-                visibleCount++;
-                if (closed) closedCount++;
-            });
-
-            // Title + year readout
-            p.noStroke();
-            p.fill('#1a1a1a'); p.textSize(15); p.textStyle(p.BOLD);
-            p.textAlign(p.LEFT, p.TOP);
-            p.text('IKEA stores by year ' + year, 12, H - 50);
-            p.textStyle(p.NORMAL); p.fill('#666'); p.textSize(11);
-            p.text(visibleCount + ' open  ·  ' + closedCount + ' closed', 12, H - 32);
-
-            // Legend
-            p.textAlign(p.RIGHT, p.TOP); p.textSize(10); p.fill('#1a1a1a');
-            var legendY = H - 50;
-            var items = [
-                { c: '#2A6FB0', label: 'Western' },
-                { c: '#C8412C', label: 'East Asian' },
-                { c: '#FFDB00', label: 'Origin' },
-            ];
-            items.forEach(function (it, i) {
-                var yy = legendY + i * 14;
-                p.noStroke(); p.fill(it.c); p.rectMode(p.CORNER); p.rect(W - 110, yy + 3, 8, 8);
-                p.fill('#333'); p.textAlign(p.LEFT, p.TOP); p.text(it.label, W - 96, yy + 2);
-            });
-            p.textAlign(p.LEFT, p.TOP); p.textSize(9); p.fill('#888');
-            p.text('▢ big-box   ◯ city store   ◇ planning studio   △ plan & order',
-                12, H - 14);
-
-            p.pop();
+    function formatHTML(format, color, dim) {
+        var op = dim ? 0.32 : 0.95;
+        var sz = 12;
+        var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:' + op +
+            ';background:' + color + ';border:1.5px solid #fff;box-shadow:0 0 1px rgba(0,0,0,0.5)';
+        switch (format) {
+            case 'big-box': return '<div style="' + base + '"></div>';
+            case 'city_store': return '<div style="' + base + ';border-radius:50%"></div>';
+            case 'planning_studio': return '<div style="' + base + ';transform:rotate(45deg)"></div>';
+            case 'plan_order_point':
+                return '<div style="width:0;height:0;border-left:' + (sz/2) +
+                    'px solid transparent;border-right:' + (sz/2) +
+                    'px solid transparent;border-bottom:' + sz + 'px solid ' + color +
+                    ';opacity:' + op + '"></div>';
+            default: return '<div style="' + base + ';border-radius:50%"></div>';
         }
+    }
+
+    // Initialise three Leaflet maps (lazy — only on first activate).
+    function ensureInit(stores) {
+        if (state.ready) return;
+        if (typeof L === 'undefined') {
+            console.error('VizMap: Leaflet (L) not loaded — check the CDN <script> tag in index.html');
+            return;
+        }
+        state.stores = stores;
+
+        REGIONS.forEach(function (r) {
+            var el = document.getElementById('map-' + r.id);
+            if (!el) { console.error('VizMap: #map-' + r.id + ' not found in DOM'); return; }
+            var m = L.map(el, {
+                center: r.center,
+                zoom: r.zoom,
+                zoomControl: false,
+                attributionControl: false,
+                worldCopyJump: false,
+                dragging: false,
+                scrollWheelZoom: false,
+                doubleClickZoom: false,
+                touchZoom: false,
+                boxZoom: false,
+                keyboard: false,
+            });
+            L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+                maxZoom: 12,
+                subdomains: 'abcd',
+            }).addTo(m);
+            // Region label overlay
+            var label = L.control({ position: 'topleft' });
+            label.onAdd = function () {
+                var div = L.DomUtil.create('div', 'region-label');
+                div.innerHTML = r.label;
+                return div;
+            };
+            label.addTo(m);
+            state.maps[r.id] = m;
+            state.markerLayers[r.id] = L.layerGroup().addTo(m);
+        });
+        state.ready = true;
+        rebuildAll();
+    }
+
+    function regionFor(lat, lon) {
+        if (lat == null || lon == null) return null;
+        // Quick bbox sort
+        if (lon > -170 && lon < -50 && lat > 15 && lat < 75) return 'na';
+        if (lon > -15 && lon < 50 && lat > 35 && lat < 72) return 'eu';
+        if (lon > 70 && lon < 150 && lat > -10 && lat < 55) return 'ea';
+        // Sweden Älmhult sits between EU/EA bbox edges — treat as EU
+        if (lon > 10 && lon < 30 && lat > 55 && lat < 65) return 'eu';
+        return null;
+    }
+
+    function rebuildAll() {
+        if (!state.ready) return;
+        // Clear all layers
+        REGIONS.forEach(function (r) {
+            state.markerLayers[r.id].clearLayers();
+        });
+        // Counters for label updates
+        var counts = { na: 0, eu: 0, ea: 0 };
+
+        state.stores.forEach(function (s) {
+            if (s.opening_year == null || s.opening_year > state.year) return;
+            if (s.latitude == null || s.longitude == null) return;
+            var region = regionFor(s.latitude, s.longitude);
+            if (!region || !state.markerLayers[region]) return;
+            var closed = s.closure_year != null && s.closure_year <= state.year;
+            var col = regimeColor(s.region_type);
+            var icon = L.divIcon({
+                className: 'ikea-marker',
+                html: formatHTML(s.store_format, col, closed),
+                iconSize: [14, 14],
+                iconAnchor: [7, 7],
+            });
+            var m = L.marker([s.latitude, s.longitude], { icon: icon, interactive: false })
+                .addTo(state.markerLayers[region]);
+            counts[region]++;
+        });
+
+        // Update year readouts in DOM
+        var yearEl = document.getElementById('map-year-readout');
+        if (yearEl) yearEl.textContent = state.year;
+        REGIONS.forEach(function (r) {
+            var el = document.getElementById('map-count-' + r.id);
+            if (el) el.textContent = counts[r.id] + ' stores';
+        });
+    }
+
+    function tickForward() {
+        if (state.year < MAX_YEAR) {
+            state.year++;
+            rebuildAll();
+        } else {
+            stopTimer();
+        }
+    }
+
+    function startTimer() {
+        if (state.timer) return;
+        state.timer = setInterval(tickForward, TICK_MS);
+    }
+
+    function stopTimer() {
+        if (state.timer) { clearInterval(state.timer); state.timer = null; }
+    }
+
+    // ===================== Public API =====================
+    window.VizMap = {
+        // Called every frame by sketch_renderer when Act 1 is active.
+        // The first call lazy-inits Leaflet, shows the container, starts auto-play.
+        draw: function (p, manager, ai, progress) {
+            var stage = document.getElementById('leaflet-stage');
+            var vis = document.getElementById('vis');
+            if (!stage) return;
+            if (!state.active) {
+                state.active = true;
+                stage.style.display = 'flex';
+                if (vis) vis.style.visibility = 'hidden';
+                ensureInit((manager.data && manager.data.stores) || []);
+                state.year = MIN_YEAR;
+                rebuildAll();
+                // Tiny delay before starting so the user sees the 1958 start
+                setTimeout(function () {
+                    REGIONS.forEach(function (r) {
+                        if (state.maps[r.id]) state.maps[r.id].invalidateSize();
+                    });
+                    startTimer();
+                }, 100);
+            }
+        },
+        deactivate: function () {
+            if (!state.active) return;
+            state.active = false;
+            stopTimer();
+            var stage = document.getElementById('leaflet-stage');
+            var vis = document.getElementById('vis');
+            if (stage) stage.style.display = 'none';
+            if (vis) vis.style.visibility = '';
+        },
     };
 })();
