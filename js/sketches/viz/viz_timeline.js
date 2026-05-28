@@ -57,9 +57,10 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerL = 130, innerR = 12, innerT = 50, innerB = 32;
+            var innerL = 130, innerR = 30, innerT = 50, innerB = 50;
             var laneH = (H - innerT - innerB) / lanes.length;
-            function xYear(y) { return p.map(y, Y_MIN, Y_MAX + 0.5, innerL + 10, W - innerR - 10); }
+            // Pad both ends of the year range by 0.5 so 2014/2026 tiles don't clip
+            function xYear(y) { return p.map(y, Y_MIN - 0.5, Y_MAX + 0.5, innerL + 10, W - innerR - 10); }
             var yearW = (W - innerR - innerL - 20) / (Y_MAX - Y_MIN + 1);
 
             var grouped = {};
@@ -101,14 +102,19 @@
                 if (y % 2 === 0 || y === Y_MIN) { p.fill('#888'); p.text(y, x, innerT - 6); }
             }
 
-            // Tiles
+            // Convert canvas mouse → translated sketch coords
+            var mx = p.mouseX - padL;
+            var my = p.mouseY - padT;
+
+            // Tiles + hover detection
+            var hoverEv = null;
             lanes.forEach(function (lane, li) {
                 var ly = innerT + li * laneH;
                 for (var yr = Y_MIN; yr <= Y_MAX; yr++) {
                     var k = lane.key + '|' + yr;
                     var evs = grouped[k];
                     if (!evs) continue;
-                    var tileW = Math.min(yearW - 3, 95);
+                    var tileW = Math.min(yearW - 3, 78);
                     var tileH = (laneH - 6) / evs.length;
                     evs.forEach(function (ev, ei) {
                         var tx = xYear(yr) - tileW / 2;
@@ -126,13 +132,18 @@
                             var shown = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
                             p.text(shown, tx + 4, ty + (tileH - 1.5) / 2);
                         }
+                        // hover check (in translated sketch space)
+                        if (mx >= tx && mx <= tx + tileW &&
+                            my >= ty && my <= ty + tileH) {
+                            hoverEv = ev;
+                        }
                     });
                 }
             });
 
-            // Legend (bottom)
+            // Legend (bottom — placed in the dedicated bottom-margin band)
             p.noStroke(); p.textSize(10); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
-            var legY = H - innerB + 8;
+            var legY = H - innerB + 18;
             var lx = innerL;
             var legendItems = regimeFilter
                 ? [
@@ -152,6 +163,25 @@
             });
 
             p.pop();
+
+            // Tooltip
+            if (hoverEv && window.VizTooltip) {
+                var ev = hoverEv;
+                var regimeLabel = ev.regime_type === 'east_asia' ? 'East Asia'
+                                : ev.regime_type === 'western'   ? 'West'
+                                : ev.regime_type === 'both'      ? 'Global / both' : 'Other';
+                var html =
+                    '<div class="tt-name">' + ev.event_year + ' · ' + ev.event_name + '</div>' +
+                    '<div class="tt-row"><b>Type</b> ' + (ev.response_type || '').replace(/_/g, ' ') + '</div>' +
+                    '<div class="tt-row"><b>Market</b> ' + (ev.market || '') + (ev.country_or_region ? ' (' + ev.country_or_region + ')' : '') + ' · ' + regimeLabel + '</div>' +
+                    (ev.short_description ? '<div class="tt-note">' + ev.short_description + '</div>' : '') +
+                    (ev.source_url ? '<div class="tt-src"><a href="' + ev.source_url + '" target="_blank" rel="noopener">' +
+                        (function(u){ try { return new URL(u).hostname; } catch (e) { return 'source'; }})(ev.source_url) +
+                     '</a></div>' : '');
+                window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
+            } else if (window.VizTooltip) {
+                window.VizTooltip.hide();
+            }
         }
     };
 })();

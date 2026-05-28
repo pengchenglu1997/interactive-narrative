@@ -90,7 +90,14 @@
                 p.endShape();
             });
 
-            // Nodes + labels
+            // Convert canvas mouse → translated sketch coords (critical: the
+            // playbook chart was completely unresponsive to hover in v6 because
+            // mouseX was being compared against post-translate node positions)
+            var mx = p.mouseX - padL;
+            var my = p.mouseY - padT;
+
+            // Nodes + labels + hover detect
+            var hoverItem = null, hoverSide = '';
             items.forEach(function (it) {
                 var yL = yFor(westPos[it.priority_key]);
                 var yR = yFor(eastPos[it.priority_key]);
@@ -114,6 +121,18 @@
                 p.text(it.priority_label, rightX + rR + 6, yR);
                 p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
                 p.text('intensity ' + it.east_intensity + '/5', rightX + rR + 6, yR + 12);
+
+                // Hover check (either column's node — use a generous hit area
+                // that covers the visible label as well as the circle, so
+                // users can reach the tooltip even when hovering the priority
+                // label text rather than the small dot)
+                var hitR_west = Math.max(rL / 2 + 10, 16);
+                var hitR_east = Math.max(rR / 2 + 10, 16);
+                if (Math.abs(my - yL) < rowH / 2 && Math.abs(mx - leftX) < 180) {
+                    hoverItem = it; hoverSide = 'west';
+                } else if (Math.abs(my - yR) < rowH / 2 && Math.abs(mx - rightX) < 180) {
+                    hoverItem = it; hoverSide = 'east';
+                }
             });
 
             // Legend (bottom)
@@ -123,6 +142,18 @@
                 W / 2, H - 22);
 
             p.pop();
+
+            // Tooltip
+            if (hoverItem && window.VizTooltip) {
+                var it = hoverItem;
+                var html =
+                    '<div class="tt-name">' + it.priority_label + '</div>' +
+                    '<div class="tt-row"><b style="color:#9ecfff">West (' + it.west_intensity + '/5)</b> ' + (it.west_evidence || '') + '</div>' +
+                    '<div class="tt-row" style="margin-top:4px"><b style="color:#ff9b80">East (' + it.east_intensity + '/5)</b> ' + (it.east_evidence || '') + '</div>';
+                window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
+            } else if (window.VizTooltip) {
+                window.VizTooltip.hide();
+            }
         }
     };
 })();

@@ -1,21 +1,20 @@
 // sketch_renderer.js
-// Two IKEAs renderer. Dispatches to per-section viz modules and passes a
-// per-section configuration (e.g. regime filter) via manager.state.vizConfig.
+// Two IKEAs renderer. Per-section vizConfig + Leaflet activation.
 //
-// Section index → viz + config (mirrors data-active-index in index.html):
-//   0    Hero / title              — no viz (full-text)
-//   1, 2 Act 1: One IKEA, six decades → Leaflet 3-region map (auto-play)
-//   3    Act 2: East Asian housing pressure  → VizResponse  {regime: "east_asia"}
-//   4    Act 2: Western response              → VizResponse  {regime: "western"}
-//   5    Act 3: Western adaptation            → VizTimeline  {regime: "western"}
-//   6    Act 3: East Asian adaptation         → VizTimeline  {regime: "east_asia"}
-//   7    Act 4: East Asian ecology            → VizEcology   {regime: "east_asia"}
-//   8    Act 4: Western ecology               → VizEcology   {regime: "western"}
-//   9    Coda: Two playbooks                  → VizPlaybook
-//   10   About authors                        — no viz (full-text)
+// v4 section index mapping (after Coda split):
+//   0      Hero / title              — no viz
+//   1, 2   Act 1: One IKEA           → Leaflet single global map (auto-play)
+//   3      Act 2: East Asian PTI     → VizResponse {regime: east_asia}
+//   4      Act 2: Western PTI        → VizResponse {regime: western}
+//   5      Act 3: Western response   → VizTimeline {regime: western}
+//   6      Act 3: East Asian resp.   → VizTimeline {regime: east_asia}
+//   7      Act 4: East ecology       → VizEcology  {regime: east_asia}
+//   8      Act 4: West ecology       → VizEcology  {regime: western}
+//   9      Coda · Scorecard          — no viz (full-text scorecard table)
+//   10     Coda · Playbook           → VizPlaybook
+//   11     About authors             — no viz
 
 (function () {
-    // Map activeIndex → { viz, config }
     var ROUTING = {
         1: { viz: 'map' },
         2: { viz: 'map' },
@@ -25,7 +24,7 @@
         6: { viz: 'timeline', config: { regime: 'east_asia' } },
         7: { viz: 'ecology',  config: { regime: 'east_asia' } },
         8: { viz: 'ecology',  config: { regime: 'western'  } },
-        9: { viz: 'playbook' },
+        10:{ viz: 'playbook' },
     };
 
     window.Renderer = {
@@ -57,23 +56,19 @@
         },
 
         draw: function (p, manager, ai, progress) {
-            // Pull routing for this active index
             var route = ROUTING[ai];
 
-            // Manage Leaflet stage visibility (Act 1 only)
             var isMapSection = !!(route && route.viz === 'map');
             if (!isMapSection && window.VizMap && window.VizMap.deactivate) {
                 window.VizMap.deactivate();
             }
 
-            // Pass per-section config to viz
             if (route && route.config) {
                 manager.state.vizConfig = route.config;
             } else {
                 manager.state.vizConfig = {};
             }
 
-            // Full-text sections — leave canvas blank
             if (!route) return;
 
             switch (route.viz) {

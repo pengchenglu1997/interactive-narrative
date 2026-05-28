@@ -62,9 +62,9 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerL = 130, innerR = 14, innerT = 90, innerB = 36;
+            var innerL = 130, innerR = 14, innerT = 96, innerB = 52;
             var cellW = (W - innerL - innerR) / dims.length;
-            var rowH = Math.min(60, (H - innerT - innerB) / Math.max(rows.length, 1));
+            var rowH = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
 
             // Section title
             p.noStroke();
@@ -99,6 +99,13 @@
                 p.pop();
             });
 
+            // Convert canvas mouse → translated sketch coords
+            var mx = p.mouseX - padL;
+            var my = p.mouseY - padT;
+
+            // Hover state
+            var hoverCell = null;
+
             // Rows
             rows.forEach(function (row, i) {
                 var y = innerT + i * rowH + rowH / 2;
@@ -115,18 +122,25 @@
                     var level = (challengeMap[d.key] && challengeMap[d.key][rawVal]) || 0;
                     var col = challengeColor(level);
                     p.noStroke(); p.fill(col);
-                    p.rect(x + 3, innerT + i * rowH + 4, cellW - 6, rowH - 8, 4);
+                    var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
+                    var cellRectW = cellW - 6, cellRectH = rowH - 8;
+                    p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
                     p.fill(level >= 3 ? 'white' : '#1a1a1a');
                     p.textSize(10);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
+
+                    if (mx >= cellRectX && mx <= cellRectX + cellRectW &&
+                        my >= cellRectY && my <= cellRectY + cellRectH) {
+                        hoverCell = { row: row, dim: d, val: rawVal, level: level };
+                    }
                 });
             });
 
-            // Legend (bottom)
+            // Legend (bottom — in the bottom margin)
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
-            var legY = H - innerB + 6;
+            var legY = H - innerB + 18;
             p.text("Challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 220;
             [
@@ -141,6 +155,21 @@
             });
 
             p.pop();
+
+            // Tooltip
+            if (hoverCell && window.VizTooltip) {
+                var h = hoverCell;
+                var challengeLabel = ['Low', 'Low', 'Moderate', 'High', 'Very high'][Math.min(4, h.level)];
+                var html =
+                    '<div class="tt-name">' + h.row.market + ' · ' + h.dim.label + '</div>' +
+                    '<div class="tt-row"><b>Value</b> ' + (h.val || '').replace(/_/g, ' ') + '</div>' +
+                    '<div class="tt-row"><b>Challenge to IKEA</b> ' + challengeLabel + '</div>' +
+                    (h.row.short_summary ? '<div class="tt-note">' + h.row.short_summary + '</div>' : '') +
+                    (h.row.primary_sources ? '<div class="tt-src">Sources: ' + h.row.primary_sources + '</div>' : '');
+                window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
+            } else if (window.VizTooltip) {
+                window.VizTooltip.hide();
+            }
         }
     };
 })();

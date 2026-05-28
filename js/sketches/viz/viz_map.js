@@ -1,27 +1,26 @@
 // viz_map.js — Two IKEAs viz 1
-// Three Leaflet maps side-by-side (North America / Europe / East Asia),
-// each showing IKEA stores. A shared year state advances automatically
-// from 1958 to 2026 when Act 1 is in view.
-//
-// Because Leaflet uses its own DOM (not the p5 canvas), this module also
-// handles the show/hide swap between the p5 canvas (#vis) and the Leaflet
-// container (#leaflet-stage). sketch_renderer calls VizMap.activate() when
-// activeIndex is in Act 1 and VizMap.deactivate() when leaving.
+// Three Leaflet maps in a 2×2 grid (NA full-width on top, EU + EA below).
+// Maps are fully interactive — drag to pan, scroll to zoom, click a marker
+// to see store details. Auto-plays year forward 1958 → 2026 on entry; the
+// year animation pauses if the user actively interacts (drags or clicks).
 (function () {
     var MIN_YEAR = 1958;
     var MAX_YEAR = 2026;
-    var TICK_MS = 200;   // ms per year advance during auto-play
+    var TICK_MS = 220;
+
+    // Tighter bounds than v5 so each region's stores fill more of the
+    // available container pixels (user feedback: "再放大一点").
     var REGIONS = [
-        { id: 'na', label: 'North America', center: [40, -95], zoom: 3 },
-        { id: 'eu', label: 'Europe',        center: [50, 10],   zoom: 3 },
-        { id: 'ea', label: 'East Asia',     center: [33, 120],  zoom: 3 },
+        { id: 'na', label: 'North America', bounds: [[28, -125], [50, -68]] },
+        { id: 'eu', label: 'Europe',         bounds: [[42, -8],   [60, 20]] },
+        { id: 'ea', label: 'East Asia',      bounds: [[22, 102],  [44, 142]] },
     ];
 
     var state = {
         ready: false,
         active: false,
-        maps: {},           // id -> Leaflet map instance
-        markerLayers: {},   // id -> L.layerGroup
+        maps: {},
+        markerLayers: {},
         year: MIN_YEAR,
         timer: null,
         stores: [],
@@ -38,7 +37,7 @@
 
     function formatHTML(format, color, dim) {
         var op = dim ? 0.32 : 0.95;
-        var sz = 12;
+        var sz = 14;
         var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:' + op +
             ';background:' + color + ';border:1.5px solid #fff;box-shadow:0 0 1px rgba(0,0,0,0.5)';
         switch (format) {
@@ -54,36 +53,57 @@
         }
     }
 
-    // Initialise three Leaflet maps (lazy — only on first activate).
+    function formatLabel(format) {
+        if (!format) return '';
+        return format.replace(/_/g, ' ');
+    }
+
+    function buildPopupHTML(s, closed) {
+        var lines = [];
+        lines.push('<div class="popup-name">' + (s.store_name || s.city) + '</div>');
+        lines.push('<div class="popup-where">' + (s.city || '') + (s.country ? ', ' + s.country : '') + '</div>');
+        lines.push('<div class="popup-meta">');
+        lines.push('  <span>Opened ' + (s.opening_year || '?') + '</span>');
+        if (s.closure_year) lines.push('  <span class="closed">· Closed ' + s.closure_year + '</span>');
+        lines.push('  <span>· ' + formatLabel(s.store_format) + '</span>');
+        lines.push('</div>');
+        if (s.notes) lines.push('<div class="popup-note">' + s.notes + '</div>');
+        if (s.source_url) {
+            try {
+                var host = new URL(s.source_url).hostname;
+                lines.push('<div class="popup-src"><a href="' + s.source_url + '" target="_blank" rel="noopener">' + host + '</a></div>');
+            } catch (e) { /* ignore bad URL */ }
+        }
+        return lines.join('');
+    }
+
     function ensureInit(stores) {
         if (state.ready) return;
         if (typeof L === 'undefined') {
-            console.error('VizMap: Leaflet (L) not loaded — check the CDN <script> tag in index.html');
+            console.error('VizMap: Leaflet (L) not loaded');
             return;
         }
         state.stores = stores;
 
         REGIONS.forEach(function (r) {
             var el = document.getElementById('map-' + r.id);
-            if (!el) { console.error('VizMap: #map-' + r.id + ' not found in DOM'); return; }
+            if (!el) { console.error('VizMap: #map-' + r.id + ' missing'); return; }
             var m = L.map(el, {
-                center: r.center,
-                zoom: r.zoom,
-                zoomControl: false,
+                zoomControl: true,         // user can zoom + button
                 attributionControl: false,
-                worldCopyJump: false,
-                dragging: false,
-                scrollWheelZoom: false,
-                doubleClickZoom: false,
-                touchZoom: false,
+                scrollWheelZoom: true,     // ← interaction enabled
+                dragging: true,            // ← interaction enabled
+                doubleClickZoom: true,
+                touchZoom: true,
                 boxZoom: false,
                 keyboard: false,
             });
+            m.fitBounds(L.latLngBounds(r.bounds), { padding: [2, 2], animate: false });
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
-                maxZoom: 12,
+                maxZoom: 14,
                 subdomains: 'abcd',
             }).addTo(m);
-            // Region label overlay
+            // In-map region label
             var label = L.control({ position: 'topleft' });
             label.onAdd = function () {
                 var div = L.DomUtil.create('div', 'region-label');
@@ -100,23 +120,18 @@
 
     function regionFor(lat, lon) {
         if (lat == null || lon == null) return null;
-        // Quick bbox sort
         if (lon > -170 && lon < -50 && lat > 15 && lat < 75) return 'na';
         if (lon > -15 && lon < 50 && lat > 35 && lat < 72) return 'eu';
         if (lon > 70 && lon < 150 && lat > -10 && lat < 55) return 'ea';
-        // Sweden Älmhult sits between EU/EA bbox edges — treat as EU
         if (lon > 10 && lon < 30 && lat > 55 && lat < 65) return 'eu';
         return null;
     }
 
     function rebuildAll() {
         if (!state.ready) return;
-        // Clear all layers
-        REGIONS.forEach(function (r) {
-            state.markerLayers[r.id].clearLayers();
-        });
-        // Counters for label updates
-        var counts = { na: 0, eu: 0, ea: 0 };
+        REGIONS.forEach(function (r) { state.markerLayers[r.id].clearLayers(); });
+        var totals = { open: 0, closed: 0 };
+        var perRegion = { na: 0, eu: 0, ea: 0 };
 
         state.stores.forEach(function (s) {
             if (s.opening_year == null || s.opening_year > state.year) return;
@@ -128,20 +143,37 @@
             var icon = L.divIcon({
                 className: 'ikea-marker',
                 html: formatHTML(s.store_format, col, closed),
-                iconSize: [14, 14],
-                iconAnchor: [7, 7],
+                iconSize: [16, 16],
+                iconAnchor: [8, 8],
             });
-            var m = L.marker([s.latitude, s.longitude], { icon: icon, interactive: false })
-                .addTo(state.markerLayers[region]);
-            counts[region]++;
+            var marker = L.marker([s.latitude, s.longitude], {
+                icon: icon,
+                interactive: true,         // ← clickable
+                keyboard: false,
+                riseOnHover: true,
+            }).addTo(state.markerLayers[region]);
+            marker.bindPopup(buildPopupHTML(s, closed), {
+                maxWidth: 260,
+                className: 'ikea-popup',
+                autoPan: false,
+            });
+            // Pause auto-play when user opens a popup; resume on close
+            marker.on('click', stopTimer);
+            if (closed) totals.closed++; else totals.open++;
+            perRegion[region]++;
         });
 
-        // Update year readouts in DOM
         var yearEl = document.getElementById('map-year-readout');
         if (yearEl) yearEl.textContent = state.year;
+        var statsEl = document.getElementById('map-stats');
+        if (statsEl) {
+            statsEl.innerHTML =
+                '<span class="open-n">' + totals.open + ' open</span>' +
+                (totals.closed ? '  ·  <span class="closed-n">' + totals.closed + ' closed</span>' : '');
+        }
         REGIONS.forEach(function (r) {
-            var el = document.getElementById('map-count-' + r.id);
-            if (el) el.textContent = counts[r.id] + ' stores';
+            var lbl = document.querySelector('#map-' + r.id + ' .leaflet-control.region-label');
+            if (lbl) lbl.innerHTML = r.label + '<span class="region-n"> · ' + perRegion[r.id] + '</span>';
         });
     }
 
@@ -161,30 +193,34 @@
 
     function stopTimer() {
         if (state.timer) { clearInterval(state.timer); state.timer = null; }
+        // Update the year readout style so the user sees auto-play paused
+        var yearEl = document.getElementById('map-year-readout');
+        if (yearEl) yearEl.classList.add('paused');
     }
 
-    // ===================== Public API =====================
     window.VizMap = {
-        // Called every frame by sketch_renderer when Act 1 is active.
-        // The first call lazy-inits Leaflet, shows the container, starts auto-play.
         draw: function (p, manager, ai, progress) {
             var stage = document.getElementById('leaflet-stage');
             var vis = document.getElementById('vis');
             if (!stage) return;
             if (!state.active) {
                 state.active = true;
-                stage.style.display = 'flex';
+                stage.style.display = 'grid';
                 if (vis) vis.style.visibility = 'hidden';
                 ensureInit((manager.data && manager.data.stores) || []);
                 state.year = MIN_YEAR;
+                var yearEl = document.getElementById('map-year-readout');
+                if (yearEl) yearEl.classList.remove('paused');
                 rebuildAll();
-                // Tiny delay before starting so the user sees the 1958 start
                 setTimeout(function () {
                     REGIONS.forEach(function (r) {
-                        if (state.maps[r.id]) state.maps[r.id].invalidateSize();
+                        if (state.maps[r.id]) {
+                            state.maps[r.id].invalidateSize();
+                            state.maps[r.id].fitBounds(L.latLngBounds(r.bounds), { padding: [2, 2], animate: false });
+                        }
                     });
                     startTimer();
-                }, 100);
+                }, 120);
             }
         },
         deactivate: function () {

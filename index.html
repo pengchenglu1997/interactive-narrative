@@ -7,7 +7,6 @@
   <meta name="description" content="An interactive data story on how IKEA's global model adapted differently to housing affordability pressure across Western and East Asian markets." />
   <link rel="stylesheet" type="text/css" href="css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="css/style.css" />
-  <!-- Leaflet (used by viz_map for the three-region maps in Act 1) -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
         integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
         crossorigin="" />
@@ -27,7 +26,7 @@
     <div id='graphic'>
       <div id='sections'>
 
-        <!-- ===== Section 0: Hero / Title (full-text) ===== -->
+        <!-- ===== 0  Hero ===== -->
         <section class="step" data-active-index="0" data-layout="full-text">
           <div class="kicker">IMT 561 Final Project · Spring 2026</div>
           <div class="title hero-title">Two IKEAs</div>
@@ -35,147 +34,210 @@
           <p class="byline">By Pengcheng Lu &amp; Samantha Wang</p>
         </section>
 
-        <!-- ===== Act 1: One IKEA, One Model ===== -->
+        <!-- ===== 1  Act 1 · Origin ===== -->
         <section class="step" data-active-index="1">
           <div class="act-label">Act 1 · Origin</div>
-          <div class="title">One IKEA, one model</div>
-          <p class="takeaway">For 60 years IKEA followed one global playbook — drive to a suburban warehouse, flat-pack, self-assemble.</p>
+          <div class="title">One global playbook</div>
+          <p class="takeaway">60 years, one playbook: suburban warehouse, flat-pack, self-assemble.</p>
           <p>
-            In 1958, when Ingvar Kamprad opened the first IKEA store in Älmhult, Sweden, the bet was
-            simple: families would drive to a large store, walk through a showroom, choose
-            affordable furniture, carry flat-packed boxes home, and assemble them themselves. The
-            three maps on the right show IKEA's footprint across North America, Europe, and East
-            Asia — every dot the same kind of big-box suburban store.
+            IKEA opened in Älmhult, Sweden in 1958. Families drove to a large store, chose
+            affordable furniture, carried flat-packed boxes home, and assembled them themselves.
+            For decades the model replicated unchanged — same big-box footprint across every
+            continent IKEA entered.
           </p>
-        </section>
-        <section class="step" data-active-index="2">
-          <div class="act-label">Act 1 · Six decades</div>
-          <div class="title">From 1958 to 2026, side by side</div>
-          <p class="takeaway">After 2018 a new shape appears in city centres — but only in some regions. After 2022 some of the dots dim out.</p>
-          <p>
-            Watch the year tick forward. The Europe and North America maps fill with squares
-            (big-box). After 2018 circles appear — city stores — and they stay open. The East Asia
-            map tells a different story: city stores arrive a few years later (Shanghai Jing'an
-            2020, Tokyo Harajuku 2020, Shinjuku 2021) and several of them dim out in 2023 and 2026
-            as IKEA closes them. Same brand, three very different trajectories.
-          </p>
+          <p class="src">Source: IKEA store locator and Wikipedia <em>List of countries with IKEA stores</em>.</p>
         </section>
 
-        <!-- ===== Act 2: The Housing Shift ===== -->
+        <!-- ===== 2  Act 1 · Six decades ===== -->
+        <section class="step" data-active-index="2">
+          <div class="act-label">Act 1 · Six decades, one map</div>
+          <div class="title">Then the shape changed — but only in some regions</div>
+          <p class="takeaway">After 2018, city stores appear. After 2022, only East Asian ones dim out.</p>
+          <p>
+            Watch the year advance on the map. North America and Europe fill with squares
+            (big-box). After 2018 circles appear — city stores — and they stay open. East Asia
+            gets city stores three years later (Shanghai Jing'an 2020, Tokyo Harajuku 2020,
+            Shinjuku 2021) and most of them dim out in 2023 and 2026 as IKEA shuts them.
+          </p>
+          <p class="src">Source: IKEA Japan newsroom, Yicai Global, and Time Out Tokyo for the city-store opening and closure dates.</p>
+        </section>
+
+        <!-- ===== 3  Act 2 · East Asia ===== -->
         <section class="step" data-active-index="3">
           <div class="act-label">Act 2 · East Asia</div>
-          <div class="title">Same pressure, no city stores</div>
-          <p class="takeaway">5 of the 8 highest-PTI East Asian cities never received a city-format IKEA at all.</p>
+          <div class="title">High pressure, no city store</div>
+          <p class="takeaway">5 of the 8 highest-PTI East Asian cities: no city-format IKEA at all.</p>
           <p>
-            The chart on the right ranks East Asian cities by Numbeo's Price-to-Income Ratio
-            (left bars). Taipei, Hong Kong, Beijing, Shenzhen, Guangzhou — five of the eight
-            highest-pressure cities — show <em>no yellow circles</em>, only faint big-box dots.
-            Where IKEA did try city format (Shanghai Jing'an, Tokyo Harajuku &amp; Shinjuku,
-            Singapore Jurong), most of those stores have closed or are scheduled to close.
-            <small class="src">Source: Numbeo Current Property Price-to-Income Ratio, fetched 2026-05-26.</small>
+            Taipei, Hong Kong, Beijing, Shenzhen and Guangzhou — five of the eight highest-PTI
+            East Asian cities — never received a city-format IKEA. Where IKEA did try city format
+            (Shanghai, Tokyo, Singapore), three of those six stores have already closed or are
+            scheduled to.
           </p>
+          <p class="src">Source: Numbeo Current Property Price-to-Income Ratio, the standard cross-city affordability proxy.</p>
         </section>
+
+        <!-- ===== 4  Act 2 · West ===== -->
         <section class="step" data-active-index="4">
           <div class="act-label">Act 2 · West</div>
-          <div class="title">Same pressure, every city store stayed open</div>
-          <p class="takeaway">In Western markets every city-format store opened since 2018 is still operating.</p>
+          <div class="title">Same pressure, every store stayed open</div>
+          <p class="takeaway">Every Western city-format store opened since 2018: still open.</p>
           <p>
-            Same chart, Western cities. Every high-PTI Western city that got a city-format IKEA —
-            London (Tottenham Court Rd 2018, Hammersmith 2022, Oxford Street 2025), Paris (La
-            Madeleine 2019), NYC (Manhattan Studio 2019), Vienna (Westbahnhof 2021), SF (Market
-            Street 2023) — still has it. Yellow circles, no triangles. Same housing pressure,
-            opposite response shape.
+            Same PTI scale, Western cities. London (Tottenham Court Rd, Hammersmith, Oxford
+            Street), Paris (La Madeleine), NYC (Manhattan Studio), Vienna (Westbahnhof), San
+            Francisco (Market Street) — every one of them is still operating.
           </p>
+          <p class="src">Sources: IKEA UK, US, Austria and France newsroom press releases.</p>
         </section>
 
-        <!-- ===== Act 3: Two Parallel Adaptations ===== -->
+        <!-- ===== 5  Act 3 · West ===== -->
         <section class="step" data-active-index="5">
-          <div class="act-label">Act 3 · West</div>
-          <div class="title">The Western response: physical format + service</div>
-          <p class="takeaway">Western IKEA adapts through smaller urban stores, the TaskRabbit assembly partnership, and the IKEA Place AR app.</p>
+          <div class="act-label">Act 3 · Western response</div>
+          <div class="title">Physical format + service</div>
+          <p class="takeaway">Western response: smaller urban stores + service partnerships + AR app.</p>
           <p>
-            The Gantt-style timeline highlights only Western and global moves. The
-            <em>service partnership</em> row is Western-only (TaskRabbit 2017). The
-            <em>urban format</em> row collects six dated openings between 2018 and 2025. The lone
-            Western entry in <em>channel innovation</em> is the IKEA Place AR app (Sep 2017,
-            launched with Apple ARKit). The global Buyback &amp; Resell programme (2020) covers
-            both regimes.
+            <em>Service partnership</em> is Western-only (TaskRabbit 2017). <em>Urban format</em>
+            collects six dated openings between 2018 and 2025. The lone Western entry in
+            <em>channel innovation</em> is the IKEA Place AR app (Sep 2017). The Buyback &amp;
+            Resell programme (2020) is global.
           </p>
-        </section>
-        <section class="step" data-active-index="6">
-          <div class="act-label">Act 3 · East Asia</div>
-          <div class="title">The East Asian response: platforms + price + retreat</div>
-          <p class="takeaway">East Asian IKEA leads on platform integration (5 channel launches) and is alone in price cuts and city-store closures.</p>
-          <p>
-            Same timeline, East-Asian moves highlighted. Five platform launches — Japan online
-            2017, Korea e-commerce 2018, China web 2019, Tmall flagship Mar 2020, JD.com flagship
-            Aug 2025 — make East Asia the channel-innovation leader (not the West, as the abstract
-            originally framed). Two China price-cut events sit in 2024. Five city-store closures
-            (Guiyang 2022, Yangpu 2022, Jing'an 2023, Harajuku &amp; Shinjuku 2026) sit on the
-            bottom row — no Western equivalents.
-          </p>
+          <p class="src">Sources: CNN Business, 9to5Mac (IKEA Place), IKEA UK / US / Austria newsrooms, Ingka Group.</p>
         </section>
 
-        <!-- ===== Act 4: Why East Asia Is Different ===== -->
+        <!-- ===== 6  Act 3 · East Asia ===== -->
+        <section class="step" data-active-index="6">
+          <div class="act-label">Act 3 · East Asian response</div>
+          <div class="title">Platforms + price + retreat</div>
+          <p class="takeaway">East response: 5 platform launches; the only regime with price cuts and closures.</p>
+          <p>
+            Five East-Asian platform launches — Japan online 2017, Korea e-commerce 2018, China
+            web 2019, Tmall flagship Mar 2020, JD.com flagship Aug 2025 — make East Asia the
+            channel-innovation leader, contrary to the abstract's original framing. Two China
+            price-cut events sit in 2024; five city-store closures sit on the bottom row with no
+            Western equivalents.
+          </p>
+          <p class="src">Sources: Inside Retail Asia, The Investor, ChinaDaily, IKEA China JD.com flagship coverage, Yicai Global, Lifeweek.</p>
+        </section>
+
+        <!-- ===== 7  Act 4 · East Asia (no stat cards — numbers inline) ===== -->
         <section class="step" data-active-index="7">
           <div class="act-label">Act 4 · East Asia</div>
           <div class="title">Why the East defends</div>
-          <p class="takeaway">East Asian markets glow warm: dense cities, weak DIY culture, strong service expectations, mature local manufacturing, and strong domestic competitors.</p>
-          <div class="stat-cards">
-            <div class="stat-card stat-east">
-              <div class="stat-value">¥929B</div>
-              <div class="stat-label">Nitori FY2025 net sales</div>
-              <div class="stat-source">Japan furniture leader; <a href="https://www.nitorihd.co.jp/en/ir/" target="_blank" rel="noopener">Nitori IR</a></div>
-            </div>
-            <div class="stat-card stat-east">
-              <div class="stat-value">₩1.97T</div>
-              <div class="stat-label">Hanssem 2023 sales</div>
-              <div class="stat-source">~25% of Korean interior market; <a href="https://www.statista.com/statistics/799503/south-korea-hanssem-sales-revenue/" target="_blank" rel="noopener">Statista</a></div>
-            </div>
-            <div class="stat-card stat-ikea">
-              <div class="stat-value">−30%</div>
-              <div class="stat-label">IKEA China FY24 vs 2019 peak</div>
-              <div class="stat-source">RMB 11.15B vs RMB 15.77B; <a href="https://www.concall.com/article/detail/article_id/4653" target="_blank" rel="noopener">ConCall</a></div>
-            </div>
-          </div>
+          <p class="takeaway">East Asia glows warm: dense cities, weak DIY culture, strong local competition.</p>
+          <p>
+            The matrix on the right shows IKEA running into structural headwinds in every East
+            Asian market. The competitive consequence is concrete:
+            <strong>Nitori</strong> posted <strong>¥929 billion</strong> in FY2025 net sales (≈USD 6B,
+            roughly half the Japanese furniture segment); <strong>Hanssem</strong> recorded
+            <strong>₩1.97 trillion</strong> in 2023 with about a 25% share of Korean interior
+            furniture; meanwhile <strong>IKEA China FY24 revenue fell to RMB 11.15 billion —
+            roughly 30% below its 2019 peak</strong>, and China has slipped from IKEA's
+            5th-largest market to its 10th.
+          </p>
+          <p class="src">Sources: Nitori IR; Statista on Hanssem; ConCall analysis of IKEA financials; Lifeweek and 21st Century Business Herald on China pricing.</p>
         </section>
+
+        <!-- ===== 8  Act 4 · West ===== -->
         <section class="step" data-active-index="8">
           <div class="act-label">Act 4 · West</div>
           <div class="title">Why the West expands</div>
-          <p class="takeaway">Western markets glow cool: stronger DIY culture, higher car ownership, lower density and less competitive pressure — the original model still fits.</p>
+          <p class="takeaway">West glows cool: the conditions that made the original model work are still in place.</p>
           <p>
-            Same six dimensions, Western markets. Almost every cell sits in the blue range — the
-            conditions that originally made the suburban big-box model work (strong DIY culture,
-            high car ownership, low urban density, moderate service expectations, weak local
-            manufacturing competition) are still the conditions Western IKEA operates under. That's
-            why the Western response can be additive (new city stores layered on top of the
-            existing network) rather than defensive.
-            <small class="src">Coding anchored in Burt, Johansson &amp; Thelander (2011); Burt, Dawson, Johansson &amp; Hultman (2020); Ivarsson &amp; Alvstam (2010). Cell-level evidence in <code>data/processed/retail_ecology.csv</code> (<code>primary_sources</code> column).</small>
+            Same six dimensions, Western markets. Almost every cell sits in the blue range —
+            strong DIY culture, high car ownership, low urban density, moderate service
+            expectations, weak local manufacturing competition. The original model still fits, so
+            the Western response can be additive (new city stores on top of the existing network)
+            rather than defensive.
           </p>
+          <p class="src">Coding anchored in Burt, Johansson &amp; Thelander (2011); Burt, Dawson, Johansson &amp; Hultman (2020); Ivarsson &amp; Alvstam (2010).</p>
         </section>
 
-        <!-- ===== Coda: Two playbooks ===== -->
-        <section class="step" data-active-index="9" data-layout="full-viz">
-          <div class="act-label">Coda</div>
+        <!-- ===== 9  Coda · Scorecard (full-text, no viz) ===== -->
+        <section class="step" data-active-index="9" data-layout="full-text">
+          <div class="act-label">Coda · Quantitative scorecard</div>
+          <div class="title">Did the two responses actually work?</div>
+          <p class="takeaway">West: city stores 90% retained, revenue stable. East: half the city stores closed, China revenue −30%.</p>
+
+          <table class="scorecard">
+            <thead>
+              <tr>
+                <th>Outcome (2014–2026)</th>
+                <th class="col-west">Western IKEA</th>
+                <th class="col-east">East Asian IKEA</th>
+                <th>Verdict</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>City-format store retention</td>
+                <td class="col-west">90% (9 of 10 still open)</td>
+                <td class="col-east">50% (3 of 6 still open)</td>
+                <td><span class="verdict west">West +40pp</span></td>
+              </tr>
+              <tr>
+                <td>Channel-innovation launches</td>
+                <td class="col-west">1 (Place AR, 2017)</td>
+                <td class="col-east">5 dated platform launches</td>
+                <td><span class="verdict east">East 5×</span></td>
+              </tr>
+              <tr>
+                <td>Strategic closures</td>
+                <td class="col-west">0</td>
+                <td class="col-east">5 (incl. 3 city-format)</td>
+                <td><span class="verdict east-loss">East alone</span></td>
+              </tr>
+              <tr>
+                <td>Major price-cut investments</td>
+                <td class="col-west">— (global FY24 EUR 2.1B both)</td>
+                <td class="col-east">China cuts Mar 2024 + global</td>
+                <td><span class="verdict both">Both</span></td>
+              </tr>
+              <tr>
+                <td>Revenue trajectory</td>
+                <td class="col-west">Stable / mild global decline</td>
+                <td class="col-east">China −30% vs 2019 peak</td>
+                <td><span class="verdict east-loss">East defensive</span></td>
+              </tr>
+              <tr>
+                <td>Global ranking of market</td>
+                <td class="col-west">No major rank change</td>
+                <td class="col-east">China #5 → #10 by sales</td>
+                <td><span class="verdict east-loss">East declining</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <p class="src">Sources: store counts derived from the project store dataset; revenue figures from ConCall analysis of IKEA financials, Inter IKEA Yearly Summary FY24, Nitori IR, Statista.</p>
+        </section>
+
+        <!-- ===== 10  Coda · Playbook ===== -->
+        <section class="step" data-active-index="10">
+          <div class="act-label">Coda · Playbook</div>
           <div class="title">Two playbooks, side by side</div>
-          <p class="takeaway">Same 8 strategic priorities, almost opposite ranking. Urban-format stores fall from West rank 1 to East rank 7. Price defense and channel innovation flip the other way.</p>
+          <p class="takeaway">Same 8 priorities, near-opposite ranking. Urban-format flips West #1 → East #7.</p>
+          <p>
+            Read the slope chart on the right against the scorecard you just saw. Where the
+            Western playbook ranks high (urban-format stores, service partnerships, resale), the
+            data shows it <em>worked</em>. Where the East-Asian playbook ranks high (channel
+            innovation, price cuts), the data shows it is <em>holding the line, not winning</em>.
+          </p>
           <p>
             Three takeaways. <strong>(1)</strong> Same global brand, same housing pressure, very
-            different responses. <strong>(2)</strong> The framing "West innovates on channel, East
-            defends on price" is too clean — East Asia has actually <em>led</em> on platform
-            integration while also cutting prices. <strong>(3)</strong> The East-Asian retreat
-            from city format (Jing'an 2023, Harajuku &amp; Shinjuku 2026) is the part of the story
-            that wasn't visible from outside until the data made it concrete.
+            different responses. <strong>(2)</strong> The framing "West innovates on channel,
+            East defends on price" is too clean — East Asia has actually <em>led</em> on platform
+            integration. <strong>(3)</strong> The East-Asian retreat from city format (Jing'an
+            2023, Harajuku &amp; Shinjuku 2026) is the part of the story that wasn't visible from
+            outside until the data made it concrete.
           </p>
+          <p class="src">Intensity scores 1–5 coded by the team, anchored in the verified events behind each row.</p>
         </section>
 
-        <!-- ===== About authors (full-text) ===== -->
-        <section class="step author-section" data-active-index="10" data-layout="full-text">
+        <!-- ===== 11  About authors ===== -->
+        <section class="step author-section" data-active-index="11" data-layout="full-text">
           <div class="title">About the authors</div>
           <div class="authors">
             <div class="author">
               <div class="author-name">Pengcheng Lu</div>
-              <div class="author-bio">MSIM, University of Washington Information School. Data engineering and analysis lead for this project.</div>
+              <div class="author-bio">MSIM, University of Washington Information School. Data engineering and analysis lead.</div>
             </div>
             <div class="author">
               <div class="author-name">Samantha Wang</div>
@@ -184,59 +246,41 @@
           </div>
           <p class="paper-footer-note">
             IMT 561 Data Visualization: Design and Development (Spring 2026), Information School,
-            University of Washington. The data and visualizations compare patterns across markets
-            rather than prove a causal model. Full provenance in
-            <code>data/AUDIT.md</code>, <code>data/PIPELINE.md</code>, <code>data/STORY_AUDIT.md</code>,
-            <code>data/VIZ_AUDIT.md</code> and <code>data/VIZ_AUDIT_v2.md</code>.
+            University of Washington. Full provenance in the project's data audit documents.
           </p>
         </section>
 
       </div>
 
-      <!-- p5 canvas mount (most sections) -->
+      <!-- p5 canvas (most sections) -->
       <div id='vis' class='vis-hidden'></div>
 
-      <!-- Leaflet stage (only Act 1 sections; sketch_renderer toggles visibility) -->
+      <!-- Leaflet stage (Act 1 only) — three region maps in 2×2 grid -->
       <div id='leaflet-stage' style='display:none'>
         <div class='leaflet-toolbar'>
           <span class='leaflet-year-label'>Year</span>
           <span id='map-year-readout'>1958</span>
+          <span id='map-stats'></span>
         </div>
-        <div class='leaflet-row'>
-          <div class='leaflet-cell'>
-            <div id='map-na' class='region-map'></div>
-            <div class='leaflet-count' id='map-count-na'>0 stores</div>
-          </div>
-          <div class='leaflet-cell'>
-            <div id='map-eu' class='region-map'></div>
-            <div class='leaflet-count' id='map-count-eu'>0 stores</div>
-          </div>
-          <div class='leaflet-cell'>
-            <div id='map-ea' class='region-map'></div>
-            <div class='leaflet-count' id='map-count-ea'>0 stores</div>
-          </div>
-        </div>
+        <div id='map-na' class='region-map'></div>
+        <div id='map-eu' class='region-map'></div>
+        <div id='map-ea' class='region-map'></div>
       </div>
 
       <div id="extra-space"></div>
     </div>
   </div>
 
-
-  <!-- p5.js (using CDN) -->
+  <!-- p5.js -->
   <script src="https://cdn.jsdelivr.net/npm/p5@1.6.0/lib/p5.min.js"></script>
-  <!-- helpers (data/loading, scroller, visual controller) -->
+  <!-- helpers -->
   <script src="js/helpers/data_loader.js"></script>
+  <script src="js/helpers/tooltip.js"></script>
   <script src="js/helpers/scroller.js"></script>
   <script src="js/helpers/visual_controller.js"></script>
-
-  <!-- orchestrator (wires scroller -> sketch) -->
   <script src="js/helpers/sections.js"></script>
-
-  <!-- sketches (manager) -->
+  <!-- sketches -->
   <script src="js/sketches/sketch_manager.js"></script>
-
-  <!-- Two IKEAs visualization renderers -->
   <script src="js/sketches/viz/viz_map.js"></script>
   <script src="js/sketches/viz/viz_response.js"></script>
   <script src="js/sketches/viz/viz_timeline.js"></script>
