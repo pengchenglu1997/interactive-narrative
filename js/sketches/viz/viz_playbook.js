@@ -1,7 +1,13 @@
 // viz_playbook.js — Two IKEAs viz 5: Side-by-side slope chart of priorities
 // 8 strategic priorities, each appears in West column and East column at its rank;
-// lines connect same item across columns, colored by which side weighs it more.
+// bezier lines connect same items, colored by which side weighs it more, thickness
+// by the size of the priority flip.
+//
+// Styled to match the typography and palette of viz_response/timeline/ecology.
 (function () {
+    var REGIME_WEST = '#2A6FB0';
+    var REGIME_EAST = '#C8412C';
+
     window.VizPlaybook = {
         draw: function (p, manager, ai, progress) {
             var items = (manager.data && manager.data.playbook) || [];
@@ -20,8 +26,10 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerT = 64, innerB = 24;
-            var rowH = (H - innerT - innerB) / items.length;
+            // Layout
+            var innerT = 86, innerB = 30;
+            var contentH = H - innerT - innerB;
+            var rowH = contentH / items.length;
 
             // Ranked order in each column
             var westRanked = items.slice().sort(function (a, b) { return b.west_intensity - a.west_intensity; });
@@ -30,36 +38,47 @@
             westRanked.forEach(function (it, i) { westPos[it.priority_key] = i; });
             eastRanked.forEach(function (it, i) { eastPos[it.priority_key] = i; });
 
-            var leftX = W * 0.32;
-            var rightX = W * 0.68;
+            var leftX = W * 0.30;
+            var rightX = W * 0.70;
             var midGap = rightX - leftX;
 
-            // Column headers
-            p.noStroke(); p.textStyle(p.BOLD); p.textSize(14);
-            p.fill('#2A6FB0'); p.textAlign(p.RIGHT, p.BOTTOM);
-            p.text('WESTERN IKEA', leftX - 14, innerT - 22);
-            p.fill('#C8412C'); p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('EAST ASIAN IKEA', rightX + 14, innerT - 22);
-            p.textStyle(p.NORMAL); p.fill('#666'); p.textSize(10);
+            // Section title
+            p.noStroke();
+            p.fill('#1a1a1a'); p.textStyle(p.BOLD); p.textSize(13);
+            p.textAlign(p.LEFT, p.BOTTOM);
+            p.text('TWO IKEAS — PLAYBOOK PRIORITIES SIDE BY SIDE', 20, innerT - 56);
+
+            // Subtitle
+            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            p.text('Each item appears in both columns at its rank in that regime. Steep lines = rank flips.', 20, innerT - 40);
+
+            // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
+            p.textStyle(p.BOLD); p.textSize(14);
+            p.fill(REGIME_WEST); p.textAlign(p.RIGHT, p.BOTTOM);
+            p.text('WESTERN IKEA', leftX - 18, innerT - 16);
+            p.fill(REGIME_EAST); p.textAlign(p.LEFT, p.BOTTOM);
+            p.text('EAST ASIAN IKEA', rightX + 18, innerT - 16);
+
+            p.textStyle(p.NORMAL); p.fill('#888'); p.textSize(10);
             p.textAlign(p.RIGHT, p.TOP);
-            p.text('top = highest priority ↓', leftX - 14, innerT - 18);
+            p.text('top = highest priority', leftX - 18, innerT - 12);
             p.textAlign(p.LEFT, p.TOP);
-            p.text('top = highest priority ↓', rightX + 14, innerT - 18);
+            p.text('top = highest priority', rightX + 18, innerT - 12);
 
             function yFor(idx) { return innerT + idx * rowH + rowH / 2; }
-            function radius(v) { return 6 + v * 2.5; }
+            function radius(v) { return 8 + v * 3; }
 
-            // Lines first
+            // Connector lines (draw first so nodes overlay)
             items.forEach(function (it) {
                 var yL = yFor(westPos[it.priority_key]);
                 var yR = yFor(eastPos[it.priority_key]);
                 var diff = it.west_intensity - it.east_intensity;
                 var strokeCol;
-                if (Math.abs(diff) <= 0.5) strokeCol = p.color(180, 180, 180, 180);
-                else if (diff > 0) strokeCol = p.color('#2A6FB0CC');
-                else strokeCol = p.color('#C8412CCC');
+                if (Math.abs(diff) <= 0.5) strokeCol = p.color(180, 180, 180, 170);
+                else if (diff > 0) strokeCol = p.color(REGIME_WEST + 'CC');
+                else strokeCol = p.color(REGIME_EAST + 'CC');
                 p.stroke(strokeCol);
-                p.strokeWeight(1.5 + Math.abs(diff));
+                p.strokeWeight(2 + Math.abs(diff));
                 p.noFill();
                 p.beginShape();
                 p.vertex(leftX, yL);
@@ -76,26 +95,32 @@
                 var yL = yFor(westPos[it.priority_key]);
                 var yR = yFor(eastPos[it.priority_key]);
 
-                // Left node
-                p.noStroke(); p.fill('#2A6FB0');
+                // West node
+                p.noStroke(); p.fill(REGIME_WEST);
                 var rL = radius(it.west_intensity);
                 p.ellipse(leftX, yL, rL, rL);
-                p.fill('#1a1a1a'); p.textSize(11); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
                 p.text(it.priority_label, leftX - rL - 6, yL);
-                p.fill('#999'); p.textSize(9); p.textStyle(p.NORMAL);
-                p.text('intensity ' + it.west_intensity, leftX - rL - 6, yL + 12);
+                p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
+                p.text('intensity ' + it.west_intensity + '/5', leftX - rL - 6, yL + 12);
 
-                // Right node
-                p.fill('#C8412C');
+                // East node
+                p.noStroke(); p.fill(REGIME_EAST);
                 var rR = radius(it.east_intensity);
                 p.ellipse(rightX, yR, rR, rR);
-                p.fill('#1a1a1a'); p.textSize(11); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(it.priority_label, rightX + rR + 6, yR);
-                p.fill('#999'); p.textSize(9); p.textStyle(p.NORMAL);
-                p.text('intensity ' + it.east_intensity, rightX + rR + 6, yR + 12);
+                p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
+                p.text('intensity ' + it.east_intensity + '/5', rightX + rR + 6, yR + 12);
             });
+
+            // Legend (bottom)
+            p.noStroke(); p.textSize(10); p.fill('#666');
+            p.textAlign(p.CENTER, p.TOP);
+            p.text('Line color: blue → Western priority higher · red → East-Asian priority higher · gray → ≈ equal · thickness = magnitude of flip',
+                W / 2, H - 22);
 
             p.pop();
         }
