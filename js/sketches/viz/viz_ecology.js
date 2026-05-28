@@ -6,11 +6,11 @@
 (function () {
     var dims = [
         { key: 'diy_culture',         label: 'DIY culture' },
-        { key: 'car_dependence',      label: 'Car dependence' },
-        { key: 'urban_density',       label: 'Urban density' },
-        { key: 'service_expectation', label: 'Service expect.' },
+        { key: 'car_dependence',      label: 'Car deps.' },
+        { key: 'urban_density',       label: 'Density' },
+        { key: 'service_expectation', label: 'Service exp.' },
         { key: 'local_manufacturing', label: 'Local mfg.' },
-        { key: 'domestic_competition',label: 'Domestic comp.' },
+        { key: 'domestic_competition',label: 'Local comp.' },
     ];
 
     var challengeMap = {
@@ -62,7 +62,7 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerL = 130, innerR = 14, innerT = 96, innerB = 52;
+            var innerL = 130, innerR = 14, innerT = 78, innerB = 52;
             var cellW = (W - innerL - innerR) / dims.length;
             var rowH = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
 
@@ -87,17 +87,16 @@
                     : 'Cell color = challenge to IKEA\'s original model';
             p.text(subtitle, innerL, innerT - 40);
 
-            // Column headers (rotated)
+            // Column headers (horizontal, single line — was rotated -30°
+            // which extended ~55px upward and overlapped the subtitle)
+            p.noStroke(); p.fill('#1a1a1a'); p.textSize(10.5);
+            p.textStyle(p.BOLD);
+            p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
                 var x = innerL + j * cellW + cellW / 2;
-                p.push();
-                p.translate(x, innerT - 6);
-                p.rotate(-p.PI / 6);
-                p.noStroke(); p.fill('#1a1a1a'); p.textSize(11);
-                p.textAlign(p.LEFT, p.BOTTOM);
-                p.text(d.label, 0, 0);
-                p.pop();
+                p.text(d.label, x, innerT - 8);
             });
+            p.textStyle(p.NORMAL);
 
             // Convert canvas mouse → translated sketch coords
             var mx = p.mouseX - padL;

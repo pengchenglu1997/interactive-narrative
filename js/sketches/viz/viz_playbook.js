@@ -38,8 +38,11 @@
             westRanked.forEach(function (it, i) { westPos[it.priority_key] = i; });
             eastRanked.forEach(function (it, i) { eastPos[it.priority_key] = i; });
 
-            var leftX = W * 0.30;
-            var rightX = W * 0.70;
+            // Anchors pulled inward (0.30 → 0.34 left, 0.70 → 0.66 right) so
+            // the priority labels on both columns have room without overflowing
+            // the canvas right edge.
+            var leftX = W * 0.34;
+            var rightX = W * 0.66;
             var midGap = rightX - leftX;
 
             // Section title
@@ -48,9 +51,9 @@
             p.textAlign(p.LEFT, p.BOTTOM);
             p.text('TWO IKEAS — PLAYBOOK PRIORITIES SIDE BY SIDE', 20, innerT - 56);
 
-            // Subtitle
+            // Subtitle (single line; algorithm note moved to the footer)
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
-            p.text('Each item appears in both columns at its rank in that regime. Steep lines = rank flips.', 20, innerT - 40);
+            p.text('Each item appears in both columns at its rank in that regime. Steep lines = rank flips.', 20, innerT - 38);
 
             // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
             p.textStyle(p.BOLD); p.textSize(14);
@@ -135,11 +138,14 @@
                 }
             });
 
-            // Legend (bottom)
+            // Legend + algorithm note (bottom)
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.CENTER, p.TOP);
             p.text('Line color: blue → Western priority higher · red → East-Asian priority higher · gray → ≈ equal · thickness = magnitude of flip',
-                W / 2, H - 22);
+                W / 2, H - 28);
+            p.fill('#999'); p.textSize(9);
+            p.text('Intensities computed from strategic_events.csv + documented external signals (data/PLAYBOOK_COMPUTATION.md)',
+                W / 2, H - 14);
 
             p.pop();
 

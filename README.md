@@ -95,9 +95,13 @@ the pipeline:
   Statista, McKinsey, IKEA Japan/Korea/China newsroom, Yicai Global, ConCall
   analysis, etc.). Every row carries `source_url` and `fetch_date` so any
   reader can re-verify.
-- **Qualitative codings** (retail ecology cells, playbook intensity scores) are
-  team judgments anchored in cited research (Burt 2011/2020; Ivarsson 2010) and
-  explicitly flagged as interpretive in the audit documents.
+- **Retail ecology cells** are qualitative team coding anchored in cited
+  research (Burt 2011/2020; Ivarsson 2010) and explicitly flagged as interpretive
+  in the audit documents.
+- **Playbook intensities** (viz 5) are *algorithmically computed* from
+  `strategic_events.csv` + `playbook_external_signals.csv` via
+  `scripts/compute_playbook_intensities.mjs`. Full per-cell math in
+  `data/PLAYBOOK_COMPUTATION.md`.
 
 The full audit trail lives in `data/AUDIT.md`, `data/PIPELINE.md`,
 `data/STORY_AUDIT.md`, `data/VIZ_AUDIT.md`, and `data/VIZ_AUDIT_v2.md`.

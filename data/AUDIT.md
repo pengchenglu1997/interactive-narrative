@@ -331,11 +331,11 @@ None — hand-coded matrix.
 
 ### Sources
 
-8 strategic priorities × 2 regimes = 16 intensity scores plus 16 evidence cells. **All 16 evidence cells cite verified events from `strategic_events.csv`** (TaskRabbit 2017, Buyback 2020, Shanghai Jing'an 2023 closure, Tokyo closures 2026, Korea price cuts 2024, etc.). The intensity scores (1–5) are the team's coding.
+8 strategic priorities × 2 regimes = 16 intensity scores plus 16 evidence cells. **All 16 evidence cells cite verified events from `strategic_events.csv`** (TaskRabbit 2017, Buyback 2020, Shanghai Jing'an 2023 closure, Tokyo closures 2026, Korea price cuts 2024, etc.). The intensity scores (1–5) are **now algorithmically computed** from `strategic_events.csv` + `playbook_external_signals.csv` via `scripts/compute_playbook_intensities.mjs` (was hand-coded through v7). Full math log in `data/PLAYBOOK_COMPUTATION.md`.
 
 ### Cleaning steps
 
-- Manual coding by team.
+- `scripts/compute_playbook_intensities.mjs` recomputes the CSV. Re-run it after any edit to events or external signals.
 - `west_intensity`, `east_intensity` coerced to float in `data_loader.js`.
 
 ### Usage in viz code
@@ -372,7 +372,7 @@ None — hand-coded matrix.
 | 5 | 14 stores in `ikea_stores.csv` are approximate (Tier C); coordinates are city-center | ⏳ **DEFERRED** — verified opening dates pushed Tier C count down from ~14 to ~7; coordinates still city-center for big-box stores |
 | 6 | 8 strategic events in `strategic_events.csv` have generic URLs | ✅ **RESOLVED** — all events now have dated press-release URLs |
 | 7 | 60 cells in `retail_ecology.csv` lack per-cell justification | ⚠️ **PARTIAL** — added `primary_sources` column citing specific paper/article per row; per-cell justification still pending |
-| 8 | `playbook_priorities.csv` intensity scoring rubric isn't documented in the article | ⏳ **DEFERRED** — viz 5 caption to be updated in next pass |
+| 8 | `playbook_priorities.csv` intensity scoring rubric isn't documented in the article | ✅ **RESOLVED** — intensities are now algorithmically computed (`scripts/compute_playbook_intensities.mjs`); full per-cell math in `data/PLAYBOOK_COMPUTATION.md`; viz 5 footer cites it |
 
 ---
 
