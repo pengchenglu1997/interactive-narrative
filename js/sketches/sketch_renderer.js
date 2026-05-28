@@ -1,26 +1,44 @@
 // sketch_renderer.js
-// Two IKEAs project renderer. Loads the 6 CSVs into manager.data, then
-// dispatches drawing to the correct viz module based on data-active-index.
+// Two IKEAs renderer. Dispatches to per-section viz modules and passes a
+// per-section configuration (e.g. regime filter) via manager.state.vizConfig.
 //
-// Section index → visualization mapping (mirrors data-active-index in index.html):
-//   0    Hero / title         — no viz drawn (full-text)
-//   1, 2 Act 1: One IKEA      → VizMap (year animates via scroll progress)
-//   3, 4 Act 2: Housing shift → VizResponse (PTI × IKEA response)
-//   5, 6 Act 3: Two adaptations → VizTimeline (Gantt of strategic events)
-//   7, 8 Act 4: Why East diff → VizEcology (retail ecology matrix)
-//   9    Coda: Two playbooks  → VizPlaybook (slope chart)
-//   10   About authors        — no viz (full-text)
+// Section index → viz + config (mirrors data-active-index in index.html):
+//   0    Hero / title              — no viz (full-text)
+//   1, 2 Act 1: One IKEA, six decades → Leaflet 3-region map (auto-play)
+//   3    Act 2: East Asian housing pressure  → VizResponse  {regime: "east_asia"}
+//   4    Act 2: Western response              → VizResponse  {regime: "western"}
+//   5    Act 3: Western adaptation            → VizTimeline  {regime: "western"}
+//   6    Act 3: East Asian adaptation         → VizTimeline  {regime: "east_asia"}
+//   7    Act 4: East Asian ecology            → VizEcology   {regime: "east_asia"}
+//   8    Act 4: Western ecology               → VizEcology   {regime: "western"}
+//   9    Coda: Two playbooks                  → VizPlaybook
+//   10   About authors                        — no viz (full-text)
 
 (function () {
+    // Map activeIndex → { viz, config }
+    var ROUTING = {
+        1: { viz: 'map' },
+        2: { viz: 'map' },
+        3: { viz: 'response', config: { regime: 'east_asia' } },
+        4: { viz: 'response', config: { regime: 'western'  } },
+        5: { viz: 'timeline', config: { regime: 'western'  } },
+        6: { viz: 'timeline', config: { regime: 'east_asia' } },
+        7: { viz: 'ecology',  config: { regime: 'east_asia' } },
+        8: { viz: 'ecology',  config: { regime: 'western'  } },
+        9: { viz: 'playbook' },
+    };
+
     window.Renderer = {
 
         setData: function (manager) {
             manager.offsetX = (manager.margin && manager.margin.left) || 20;
             manager.offsetY = (manager.margin && manager.margin.top) || 0;
             manager.data = { stores: [], housing: [], events: [], competitors: [], ecology: [], playbook: [] };
+            if (!manager.state) manager.state = {};
+            manager.state.vizConfig = {};
 
             if (!window.DataLoader || !window.DataLoader.loadTwoIKEAsData) {
-                console.warn('Renderer: DataLoader.loadTwoIKEAsData missing — viz will show "Loading…" forever');
+                console.warn('Renderer: DataLoader.loadTwoIKEAsData missing');
                 return Promise.resolve(manager.data);
             }
             return window.DataLoader.loadTwoIKEAsData().then(function (data) {
@@ -39,33 +57,41 @@
         },
 
         draw: function (p, manager, ai, progress) {
-            // Full-text sections — leave canvas blank
-            if (ai === 0 || ai === 10) return;
+            // Pull routing for this active index
+            var route = ROUTING[ai];
 
-            // Act 1 — map
-            if (ai === 1 || ai === 2) {
-                if (window.VizMap) window.VizMap.draw(p, manager, ai, progress);
-                return;
+            // Manage Leaflet stage visibility (Act 1 only)
+            var isMapSection = !!(route && route.viz === 'map');
+            if (!isMapSection && window.VizMap && window.VizMap.deactivate) {
+                window.VizMap.deactivate();
             }
-            // Act 2 — PTI x response
-            if (ai === 3 || ai === 4) {
-                if (window.VizResponse) window.VizResponse.draw(p, manager, ai, progress);
-                return;
+
+            // Pass per-section config to viz
+            if (route && route.config) {
+                manager.state.vizConfig = route.config;
+            } else {
+                manager.state.vizConfig = {};
             }
-            // Act 3 — strategic timeline
-            if (ai === 5 || ai === 6) {
-                if (window.VizTimeline) window.VizTimeline.draw(p, manager, ai, progress);
-                return;
-            }
-            // Act 4 — retail ecology matrix
-            if (ai === 7 || ai === 8) {
-                if (window.VizEcology) window.VizEcology.draw(p, manager, ai, progress);
-                return;
-            }
-            // Coda — playbook slope chart
-            if (ai === 9) {
-                if (window.VizPlaybook) window.VizPlaybook.draw(p, manager, ai, progress);
-                return;
+
+            // Full-text sections — leave canvas blank
+            if (!route) return;
+
+            switch (route.viz) {
+                case 'map':
+                    if (window.VizMap) window.VizMap.draw(p, manager, ai, progress);
+                    return;
+                case 'response':
+                    if (window.VizResponse) window.VizResponse.draw(p, manager, ai, progress);
+                    return;
+                case 'timeline':
+                    if (window.VizTimeline) window.VizTimeline.draw(p, manager, ai, progress);
+                    return;
+                case 'ecology':
+                    if (window.VizEcology) window.VizEcology.draw(p, manager, ai, progress);
+                    return;
+                case 'playbook':
+                    if (window.VizPlaybook) window.VizPlaybook.draw(p, manager, ai, progress);
+                    return;
             }
         }
     };
