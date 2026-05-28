@@ -1,0 +1,13 @@
+market,competitor_name,competitor_type,year,indicator_type,indicator_value,short_description,source_url
+Japan,Nitori Holdings,furniture_retailer,2025,revenue_yen_billion,929.0,FY ending March 2025 consolidated net sales,https://www.nitorihd.co.jp/en/ir/
+Japan,Nitori Holdings,furniture_retailer,2024,revenue_growth_pct,12.0,FY ending March 2024 revenue growth (~JPY 650B baseline),https://pestel-analysis.com/blogs/growth-strategy/nitori-net
+Japan,Nitori Holdings,furniture_retailer,2024,japan_furniture_market_share_pct,50.0,Estimated share of Japan furniture segment specifically (10.3% of broader retail),https://pestel-analysis.com/blogs/growth-strategy/nitori-net
+Japan,Muji Home,furniture_retailer,2024,price_positioning,above_ikea,Design-led competitor at higher service level (qualitative coding),https://www.muji.com/
+Japan,Rakuten Furniture,platform,2024,channel_pressure,full_service_delivery,E-commerce platform shaping full-service delivery expectations,https://www.rakuten.co.jp/
+South Korea,Hanssem,furniture_retailer,2023,revenue_krw_trillion,1.97,Net sales 2023 #1 in Korean furniture,https://www.statista.com/statistics/799503/south-korea-hanssem-sales-revenue/
+South Korea,Hanssem,furniture_retailer,2024,korea_interior_market_share_pct,25.0,Dominant share of Korean interior furniture market,https://www.statista.com/statistics/1458924/south-korea-major-furniture-companies-by-revenue/
+South Korea,Nitori Korea,furniture_retailer,2024,market_entry,confirmed_expansion,Nitori expanding into Korea pressuring IKEA on low-price end,https://www.koreaherald.com/
+South Korea,Coupang Home,platform,2024,channel_pressure,same_day_delivery,Same/next-day delivery norm shaping Korean home category expectations,https://www.aboutcoupang.com/
+China,Linshimuye,private_label,2024,channel_type,online_first,Online-first private label growing rapidly via Tmall and JD,https://finance.sina.com.cn/
+China,JD Home,platform,2024,channel_pressure,fast_delivery_one_stop,One-stop home platform combining e-commerce and same-city delivery,https://corporate.jd.com/
+China,Pinduoduo Home,platform,2024,price_positioning,well_below_ikea,Group-buying platform driving aggressive low pricing in home category,https://investor.pddholdings.com/
