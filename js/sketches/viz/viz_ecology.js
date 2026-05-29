@@ -121,14 +121,14 @@
                     : 'RETAIL ECOLOGY MATRIX';
             p.text(title, innerL, innerT - 56);
 
-            // Subtitle — make the causal payload explicit.
-            // Cells = structural friction; right side = what IKEA actually got.
+            // Subtitle — explicit time horizons so the reader knows what
+            // each right-side number is measuring.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
             var subtitle = regimeFilter === 'east_asia'
-                ? 'Sorted by total challenge. Right column = IKEA\'s actual result. Watch the gradient: more friction ↔ more closures.'
+                ? 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018. Watch: more friction ↔ more shuts.'
                 : regimeFilter === 'western'
-                    ? 'Sorted by total challenge. Right column = IKEA\'s actual result. Watch the gradient: low friction ↔ stores stay open.'
-                    : 'Sorted by total challenge. Right columns show the aggregate friction score and IKEA\'s actual presence in each market.';
+                    ? 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018. Watch: low friction ↔ stores stay open.'
+                    : 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018.';
             p.text(subtitle, innerL, innerT - 40);
 
             // Column headers (horizontal, single line — was rotated -30°
@@ -146,9 +146,17 @@
             // directly above it (instead of forcing the reader to decode an
             // inline 'N big · N city · N closed' string against a footer key).
             p.text('CHALLENGE / 24', chalColX + CHAL_COL_W / 2, innerT - 8);
+
+            // Three mutually-exclusive store-state slots. Labels spell out
+            // the time horizon so the reader doesn't have to wonder if the
+            // numbers are deltas or stocks:
+            //   BIG-BOX   = open big-box stores  (snapshot, 2026)
+            //   CITY OPEN = open city-format     (snapshot, 2026)
+            //   CITY SHUT = ever-closed city     (cumulative, since 2018)
+            // A city store is either OPEN or SHUT — no double-counting.
             var slotW = OUTCOME_COL_W / 3;
             p.textSize(9);
-            ['BIG-BOX', 'CITY', 'CLOSED'].forEach(function (lab, k) {
+            ['BIG-BOX', 'CITY OPEN', 'CITY SHUT'].forEach(function (lab, k) {
                 var sx = outcomeColX + k * slotW + slotW / 2;
                 p.fill(k === 2 ? '#C57F00' : '#0058AB');
                 p.text(lab, sx, innerT - 8);
