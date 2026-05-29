@@ -28,18 +28,20 @@
 
     function regimeColor(rt) {
         switch ((rt || '').toLowerCase()) {
-            case 'western': return '#2A6FB0';
-            case 'east_asia': return '#C8412C';
-            case 'origin': return '#FFDB00';
-            default: return '#888';
+            case 'western':   return '#0058AB';   // IKEA blue
+            case 'east_asia': return '#FBD914';   // IKEA yellow
+            case 'origin':    return '#1a1a1a';   // neutral anchor (was yellow — clashed with East)
+            default:          return '#888';
         }
     }
 
     function formatHTML(format, color, dim) {
         var op = dim ? 0.32 : 0.95;
         var sz = 14;
+        // Yellow markers need a dark IKEA-blue border to stay legible on the light basemap.
+        var bord = (color === '#FBD914') ? '1.5px solid #0058AB' : '1.5px solid #fff';
         var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:' + op +
-            ';background:' + color + ';border:1.5px solid #fff;box-shadow:0 0 1px rgba(0,0,0,0.5)';
+            ';background:' + color + ';border:' + bord + ';box-shadow:0 0 1px rgba(0,0,0,0.4)';
         switch (format) {
             case 'big-box': return '<div style="' + base + '"></div>';
             case 'city_store': return '<div style="' + base + ';border-radius:50%"></div>';

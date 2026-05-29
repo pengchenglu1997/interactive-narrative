@@ -4,12 +4,28 @@
    ========================================================= */
 
 :root {
-  --ikea-blue: #0058AB;
-  --ikea-blue-soft: #2A6FB0;
-  --ikea-yellow: #FFDB00;
-  --regime-east: #C8412C;
-  --regime-east-soft: #fdf5f3;
+  /* IKEA brand identity — blue + yellow only */
+  --ikea-blue:        #0058AB;
+  --ikea-blue-dark:   #003c75;
+  --ikea-blue-soft:   #2A6FB0;
+  --ikea-yellow:      #FBD914;          /* refined brand yellow */
+  --ikea-amber:       #C9A800;          /* readable yellow for text */
+  --ikea-yellow-soft: #fff5b2;
+
+  /* Regime identity — both regimes are IKEA brand colors */
+  --regime-west:      var(--ikea-blue);
+  --regime-east:      var(--ikea-yellow);
+  --regime-east-text: var(--ikea-amber);
+  --regime-both:      #1a1a1a;
+  --regime-east-soft: #fef9d6;
   --regime-west-soft: #f3f7fc;
+
+  /* Ecology heatmap — cool blue = fits the model, warm yellow = challenges it */
+  --eco-1: #e6eef6;
+  --eco-2: #b9d0e6;
+  --eco-3: #f8e288;
+  --eco-4: var(--ikea-yellow);
+
   --warn: #C57F00;
   --ink: #1a1a1a;
   --ink-soft: #333;

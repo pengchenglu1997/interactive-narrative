@@ -18,11 +18,16 @@
 
     function regimeFill(ev, dimmed) {
         var base;
-        if (ev.regime_type === 'east_asia') base = '#C8412C';
-        else if (ev.regime_type === 'western') base = '#2A6FB0';
-        else if (ev.regime_type === 'both') base = '#E0A800';
+        if (ev.regime_type === 'east_asia') base = '#FBD914';      // IKEA yellow
+        else if (ev.regime_type === 'western') base = '#0058AB';   // IKEA blue
+        else if (ev.regime_type === 'both') base = '#1a1a1a';      // neutral (was orange #E0A800)
         else base = '#888';
-        return dimmed ? base + '33' : base;
+        return dimmed ? base + '40' : base;
+    }
+
+    // Tile label: dark ink on yellow, white on blue/black.
+    function tileTextColor(ev) {
+        return ev.regime_type === 'east_asia' ? '#1a1a1a' : '#fff';
     }
 
     function isHighlighted(ev, regimeFilter) {
@@ -70,9 +75,9 @@
                 grouped[k].push(e);
             });
 
-            // Section title
+            // Section title — amber for East (yellow itself is unreadable as text)
             p.noStroke();
-            p.fill(regimeFilter === 'east_asia' ? '#C8412C' : regimeFilter === 'western' ? '#2A6FB0' : '#333');
+            p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(13);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
@@ -124,7 +129,7 @@
                         p.fill(regimeFill(ev, !hi));
                         p.rect(tx, ty, tileW, tileH - 1.5, 2);
                         if (hi) {
-                            p.fill(255);
+                            p.fill(tileTextColor(ev));
                             p.textSize(Math.max(7, Math.min(9, tileH - 4)));
                             p.textAlign(p.LEFT, p.CENTER);
                             var label = ev.event_name || '';
@@ -147,14 +152,14 @@
             var lx = innerL;
             var legendItems = regimeFilter
                 ? [
-                    { c: regimeFilter === 'east_asia' ? '#C8412C' : '#2A6FB0', label: regimeFilter === 'east_asia' ? 'East Asian' : 'Western' },
-                    { c: '#E0A800', label: 'Global / both' },
+                    { c: regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB', label: regimeFilter === 'east_asia' ? 'East Asian' : 'Western' },
+                    { c: '#1a1a1a', label: 'Global / both' },
                     { c: '#cccccc', label: 'Other regime (faded)' },
                 ]
                 : [
-                    { c: '#2A6FB0', label: 'Western' },
-                    { c: '#C8412C', label: 'East Asian' },
-                    { c: '#E0A800', label: 'Global / both' },
+                    { c: '#0058AB', label: 'Western' },
+                    { c: '#FBD914', label: 'East Asian' },
+                    { c: '#1a1a1a', label: 'Global / both' },
                 ];
             legendItems.forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY + 4, 9, 9);

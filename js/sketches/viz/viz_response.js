@@ -7,8 +7,8 @@
 (function () {
     function regimeColor(rt) {
         switch ((rt || '').toLowerCase()) {
-            case 'western': return '#2A6FB0';
-            case 'east_asia': return '#C8412C';
+            case 'western':   return '#0058AB';   // IKEA blue
+            case 'east_asia': return '#FBD914';   // IKEA yellow
             default: return '#888';
         }
     }
@@ -72,9 +72,9 @@
 
             function xPTI(v) { return contentX + (v / maxPTI) * barW; }
 
-            // Section title
+            // Section title — amber for East (raw yellow is unreadable as text)
             p.noStroke();
-            p.fill(regime === 'east_asia' ? '#C8412C' : regime === 'western' ? '#2A6FB0' : '#333');
+            p.fill(regime === 'east_asia' ? '#C9A800' : regime === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(14);
             p.textAlign(p.LEFT, p.BOTTOM);
             p.text(regime === 'east_asia'
@@ -131,19 +131,21 @@
                 var closedCity = cityFormatStores.filter(function (s) { return s.closure_year != null; }).length;
                 var bigBoxCount = cityStores.filter(function (s) { return s.store_format === 'big-box'; }).length;
 
+                // Verdict color: failure/warning stays warm (amber → IKEA on-brand);
+                // success uses IKEA blue.
                 var verdict, verdictColor;
                 if (openCity === 0 && closedCity === 0) {
                     verdict = '✗  No city-format store';
-                    verdictColor = '#C8412C';
+                    verdictColor = '#C9A800';                  // amber
                 } else if (closedCity > 0 && openCity === 0) {
                     verdict = '⚠  ' + closedCity + ' opened, all closed';
-                    verdictColor = '#C8412C';
+                    verdictColor = '#C9A800';
                 } else if (closedCity > 0) {
                     verdict = '⚠  ' + openCity + ' open · ' + closedCity + ' closed';
-                    verdictColor = '#C57F00';
+                    verdictColor = '#C57F00';                  // darker warn for mixed
                 } else {
                     verdict = '✓  ' + openCity + ' city store' + (openCity > 1 ? 's' : '') + ' open';
-                    verdictColor = '#2A6FB0';
+                    verdictColor = '#0058AB';                  // IKEA blue
                 }
                 p.noStroke(); p.fill(verdictColor);
                 p.textSize(13); p.textStyle(p.BOLD);

@@ -5,8 +5,9 @@
 //
 // Styled to match the typography and palette of viz_response/timeline/ecology.
 (function () {
-    var REGIME_WEST = '#2A6FB0';
-    var REGIME_EAST = '#C8412C';
+    var REGIME_WEST = '#0058AB';           // IKEA blue
+    var REGIME_EAST = '#FBD914';           // IKEA yellow (node fills only)
+    var REGIME_EAST_TEXT = '#C9A800';      // amber — readable yellow for text + connectors
 
     window.VizPlaybook = {
         draw: function (p, manager, ai, progress) {
@@ -59,7 +60,7 @@
             p.textStyle(p.BOLD); p.textSize(14);
             p.fill(REGIME_WEST); p.textAlign(p.RIGHT, p.BOTTOM);
             p.text('WESTERN IKEA', leftX - 18, innerT - 16);
-            p.fill(REGIME_EAST); p.textAlign(p.LEFT, p.BOTTOM);
+            p.fill(REGIME_EAST_TEXT); p.textAlign(p.LEFT, p.BOTTOM);
             p.text('EAST ASIAN IKEA', rightX + 18, innerT - 16);
 
             p.textStyle(p.NORMAL); p.fill('#888'); p.textSize(10);
@@ -79,7 +80,7 @@
                 var strokeCol;
                 if (Math.abs(diff) <= 0.5) strokeCol = p.color(180, 180, 180, 170);
                 else if (diff > 0) strokeCol = p.color(REGIME_WEST + 'CC');
-                else strokeCol = p.color(REGIME_EAST + 'CC');
+                else strokeCol = p.color(REGIME_EAST_TEXT + 'CC');   // amber, not raw yellow — readable on white
                 p.stroke(strokeCol);
                 p.strokeWeight(2 + Math.abs(diff));
                 p.noFill();
@@ -115,10 +116,12 @@
                 p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
                 p.text('intensity ' + it.west_intensity + '/5', leftX - rL - 6, yL + 12);
 
-                // East node
-                p.noStroke(); p.fill(REGIME_EAST);
+                // East node — yellow fill needs an IKEA-blue ring for legibility on white
+                p.stroke(REGIME_WEST); p.strokeWeight(1.2);
+                p.fill(REGIME_EAST);
                 var rR = radius(it.east_intensity);
                 p.ellipse(rightX, yR, rR, rR);
+                p.noStroke();
                 p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(it.priority_label, rightX + rR + 6, yR);
@@ -155,7 +158,7 @@
                 var html =
                     '<div class="tt-name">' + it.priority_label + '</div>' +
                     '<div class="tt-row"><b style="color:#9ecfff">West (' + it.west_intensity + '/5)</b> ' + (it.west_evidence || '') + '</div>' +
-                    '<div class="tt-row" style="margin-top:4px"><b style="color:#ff9b80">East (' + it.east_intensity + '/5)</b> ' + (it.east_evidence || '') + '</div>';
+                    '<div class="tt-row" style="margin-top:4px"><b style="color:#FBD914">East (' + it.east_intensity + '/5)</b> ' + (it.east_evidence || '') + '</div>';
                 window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
             } else if (window.VizTooltip) {
                 window.VizTooltip.hide();

@@ -22,17 +22,19 @@
         domestic_competition: { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
     };
 
+    // Heatmap palette: cool IKEA blue tones = condition fits the original model;
+    // warm IKEA yellow tones = condition challenges the model. On-brand bipolar scale.
     function challengeColor(level) {
-        if (level <= 1) return '#cfe2f3';
-        if (level <= 2) return '#a4c2db';
-        if (level <= 3) return '#e69080';
-        return '#C8412C';
+        if (level <= 1) return '#e6eef6';   // pale blue — fits
+        if (level <= 2) return '#b9d0e6';   // blue
+        if (level <= 3) return '#f8e288';   // pale yellow — challenges
+        return '#FBD914';                    // IKEA yellow — very high challenge
     }
 
     function regimeColor(rt) {
         switch ((rt || '').toLowerCase()) {
-            case 'western': return '#2A6FB0';
-            case 'east_asia': return '#C8412C';
+            case 'western':   return '#0058AB';   // IKEA blue
+            case 'east_asia': return '#FBD914';   // IKEA yellow
             default: return '#888';
         }
     }
@@ -66,9 +68,9 @@
             var cellW = (W - innerL - innerR) / dims.length;
             var rowH = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
 
-            // Section title
+            // Section title — amber for East (yellow itself is unreadable as text)
             p.noStroke();
-            p.fill(regimeFilter === 'east_asia' ? '#C8412C' : regimeFilter === 'western' ? '#2A6FB0' : '#333');
+            p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(13);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
@@ -124,7 +126,8 @@
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    p.fill(level >= 3 ? 'white' : '#1a1a1a');
+                    // Dark ink on both blue and yellow cells — readable across the scale.
+                    p.fill('#1a1a1a');
                     p.textSize(10);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
@@ -143,10 +146,10 @@
             p.text("Challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 220;
             [
-                { c: '#cfe2f3', label: 'Low' },
-                { c: '#a4c2db', label: 'Moderate' },
-                { c: '#e69080', label: 'High' },
-                { c: '#C8412C', label: 'Very high' },
+                { c: '#e6eef6', label: 'Low' },
+                { c: '#b9d0e6', label: 'Moderate' },
+                { c: '#f8e288', label: 'High' },
+                { c: '#FBD914', label: 'Very high' },
             ].forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY - 2, 10, 10);
                 p.fill('#333'); p.text(it.label, lx + 14, legY);
