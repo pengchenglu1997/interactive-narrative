@@ -1,102 +1,106 @@
-# Playbook intensity computation log
-Generated: 2026-05-28T15:19:22.895Z
+# Playbook intensity computation log (v2)
+Generated: 2026-05-29T01:12:57.494Z
+Anchor year = 2026, τ = 6 years
 
-## Step 1+2 — Dated events
+## Step 1 — Dated events  (magnitude × time_decay)
 
-| Year | Event | Lane | Regime | Base | Weight | Contribution |
+| Year | Event | Lane | Regime | USD-bn parsed | Decay | Contribution |
 |---|---|---|---|---|---|---|
-| 2014 | Gwangmyeong Korea store opens | big_box | east_asia | 1.00 | 1.40×1.0 | +1.40 |
-| 2016 | CEO urban strategy announcement | strategy_pivot | western | 1.00 | 0.65×0.7 | +0.45 |
-| 2016 | CEO urban strategy announcement | strategy_pivot | east_asia | 1.00 | 0.65×0.7 | +0.45 |
-| 2017 | TaskRabbit acquisition | service_partnership | western | 1.00 | 1.40×1.0 | +1.40 |
-| 2017 | IKEA Place AR app launches | channel_innovation | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2017 | IKEA Japan online shop launches | channel_innovation | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2018 | Tottenham Court Road planning studio opens | urban_format | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2018 | Future of IKEA announcement | strategy_pivot | western | 1.00 | 0.65×1.0 | +0.65 |
-| 2018 | IKEA Korea e-commerce launches | channel_innovation | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2019 | Manhattan Planning Studio opens | urban_format | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2019 | Paris La Madeleine opens | urban_format | western | 1.00 | 1.40×1.0 | +1.40 |
-| 2019 | Greenwich sustainability flagship opens | urban_format | western | 1.00 | 1.25×1.0 | +1.25 |
-| 2019 | IKEA China web shop launches | channel_innovation | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2020 | IKEA China Tmall flagship launches | channel_innovation | east_asia | 1.00 | 1.25×1.0 | +1.25 |
-| 2020 | Shanghai Jing'an city store opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2020 | IKEA Harajuku opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2020 | IKEA Shibuya opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2020 | Buyback and Resell launched | resale_circularity | western | 1.00 | 1.40×0.7 | +0.98 |
-| 2020 | Buyback and Resell launched | resale_circularity | east_asia | 1.00 | 1.40×0.7 | +0.98 |
-| 2021 | IKEA Shinjuku opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2021 | Vienna Westbahnhof car-free store opens | urban_format | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2021 | Taipei Neihu opens replacing Dunbei | urban_format | east_asia | 1.00 | 1.15×1.0 | +1.15 |
-| 2021 | Singapore Jurong opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2022 | IKEA Guiyang closes | (closure→urban_format penalty) | east_asia | 1.00 | 1.15×1.0×-1.2 | -1.38 |
-| 2022 | IKEA Shanghai Yangpu closes | (closure→urban_format penalty) | east_asia | 1.00 | 1.15×1.0×-1.2 | -1.38 |
-| 2022 | Hammersmith London opens | urban_format | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2023 | Shanghai Jing'an closure announced | (closure→urban_format penalty) | east_asia | 1.00 | 1.15×1.0×-1.2 | -1.38 |
-| 2023 | San Francisco Market Street opens | urban_format | western | 1.00 | 1.00×1.0 | +1.00 |
-| 2024 | IKEA Shibuya renewal reopens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2024 | IKEA global price cuts EUR 2.1B | price_cut | western | 1.00 | 1.70×0.7 | +1.19 |
-| 2024 | IKEA global price cuts EUR 2.1B | price_cut | east_asia | 1.00 | 1.70×0.7 | +1.19 |
-| 2024 | China major price cuts March | price_cut | east_asia | 1.00 | 0.65×1.0 | +0.65 |
-| 2024 | Lifeweek price strategy coverage | price_cut | east_asia | 1.00 | 0.65×1.0 | +0.65 |
-| 2024 | IKEA China revenue trough | strategy_pivot | east_asia | 1.00 | 1.70×1.0 | +1.70 |
-| 2025 | Gangdong Seoul opens | urban_format | east_asia | 1.00 | 1.00×1.0 | +1.00 |
-| 2025 | Oxford Street London flagship opens | urban_format | western | 1.00 | 1.25×1.0 | +1.25 |
-| 2025 | IKEA China JD.com flagship launches | channel_innovation | east_asia | 1.00 | 1.25×1.0 | +1.25 |
-| 2025 | IKEA China RMB 6.3B reinvestment | strategy_pivot | east_asia | 1.00 | 1.70×1.0 | +1.70 |
-| 2025 | Tokyo business optimization announcement | strategy_pivot | east_asia | 1.00 | 0.65×1.0 | +0.65 |
-| 2025 | Harajuku and Shinjuku closure announced | (closure→urban_format penalty) | east_asia | 1.00 | 1.15×1.0×-1.2 | -1.38 |
-| 2026 | IKEA Harajuku and Shinjuku close | (closure→urban_format penalty) | east_asia | 1.00 | 1.00×1.0×-1.2 | -1.20 |
+| 2014 | Gwangmyeong Korea store opens | big_box | east_asia | 0.10 | 0.14 | +0.01 |
+| 2016 | CEO urban strategy announcement | strategy_pivot | western | 0.10 | 0.19 | +0.01 |
+| 2016 | CEO urban strategy announcement | strategy_pivot | east_asia | 0.10 | 0.19 | +0.01 |
+| 2017 | TaskRabbit acquisition | service_partnership | western | 0.10 | 0.22 | +0.02 |
+| 2017 | IKEA Place AR app launches | channel_innovation | western | 0.10 | 0.22 | +0.02 |
+| 2017 | IKEA Japan online shop launches | channel_innovation | east_asia | 0.10 | 0.22 | +0.02 |
+| 2018 | Tottenham Court Road planning studio opens | urban_format | western | 0.10 | 0.26 | +0.03 |
+| 2018 | Future of IKEA announcement | strategy_pivot | western | 0.10 | 0.26 | +0.03 |
+| 2018 | IKEA Korea e-commerce launches | channel_innovation | east_asia | 0.10 | 0.26 | +0.03 |
+| 2019 | Manhattan Planning Studio opens | urban_format | western | 0.10 | 0.31 | +0.03 |
+| 2019 | Paris La Madeleine opens | urban_format | western | 0.10 | 0.31 | +0.03 |
+| 2019 | Greenwich sustainability flagship opens | urban_format | western | 4.62 | 0.31 | +0.54 |
+| 2019 | IKEA China web shop launches | channel_innovation | east_asia | 0.10 | 0.31 | +0.03 |
+| 2020 | IKEA China Tmall flagship launches | channel_innovation | east_asia | 0.10 | 0.37 | +0.04 |
+| 2020 | Shanghai Jing'an city store opens | urban_format | east_asia | 0.10 | 0.37 | +0.04 |
+| 2020 | IKEA Harajuku opens | urban_format | east_asia | 0.10 | 0.37 | +0.04 |
+| 2020 | IKEA Shibuya opens | urban_format | east_asia | 0.10 | 0.37 | +0.04 |
+| 2020 | Buyback and Resell launched | resale_circularity | western | 0.10 | 0.37 | +0.02 |
+| 2020 | Buyback and Resell launched | resale_circularity | east_asia | 0.10 | 0.37 | +0.02 |
+| 2021 | IKEA Shinjuku opens | urban_format | east_asia | 0.10 | 0.43 | +0.04 |
+| 2021 | Vienna Westbahnhof car-free store opens | urban_format | western | 0.10 | 0.43 | +0.04 |
+| 2021 | Taipei Neihu opens replacing Dunbei | urban_format | east_asia | 0.10 | 0.43 | +0.04 |
+| 2021 | Singapore Jurong opens | urban_format | east_asia | 0.10 | 0.43 | +0.04 |
+| 2022 | IKEA Guiyang closes | closure → −urban_format | east_asia | 0.10 | 0.51 | -0.06 |
+| 2022 | IKEA Shanghai Yangpu closes | closure → −urban_format | east_asia | 0.10 | 0.51 | -0.06 |
+| 2022 | Hammersmith London opens | urban_format | western | 0.10 | 0.51 | +0.05 |
+| 2023 | Shanghai Jing'an closure announced | closure → −urban_format | east_asia | 0.10 | 0.61 | -0.07 |
+| 2023 | San Francisco Market Street opens | urban_format | western | 0.10 | 0.61 | +0.06 |
+| 2024 | IKEA Shibuya renewal reopens | urban_format | east_asia | 0.10 | 0.72 | +0.07 |
+| 2024 | IKEA global price cuts EUR 2.1B | price_cut | western | 48.28 | 0.72 | +1.95 |
+| 2024 | IKEA global price cuts EUR 2.1B | price_cut | east_asia | 48.28 | 0.72 | +1.95 |
+| 2024 | China major price cuts March | price_cut | east_asia | 0.10 | 0.72 | +0.07 |
+| 2024 | Lifeweek price strategy coverage | price_cut | east_asia | 1.60 | 0.72 | +0.68 |
+| 2024 | IKEA China revenue trough | strategy_pivot | east_asia | 1.66 | 0.72 | +0.70 |
+| 2025 | Gangdong Seoul opens | urban_format | east_asia | 0.10 | 0.85 | +0.08 |
+| 2025 | Oxford Street London flagship opens | urban_format | western | 0.10 | 0.85 | +0.08 |
+| 2025 | IKEA China JD.com flagship launches | channel_innovation | east_asia | 0.10 | 0.85 | +0.08 |
+| 2025 | IKEA China RMB 6.3B reinvestment | strategy_pivot | east_asia | 1.86 | 0.85 | +0.89 |
+| 2025 | Tokyo business optimization announcement | strategy_pivot | east_asia | 0.10 | 0.85 | +0.08 |
+| 2025 | Harajuku and Shinjuku closure announced | closure → −urban_format | east_asia | 0.10 | 0.85 | -0.10 |
+| 2026 | IKEA Harajuku and Shinjuku close | closure → −urban_format | east_asia | 0.10 | 1.00 | -0.11 |
 
-## Step 3 — Store-network signals
+## Step 2 — Active store-network signal (live count, decay = 1.00)
 
-- Western active city-format stores: 9 × 0.30 = +2.70 → urban_format
-- East Asian active city-format stores: 3 × 0.30 = +0.90 → urban_format
-- Western active big-box stores: 16 × 0.10 = +1.60 → big_box
-- East Asian active big-box stores: 20 × 0.10 = +2.00 → big_box
+- urban_format ← active city-stores: West 9 → +0.41, East 3 → +0.25
+- big_box       ← active big-box: West 16 → +0.17, East 20 → +0.18
 
-## Step 4 — External documented signals
+## Step 3 — Quantitative external anchors  (metric × scale × time_decay)
 
-| Lane | Regime | Bump | Reason | Source |
-|---|---|---|---|---|
-| price_cut | east_asia | +2.50 | China IKEA revenue fell ~30% from 2019 peak (RMB 15.77B → 11.15B FY24), triggering deep price defensiveness | ConCall analysis of IKEA financials; Yicai Global |
-| strategy_pivot | east_asia | +1.50 | China dropped from IKEA's #5 to #10 market by sales (5% → 3.5% of global) | ConCall analysis of IKEA financials |
-| local_integration | east_asia | +2.00 | Burt et al. (2020) document deep China localization; Nitori (¥929B FY25) operates at ~4× IKEA China's scale in Japan; Hanssem ~25% Korean interior share | Burt et al. 2020; Nitori IR; Statista |
-| channel_innovation | east_asia | +1.20 | Local platform ecosystem pressure (Pinduoduo, Coupang, JD.com) requires continuous channel investment beyond the 5 dated launches | east_asian_competitors.csv |
-| big_box | east_asia | +0.80 | Doubled down on big-box network after city-store retreat (Beicai expansion, Livat complexes) | Yicai Global; Lifeweek 2024 |
-| service_partnership | east_asia | +0.50 | Service expectation is baseline (delivery, assembly) — IKEA matches local norms rather than differentiating; no major partnerships | Korea Herald; Lifeweek |
-| resale_circularity | east_asia | +0.30 | Buyback program runs but not headline message in East Asian markets | Ingka Group newsroom |
-| service_partnership | western | +1.50 | TaskRabbit acquisition (2017) is a strategic M&A move beyond a single dated event; planning studios are now standard part of urban rollout | CNN Business; IKEA UK newsroom |
-| resale_circularity | western | +1.00 | Global Buyback & Resell program runs in 27 countries, with Western markets as flagship narrative | Planet Ark Nov 2020 |
-| big_box | western | +1.50 | Stable suburban big-box network is the unchanged backbone of Western revenue (~250 stores across NA/EU) | ikea_stores.csv |
-| channel_innovation | western | +0.80 | IKEA Place AR app is one dated event but represents tech R&D investment with Apple ARKit launch partnership | 9to5Mac |
-| strategy_pivot | western | +0.50 | Public 2016/2018 announcements explicitly framed the urban shift | Retail Dive 2016; CNN Business 2018 |
+| Lane | Regime | Metric | Value | Unit | Year | dir × w | Scaled | Decay | Contribution |
+|---|---|---|---|---|---|---|---|---|---|
+| price_cut | east_asia | china_revenue_decline_pct | 30 | pct | 2024 | +1 | 0.92 | 0.72 | +0.66 |
+| price_cut | east_asia | china_fy24_revenue_rmb_bn | 11.15 | rmb_bn | 2024 | +0.6 | 0.94 | 0.72 | +0.40 |
+| strategy_pivot | east_asia | china_rank_drop_positions | 5 | positions | 2024 | +1.2 | 0.92 | 0.72 | +0.79 |
+| strategy_pivot | east_asia | tokyo_format_reset_count | 1 | events | 2025 | +0.6 | 0.41 | 0.85 | +0.21 |
+| local_integration | east_asia | nitori_fy25_revenue_jpy_bn | 929 | jpy_bn | 2025 | +1 | 1.98 | 0.85 | +1.67 |
+| local_integration | east_asia | hanssem_korea_interior_share_pct | 25 | pct | 2024 | +0.6 | 0.81 | 0.72 | +0.35 |
+| local_integration | east_asia | burt_2020_localization_signal | 1 | boolean | 2020 | +0.5 | 0.69 | 0.37 | +0.13 |
+| channel_innovation | east_asia | active_platform_partners_count | 4 | partners | 2024 | +0.5 | 0.59 | 0.72 | +0.21 |
+| big_box | east_asia | beicai_expansion_eur_m | 150 | eur_m | 2024 | +0.4 | 0.15 | 0.72 | +0.04 |
+| service_partnership | east_asia | no_major_partnership | 0 | boolean | 2024 | −0.3 | 0.00 | 0.72 | +0.00 |
+| resale_circularity | east_asia | buyback_program_active | 1 | boolean | 2024 | +0.2 | 0.69 | 0.72 | +0.10 |
+| service_partnership | western | taskrabbit_acquisition_eur_m | 42 | eur_m | 2017 | +1.5 | 0.05 | 0.22 | +0.02 |
+| service_partnership | western | planning_studios_active_count | 40 | stores | 2026 | +0.7 | 0.96 | 1.00 | +0.67 |
+| resale_circularity | western | buyback_countries_count | 27 | countries | 2020 | +1.2 | 1.31 | 0.37 | +0.58 |
+| big_box | western | active_big_box_count | 250 | stores | 2026 | +1.5 | 2.40 | 1.00 | +3.60 |
+| channel_innovation | western | ikea_place_ar_launch | 1 | events | 2017 | +0.6 | 0.41 | 0.22 | +0.05 |
+| strategy_pivot | western | urban_shift_announcements_count | 2 | events | 2018 | +0.4 | 0.69 | 0.26 | +0.07 |
+| price_cut | western | fy24_global_price_cut_eur_bn | 2.1 | eur_bn | 2024 | +2 | 1.20 | 0.72 | +1.72 |
 
-## Step 5+6 — Ranking and intensity mapping
+## Step 4 — Min-max within regime → intensity 1..5
 
 ### Western
 
-| Rank | Lane | Raw score | Intensity |
-|---|---|---|---|
-| 1 | urban_format | 11.60 | 5/5 |
-| 2 | big_box | 3.10 | 5/5 |
-| 3 | service_partnership | 2.90 | 4/5 |
-| 4 | resale_circularity | 1.98 | 4/5 |
-| 5 | channel_innovation | 1.80 | 3/5 |
-| 6 | strategy_pivot | 1.60 | 2/5 |
-| 7 | price_cut | 1.19 | 2/5 |
-| 8 | local_integration | 0.00 | 1/5 |
+| Rank | Lane | Raw score | norm | Intensity |
+|---|---|---|---|---|
+| 1 | big_box | 3.77 | 1.00 | 5/5 |
+| 2 | price_cut | 3.67 | 0.97 | 5/5 |
+| 3 | urban_format | 1.27 | 0.34 | 2/5 |
+| 4 | service_partnership | 0.71 | 0.19 | 2/5 |
+| 5 | resale_circularity | 0.60 | 0.16 | 2/5 |
+| 6 | strategy_pivot | 0.11 | 0.03 | 1/5 |
+| 7 | channel_innovation | 0.08 | 0.02 | 1/5 |
+| 8 | local_integration | 0.00 | 0.00 | 1/5 |
 
 ### East Asian
 
-| Rank | Lane | Raw score | Intensity |
-|---|---|---|---|
-| 1 | channel_innovation | 6.70 | 5/5 |
-| 2 | strategy_pivot | 6.00 | 5/5 |
-| 3 | price_cut | 4.99 | 4/5 |
-| 4 | big_box | 4.20 | 4/5 |
-| 5 | urban_format | 2.33 | 3/5 |
-| 6 | local_integration | 2.00 | 2/5 |
-| 7 | resale_circularity | 1.28 | 2/5 |
-| 8 | service_partnership | 0.50 | 1/5 |
+| Rank | Lane | Raw score | norm | Intensity |
+|---|---|---|---|---|
+| 1 | price_cut | 3.77 | 1.00 | 5/5 |
+| 2 | strategy_pivot | 2.68 | 0.71 | 4/5 |
+| 3 | local_integration | 2.15 | 0.57 | 3/5 |
+| 4 | channel_innovation | 0.40 | 0.11 | 1/5 |
+| 5 | big_box | 0.24 | 0.06 | 1/5 |
+| 6 | urban_format | 0.23 | 0.06 | 1/5 |
+| 7 | resale_circularity | 0.12 | 0.03 | 1/5 |
+| 8 | service_partnership | 0.00 | 0.00 | 1/5 |
 
-Wrote data/processed/playbook_priorities.csv

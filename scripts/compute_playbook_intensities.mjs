@@ -1,55 +1,29 @@
 #!/usr/bin/env node
-/* compute_playbook_intensities.mjs
+/* compute_playbook_intensities.mjs  (v2)
  *
- * Generates data/processed/playbook_priorities.csv from:
- *   1. data/processed/strategic_events.csv         (dated public events)
- *   2. data/processed/ikea_stores.csv               (active store counts)
- *   3. data/processed/playbook_external_signals.csv (auditable bumps)
+ * Generates data/processed/playbook_priorities.csv from quantitative anchors.
  *
- * Replaces the hand-coded 1-5 intensities used through v7 with a
- * reproducible, transparent algorithm. Anyone can re-run this script and
- * get the same numbers; reviewers can challenge any specific weight.
+ * WHAT CHANGED vs v1 (the "count references with bonus weights" version):
+ *   - Every input now carries a real metric_value with explicit unit and year.
+ *   - Dated events get a magnitude parsed from their text (EUR/RMB/USD/JPY
+ *     billions, %, etc.) instead of a keyword multiplier.
+ *   - All contributions are time-decayed (τ = 6y, so 2026 = 1.00,
+ *     2020 ≈ 0.37, 2014 ≈ 0.14): recent strategy weighs more than history.
+ *   - Lane intensities come from min-max normalization WITHIN regime,
+ *     so magnitude differences matter (not just rank order).
+ *   - Every cell is traceable to either a parsed-magnitude event or an
+ *     anchored metric row with a source URL.
  *
- * ALGORITHM
- * =========
- * Step 1 — Per dated event, compute an impact-weighted score.
- *          A small keyword-based weight function (impactWeight) up-weights
- *          financial-commitment events ("EUR 2.1B", "global", "billion"),
- *          strategic M&A ("acquisition"), closures, and down-weights pure
- *          announcements / coverage.
+ * INPUTS
+ *   data/processed/strategic_events.csv          (dated public events)
+ *   data/processed/ikea_stores.csv                (active store counts)
+ *   data/processed/playbook_external_signals.csv  (quantitative anchors)
  *
- * Step 2 — Attribute that score to the appropriate (regime, priority_key).
- *          "both" regime events contribute 0.7 to each side (recognizing
- *          they are global moves while still letting each regime carry
- *          its share).
- *
- * Step 3 — Add store-network signals: each currently-open city-format
- *          store adds 0.30 to urban_format (regime is store.region_type);
- *          each open big-box adds 0.10 to big_box.
- *
- * Step 4 — Add documented external signals (playbook_external_signals.csv).
- *          These represent strategic priorities that aren't captured by
- *          dated events alone — e.g., China revenue decline, Burt et al.
- *          documented localization, Nitori scale. Each row carries an
- *          explicit reason and source.
- *
- * Step 5 — Rank each regime's 8 priorities by raw score (highest = rank 1).
- *
- * Step 6 — Map rank → intensity on a 1-5 scale:
- *          rank 1 → 5   (regime's top priority)
- *          rank 2 → 5
- *          rank 3-4 → 4
- *          rank 5 → 3
- *          rank 6-7 → 2
- *          rank 8 → 1
- *
- * Step 7 — Build evidence text from actual event_names for the regime
- *          and external signals so every cell can be traced back to a
- *          dated press release or a cited source.
+ * OUTPUTS
+ *   data/processed/playbook_priorities.csv        (the 8 lanes × 2 regimes)
+ *   data/PLAYBOOK_COMPUTATION.md                  (per-row audit log)
  *
  * Run:  node scripts/compute_playbook_intensities.mjs
- * Output is written in place to data/processed/playbook_priorities.csv
- * Detailed math log is also printed to stdout.
  */
 
 import fs from 'fs';
@@ -59,7 +33,7 @@ import { fileURLToPath } from 'url';
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.resolve(__dirname, '..');
 
-// ---------- CSV parsing (same routine used in audit_data.mjs) ----------
+// ---------- CSV ----------
 function splitCSVLine(line) {
     const out = []; let cur = ''; let q = false;
     for (let i = 0; i < line.length; i++) {
@@ -82,11 +56,7 @@ function parseCSV(text) {
         return row;
     });
 }
-function loadCSV(rel) {
-    return parseCSV(fs.readFileSync(path.join(ROOT, rel), 'utf8'));
-}
-
-// ---------- CSV escape ----------
+function loadCSV(rel) { return parseCSV(fs.readFileSync(path.join(ROOT, rel), 'utf8')); }
 function csvQuote(s) {
     s = String(s == null ? '' : s);
     if (/[",\n]/.test(s)) return '"' + s.replace(/"/g, '""') + '"';
@@ -106,102 +76,157 @@ const LANES = [
     { key: 'local_integration',   label: 'Local design integration' },
     { key: 'strategy_pivot',      label: 'Strategy repositioning' },
 ];
+function normalizeLane(t) { return t === 'store_expansion' ? 'big_box' : t; }
 
-// strategic_events.csv uses 'store_expansion' for big-box rollouts; map it.
-function normalizeLane(responseType) {
-    if (responseType === 'store_expansion') return 'big_box';
-    return responseType;
+// ============================================================
+// TIME DECAY  τ = 6 years
+// ============================================================
+const ANCHOR_YEAR = 2026;
+const TAU = 6;
+function timeDecay(year) {
+    const y = parseInt(year, 10);
+    if (!isFinite(y)) return 0.3;
+    return Math.exp((y - ANCHOR_YEAR) / TAU);
 }
 
 // ============================================================
-// Step 1: impact weight for a dated event
+// MAGNITUDE EXTRACTION  — parse a USD-equivalent billions figure
+// from event_name / short_description.  Returns 0 if nothing
+// parseable; a small EVENT_BASELINE is added later so undated
+// magnitudes still count.
 // ============================================================
-function impactWeight(ev) {
-    const name = (ev.event_name || '').toLowerCase();
-    const desc = (ev.short_description || '').toLowerCase();
-    const blob = name + ' ' + desc;
+const FX_TO_USD_BN = {
+    eur:  1.10,
+    usd:  1.00,
+    rmb:  0.14,
+    cny:  0.14,
+    jpy:  0.0067,    // ¥100B ≈ $670M
+    krw:  0.00075,
+    sgd:  0.74,
+    gbp:  1.27,
+};
 
-    let w = 1.0;
-    // Major financial commitment signals
-    if (/\beur\s*\d|\brmb\s*\d|\bbillion\b|\b\d+(\.\d+)?b\b/.test(blob)) w *= 1.7;
-    // Global / world-scale moves
-    else if (/\bglobal\b|world(['']s)?(\s+largest)?|worldwide|27 countries/.test(blob)) w *= 1.4;
-    // M&A signals
-    else if (/acquisition|acquires|acquired/.test(blob)) w *= 1.4;
-    // Flagship / first-of-kind
-    else if (/flagship|first(\s+ever)?(\s+\w+)?(\s+(store|opens|opening))/.test(blob)) w *= 1.25;
-    // Closures (strategic retreat = important signal)
-    else if (/\bclos(es|ed|ure|ing)\b/.test(blob)) w *= 1.15;
-    // Pure announcements / coverage / context — discount
-    else if (/announce|coverage|report|trough/.test(blob)) w *= 0.65;
+function parseEventMagnitudeUSDBn(ev) {
+    const txt = ((ev.event_name || '') + ' ' + (ev.short_description || '')).toLowerCase();
 
-    return w;
+    // 1) explicit currency + billion
+    const reCur = /(eur|usd|rmb|cny|jpy|krw|sgd|gbp|\$|¥|₩|€|£)\s*(\d+(?:\.\d+)?)\s*(b\b|bn|billion)/g;
+    let mag = 0; let m;
+    while ((m = reCur.exec(txt)) !== null) {
+        let cur = m[1];
+        if (cur === '$') cur = 'usd';
+        else if (cur === '¥') cur = 'jpy';
+        else if (cur === '€') cur = 'eur';
+        else if (cur === '£') cur = 'gbp';
+        else if (cur === '₩') cur = 'krw';
+        const val = parseFloat(m[2]);
+        const usd = val * (FX_TO_USD_BN[cur] || 1.0);
+        mag += usd;
+    }
+    if (mag > 0) return mag;
+
+    // 2) bare "X billion"  (default USD)
+    m = txt.match(/(\d+(?:\.\d+)?)\s*billion/);
+    if (m) return parseFloat(m[1]);
+
+    // 3) percent revenue / share change → 0.05 USD-bn per percent
+    m = txt.match(/(\d+(?:\.\d+)?)\s*%/);
+    if (m) return parseFloat(m[1]) * 0.05;
+
+    return 0;
+}
+
+// ============================================================
+// METRIC-UNIT SCALING for external anchor rows.
+// Each unit → scalar that puts metric onto the same log-scaled
+// axis as USD-bn so anchors and events can be summed.
+// ============================================================
+const UNIT_SCALE = {
+    pct:           0.05,
+    rmb_bn:        FX_TO_USD_BN.rmb,
+    jpy_bn:        FX_TO_USD_BN.jpy,
+    eur_bn:        FX_TO_USD_BN.eur,
+    usd_bn:        1,
+    eur_m:         FX_TO_USD_BN.eur / 1000,
+    countries:     0.10,
+    stores:        0.04,
+    partners:      0.20,
+    positions:     0.30,
+    events:        0.50,
+    boolean:       1.00,
+    year_anchor:   0.50,
+};
+
+function scaleAnchor(row) {
+    const v = parseFloat(String(row.metric_value).replace(/[^\d.\-]/g, '')) || 0;
+    const unit = (row.unit || '').toLowerCase();
+    const scale = UNIT_SCALE[unit] != null ? UNIT_SCALE[unit] : 1;
+    return Math.log1p(Math.abs(v) * scale);
 }
 
 // ============================================================
 // MAIN
 // ============================================================
-const events = loadCSV('data/processed/strategic_events.csv');
-const stores = loadCSV('data/processed/ikea_stores.csv');
-const signals = loadCSV('data/processed/playbook_external_signals.csv');
+const events  = loadCSV('data/processed/strategic_events.csv');
+const stores  = loadCSV('data/processed/ikea_stores.csv');
+const anchors = loadCSV('data/processed/playbook_external_signals.csv');
+
+const raw = {};
+for (const l of LANES) raw[l.key] = { western: 0, east_asia: 0 };
+const evidence = {};
+for (const l of LANES) evidence[l.key] = { western: [], east_asia: [] };
 
 const log = [];
 function logLine(s) { log.push(s); }
 
-logLine('# Playbook intensity computation log');
+logLine('# Playbook intensity computation log (v2)');
 logLine('Generated: ' + new Date().toISOString());
+logLine('Anchor year = ' + ANCHOR_YEAR + ', τ = ' + TAU + ' years');
 logLine('');
 
-// raw[lane][regime] = number
-const raw = {};
-for (const l of LANES) raw[l.key] = { western: 0, east_asia: 0 };
-
-// Step 1+2: tally dated events
-logLine('## Step 1+2 — Dated events');
+// ---------- Step 1: dated events ----------
+logLine('## Step 1 — Dated events  (magnitude × time_decay)');
 logLine('');
-logLine('| Year | Event | Lane | Regime | Base | Weight | Contribution |');
+logLine('| Year | Event | Lane | Regime | USD-bn parsed | Decay | Contribution |');
 logLine('|---|---|---|---|---|---|---|');
 
-const eventsByLane = {}; // for evidence text later
-for (const l of LANES) eventsByLane[l.key] = { western: [], east_asia: [] };
-
-const CLOSURE_PENALTY = 1.2;   // closure events subtract from urban_format
+const EVENT_BASELINE = 0.1;     // undated-magnitude events still register
+const CLOSURE_PENALTY = 1.2;
 
 for (const ev of events) {
     if (ev.response_type === 'context_report' || ev.response_type === 'corporate_report') continue;
     const lane = normalizeLane(ev.response_type);
-    const w = impactWeight(ev);
-    const regimeRow = ev.regime_type;
-    let attributes = [];
-    if (regimeRow === 'both') attributes = [['western', 0.7], ['east_asia', 0.7]];
-    else if (regimeRow === 'western' || regimeRow === 'east_asia') attributes = [[regimeRow, 1.0]];
+    const decay = timeDecay(ev.event_year);
+    const mag = parseEventMagnitudeUSDBn(ev) + EVENT_BASELINE;
+    const magScaled = Math.log1p(mag);
+    const base = magScaled * decay;
+
+    let attrs;
+    if (ev.regime_type === 'both') attrs = [['western', 0.7], ['east_asia', 0.7]];
+    else if (ev.regime_type === 'western' || ev.regime_type === 'east_asia') attrs = [[ev.regime_type, 1.0]];
     else continue;
 
-    // 'closure' events aren't a lane of their own — they penalize urban_format
-    // (a city-store closure is a retreat from the urban-format strategy).
     if (lane === 'closure') {
-        for (const [reg, share] of attributes) {
-            const contrib = -w * CLOSURE_PENALTY * share;
-            raw.urban_format[reg] += contrib;
-            eventsByLane.urban_format[reg].push({ year: ev.event_year, name: '✗ ' + ev.event_name, weight: contrib });
-            logLine(`| ${ev.event_year} | ${ev.event_name} | (closure→urban_format penalty) | ${reg} | 1.00 | ${w.toFixed(2)}×${share.toFixed(1)}×-${CLOSURE_PENALTY} | ${contrib.toFixed(2)} |`);
+        for (const [reg, share] of attrs) {
+            const c = -base * CLOSURE_PENALTY * share;
+            raw.urban_format[reg] += c;
+            evidence.urban_format[reg].push({ year: ev.event_year, name: '✗ ' + ev.event_name, c });
+            logLine(`| ${ev.event_year} | ${ev.event_name} | closure → −urban_format | ${reg} | ${mag.toFixed(2)} | ${decay.toFixed(2)} | ${c.toFixed(2)} |`);
         }
         continue;
     }
-
     if (!raw[lane]) continue;
-
-    for (const [reg, share] of attributes) {
-        const contrib = w * share;
-        raw[lane][reg] += contrib;
-        eventsByLane[lane][reg].push({ year: ev.event_year, name: ev.event_name, weight: contrib });
-        logLine(`| ${ev.event_year} | ${ev.event_name} | ${lane} | ${reg} | 1.00 | ${w.toFixed(2)}×${share.toFixed(1)} | +${contrib.toFixed(2)} |`);
+    for (const [reg, share] of attrs) {
+        const c = base * share;
+        raw[lane][reg] += c;
+        evidence[lane][reg].push({ year: ev.event_year, name: ev.event_name, c });
+        logLine(`| ${ev.event_year} | ${ev.event_name} | ${lane} | ${reg} | ${mag.toFixed(2)} | ${decay.toFixed(2)} | +${c.toFixed(2)} |`);
     }
 }
 
-// Step 3: store-network signals
+// ---------- Step 2: store-network anchors (live in 2026) ----------
 logLine('');
-logLine('## Step 3 — Store-network signals');
+logLine('## Step 2 — Active store-network signal (live count, decay = 1.00)');
 logLine('');
 let openCity = { western: 0, east_asia: 0 };
 let openBig  = { western: 0, east_asia: 0 };
@@ -212,91 +237,85 @@ for (const s of stores) {
     if (s.store_format === 'big-box') openBig[r]++;
     else if (['city_store', 'planning_studio', 'plan_order_point'].includes(s.store_format)) openCity[r]++;
 }
-const CITY_W = 0.30, BIGBOX_W = 0.10;
-const cityBumpWest  = openCity.western  * CITY_W;
-const cityBumpEast  = openCity.east_asia * CITY_W;
-const bbBumpWest    = openBig.western   * BIGBOX_W;
-const bbBumpEast    = openBig.east_asia * BIGBOX_W;
-raw.urban_format.western  += cityBumpWest;
-raw.urban_format.east_asia += cityBumpEast;
-raw.big_box.western        += bbBumpWest;
-raw.big_box.east_asia      += bbBumpEast;
-logLine(`- Western active city-format stores: ${openCity.western} × 0.30 = +${cityBumpWest.toFixed(2)} → urban_format`);
-logLine(`- East Asian active city-format stores: ${openCity.east_asia} × 0.30 = +${cityBumpEast.toFixed(2)} → urban_format`);
-logLine(`- Western active big-box stores: ${openBig.western} × 0.10 = +${bbBumpWest.toFixed(2)} → big_box`);
-logLine(`- East Asian active big-box stores: ${openBig.east_asia} × 0.10 = +${bbBumpEast.toFixed(2)} → big_box`);
+const CITY_UNIT = 0.18, BB_UNIT = 0.06;
+const bumpUF_W = Math.log1p(openCity.western)   * CITY_UNIT;
+const bumpUF_E = Math.log1p(openCity.east_asia) * CITY_UNIT;
+const bumpBB_W = Math.log1p(openBig.western)    * BB_UNIT;
+const bumpBB_E = Math.log1p(openBig.east_asia)  * BB_UNIT;
+raw.urban_format.western   += bumpUF_W;
+raw.urban_format.east_asia += bumpUF_E;
+raw.big_box.western        += bumpBB_W;
+raw.big_box.east_asia      += bumpBB_E;
+logLine(`- urban_format ← active city-stores: West ${openCity.western} → +${bumpUF_W.toFixed(2)}, East ${openCity.east_asia} → +${bumpUF_E.toFixed(2)}`);
+logLine(`- big_box       ← active big-box: West ${openBig.western} → +${bumpBB_W.toFixed(2)}, East ${openBig.east_asia} → +${bumpBB_E.toFixed(2)}`);
 
-// Step 4: external signals
+// ---------- Step 3: quantitative external anchors ----------
 logLine('');
-logLine('## Step 4 — External documented signals');
+logLine('## Step 3 — Quantitative external anchors  (metric × scale × time_decay)');
 logLine('');
-logLine('| Lane | Regime | Bump | Reason | Source |');
-logLine('|---|---|---|---|---|');
-for (const sig of signals) {
-    const w = parseFloat(sig.weight) || 0;
-    if (w === 0) continue;
-    if (!raw[sig.priority_key]) continue;
-    if (sig.regime !== 'western' && sig.regime !== 'east_asia') continue;
-    raw[sig.priority_key][sig.regime] += w;
-    logLine(`| ${sig.priority_key} | ${sig.regime} | +${w.toFixed(2)} | ${sig.reason} | ${sig.source} |`);
+logLine('| Lane | Regime | Metric | Value | Unit | Year | dir × w | Scaled | Decay | Contribution |');
+logLine('|---|---|---|---|---|---|---|---|---|---|');
+for (const a of anchors) {
+    if (!raw[a.priority_key]) continue;
+    if (a.regime !== 'western' && a.regime !== 'east_asia') continue;
+    const dir = parseFloat(a.direction) || 1;
+    const w   = parseFloat(a.weight)    || 1;
+    const decay = timeDecay(a.year);
+    const scaled = scaleAnchor(a);
+    const c = dir * w * scaled * decay;
+    raw[a.priority_key][a.regime] += c;
+    evidence[a.priority_key][a.regime].push({ year: a.year, name: a.reason, c });
+    logLine(`| ${a.priority_key} | ${a.regime} | ${a.metric_name} | ${a.metric_value} | ${a.unit} | ${a.year} | ${dir > 0 ? '+' : '−'}${w} | ${scaled.toFixed(2)} | ${decay.toFixed(2)} | ${c >= 0 ? '+' : ''}${c.toFixed(2)} |`);
 }
 
-// Step 5+6: rank within each regime, map rank → intensity
+// ---------- Step 4: min-max normalization within regime → intensity 1..5 ----------
 logLine('');
-logLine('## Step 5+6 — Ranking and intensity mapping');
+logLine('## Step 4 — Min-max within regime → intensity 1..5');
 logLine('');
-function rankToIntensity(rank) {
-    // 1→5, 2→5, 3→4, 4→4, 5→3, 6→2, 7→2, 8→1
-    if (rank <= 2) return 5;
-    if (rank <= 4) return 4;
-    if (rank === 5) return 3;
-    if (rank <= 7) return 2;
-    return 1;
-}
 
-function computeRanksAndIntensities(regime) {
-    const arr = LANES.map(l => ({ key: l.key, score: raw[l.key][regime] }));
-    arr.sort((a, b) => b.score - a.score);
+function computeIntensities(regime) {
+    const scores = LANES.map(l => raw[l.key][regime]);
+    const max = Math.max(...scores);
+    const min = Math.min(...scores);
+    const range = max - min || 1;
     const out = {};
-    arr.forEach((row, i) => {
-        out[row.key] = { rank: i + 1, score: row.score, intensity: rankToIntensity(i + 1) };
+    LANES.forEach(l => {
+        const s = raw[l.key][regime];
+        const norm = (s - min) / range;       // 0..1
+        const intensity = Math.max(1, Math.min(5, Math.round(1 + 4 * norm)));
+        const rank = scores.filter(x => x > s).length + 1;
+        out[l.key] = { rank, score: s, norm, intensity };
     });
     return out;
 }
-const W = computeRanksAndIntensities('western');
-const E = computeRanksAndIntensities('east_asia');
+const W = computeIntensities('western');
+const E = computeIntensities('east_asia');
 
-logLine('### Western');
-logLine('');
-logLine('| Rank | Lane | Raw score | Intensity |');
-logLine('|---|---|---|---|');
-LANES.map(l => ({ key: l.key, score: W[l.key].score, rank: W[l.key].rank, intensity: W[l.key].intensity }))
-    .sort((a, b) => a.rank - b.rank)
-    .forEach(r => logLine(`| ${r.rank} | ${r.key} | ${r.score.toFixed(2)} | ${r.intensity}/5 |`));
+function dumpRegime(label, R) {
+    logLine('### ' + label);
+    logLine('');
+    logLine('| Rank | Lane | Raw score | norm | Intensity |');
+    logLine('|---|---|---|---|---|');
+    LANES.map(l => ({ key: l.key, ...R[l.key] }))
+        .sort((a, b) => a.rank - b.rank)
+        .forEach(r => logLine(`| ${r.rank} | ${r.key} | ${r.score.toFixed(2)} | ${r.norm.toFixed(2)} | ${r.intensity}/5 |`));
+    logLine('');
+}
+dumpRegime('Western',    W);
+dumpRegime('East Asian', E);
 
-logLine('');
-logLine('### East Asian');
-logLine('');
-logLine('| Rank | Lane | Raw score | Intensity |');
-logLine('|---|---|---|---|');
-LANES.map(l => ({ key: l.key, score: E[l.key].score, rank: E[l.key].rank, intensity: E[l.key].intensity }))
-    .sort((a, b) => a.rank - b.rank)
-    .forEach(r => logLine(`| ${r.rank} | ${r.key} | ${r.score.toFixed(2)} | ${r.intensity}/5 |`));
-
-// Step 7: build evidence text from real event names + external signal reasons
+// ---------- Step 5: write CSV ----------
 function buildEvidence(laneKey, regime) {
-    const evs = eventsByLane[laneKey][regime] || [];
-    evs.sort((a, b) => a.year - b.year);
-    const parts = evs.map(e => `${e.name} (${e.year})`);
-    const sigs = signals.filter(s => s.priority_key === laneKey && s.regime === regime && parseFloat(s.weight) > 0);
-    if (sigs.length) parts.push(...sigs.map(s => s.reason));
-    if (!parts.length) return 'No dated events in this regime/lane';
-    return parts.join('; ');
+    const evs = evidence[laneKey][regime] || [];
+    if (!evs.length) return 'No quantitative anchors in this regime/lane';
+    evs.sort((a, b) => (parseInt(a.year, 10) || 0) - (parseInt(b.year, 10) || 0));
+    return evs.map(e => e.year ? `${e.name} (${e.year})` : e.name).join('; ');
 }
 
-// Write the CSV
-const outRows = [];
-outRows.push(['priority_key','priority_label','west_intensity','east_intensity','west_evidence','east_evidence'].map(csvQuote).join(','));
+const outRows = [
+    ['priority_key','priority_label','west_intensity','east_intensity','west_evidence','east_evidence']
+        .map(csvQuote).join(',')
+];
 LANES.forEach(l => {
     outRows.push([
         l.key,
@@ -307,12 +326,7 @@ LANES.forEach(l => {
         buildEvidence(l.key, 'east_asia'),
     ].map(csvQuote).join(','));
 });
-const outCSV = outRows.join('\n') + '\n';
-fs.writeFileSync(path.join(ROOT, 'data/processed/playbook_priorities.csv'), outCSV);
-logLine('');
-logLine('Wrote data/processed/playbook_priorities.csv');
-
-// Also dump the math log
+fs.writeFileSync(path.join(ROOT, 'data/processed/playbook_priorities.csv'), outRows.join('\n') + '\n');
 fs.writeFileSync(path.join(ROOT, 'data/PLAYBOOK_COMPUTATION.md'), log.join('\n') + '\n');
 console.log(log.join('\n'));
 console.log('\n✓ Wrote data/processed/playbook_priorities.csv');
