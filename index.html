@@ -266,6 +266,12 @@
         <div class='leaflet-toolbar'>
           <span class='leaflet-year-label'>Year</span>
           <span id='map-year-readout'>1958</span>
+          <input id='map-year-scrubber' type='range'
+                 min='1958' max='2026' value='1958' step='1'
+                 aria-label='Scrub year' />
+          <span id='map-year-bounds'>1958 – 2026</span>
+          <button id='map-year-play' type='button'
+                  aria-label='Play / pause' title='Play / pause'>▶</button>
           <span id='map-stats'></span>
         </div>
         <div id='map-na' class='region-map'></div>

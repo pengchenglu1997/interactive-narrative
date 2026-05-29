@@ -117,6 +117,7 @@
             state.markerLayers[r.id] = L.layerGroup().addTo(m);
         });
         state.ready = true;
+        wireToolbar();
         rebuildAll();
     }
 
@@ -179,25 +180,65 @@
         });
     }
 
-    function tickForward() {
-        if (state.year < MAX_YEAR) {
-            state.year++;
-            rebuildAll();
-        } else {
-            stopTimer();
+    // Central place to change the year — keeps the scrubber UI in sync.
+    function setYear(y) {
+        y = Math.max(MIN_YEAR, Math.min(MAX_YEAR, y));
+        if (y === state.year) return;
+        state.year = y;
+        rebuildAll();
+        var slider = document.getElementById('map-year-scrubber');
+        if (slider) {
+            slider.value = y;
+            var pct = ((y - MIN_YEAR) / (MAX_YEAR - MIN_YEAR)) * 100;
+            slider.style.setProperty('--pct', pct.toFixed(1) + '%');
         }
+    }
+
+    function setPlayUI(playing) {
+        var btn    = document.getElementById('map-year-play');
+        var yearEl = document.getElementById('map-year-readout');
+        if (btn) {
+            btn.classList.toggle('playing', playing);
+            btn.textContent = playing ? '❚❚' : '▶';
+        }
+        if (yearEl) yearEl.classList.toggle('paused', !playing);
+    }
+
+    function tickForward() {
+        if (state.year < MAX_YEAR) setYear(state.year + 1);
+        else stopTimer();
     }
 
     function startTimer() {
         if (state.timer) return;
         state.timer = setInterval(tickForward, TICK_MS);
+        setPlayUI(true);
     }
 
     function stopTimer() {
         if (state.timer) { clearInterval(state.timer); state.timer = null; }
-        // Update the year readout style so the user sees auto-play paused
-        var yearEl = document.getElementById('map-year-readout');
-        if (yearEl) yearEl.classList.add('paused');
+        setPlayUI(false);
+    }
+
+    // Wire the scrubber + play button once the toolbar is in the DOM.
+    function wireToolbar() {
+        var slider = document.getElementById('map-year-scrubber');
+        var play   = document.getElementById('map-year-play');
+        if (slider && !slider.__wired) {
+            slider.__wired = true;
+            slider.addEventListener('input', function () {
+                stopTimer();                                // user takes over
+                setYear(parseInt(this.value, 10));
+            });
+        }
+        if (play && !play.__wired) {
+            play.__wired = true;
+            play.addEventListener('click', function () {
+                if (state.timer) { stopTimer(); return; }
+                if (state.year >= MAX_YEAR) setYear(MIN_YEAR);  // restart from start
+                startTimer();
+            });
+        }
     }
 
     window.VizMap = {
@@ -210,10 +251,10 @@
                 stage.style.display = 'grid';
                 if (vis) vis.style.visibility = 'hidden';
                 ensureInit((manager.data && manager.data.stores) || []);
-                state.year = MIN_YEAR;
-                var yearEl = document.getElementById('map-year-readout');
-                if (yearEl) yearEl.classList.remove('paused');
-                rebuildAll();
+                // Force a reset so setYear() actually changes state and
+                // syncs the scrubber UI (it short-circuits when y === state.year).
+                state.year = MIN_YEAR - 1;
+                setYear(MIN_YEAR);
                 setTimeout(function () {
                     REGIONS.forEach(function (r) {
                         if (state.maps[r.id]) {

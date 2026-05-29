@@ -308,9 +308,9 @@
 
 .leaflet-toolbar {
   display: flex;
-  align-items: baseline;
-  gap: 16px;
-  padding: 2px 4px 10px;
+  align-items: center;
+  gap: 14px;
+  padding: 6px 4px 10px;
   border-bottom: 1px solid var(--rule);
   margin-bottom: 8px;
   flex-wrap: wrap;
@@ -327,11 +327,74 @@
 
 .leaflet-toolbar #map-year-readout {
   font-family: var(--font-serif);
-  font-size: 40px;
+  font-size: 36px;
   font-weight: 900;
   color: var(--ink);
   letter-spacing: -0.02em;
   line-height: 1;
+  min-width: 72px;
+}
+
+/* === Year scrubber === */
+.leaflet-toolbar #map-year-scrubber {
+  flex: 1 1 240px;
+  min-width: 200px;
+  appearance: none;
+  -webkit-appearance: none;
+  height: 4px;
+  background: linear-gradient(to right,
+    var(--ikea-blue) var(--pct, 0%),
+    var(--rule) var(--pct, 0%));
+  border-radius: 2px;
+  cursor: pointer;
+  outline: none;
+}
+.leaflet-toolbar #map-year-scrubber::-webkit-slider-thumb {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--ikea-yellow);
+  border: 2px solid var(--ikea-blue);
+  cursor: grab;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+.leaflet-toolbar #map-year-scrubber::-moz-range-thumb {
+  width: 16px; height: 16px;
+  border-radius: 50%;
+  background: var(--ikea-yellow);
+  border: 2px solid var(--ikea-blue);
+  cursor: grab;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
+}
+.leaflet-toolbar #map-year-scrubber:active::-webkit-slider-thumb { cursor: grabbing; }
+.leaflet-toolbar #map-year-scrubber:active::-moz-range-thumb     { cursor: grabbing; }
+.leaflet-toolbar #map-year-bounds {
+  font-family: var(--font-sans);
+  font-size: 10.5px;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: 0.02em;
+}
+.leaflet-toolbar #map-year-play {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: #fff;
+  width: 30px; height: 30px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 11px;
+  color: var(--ikea-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.leaflet-toolbar #map-year-play.playing {
+  background: var(--ikea-yellow);
+  border-color: var(--ikea-blue);
+  color: var(--ikea-blue-dark);
 }
 
 .leaflet-toolbar #map-stats {
