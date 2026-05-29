@@ -1,0 +1,3 @@
+# Raw data lives here.
+# Each subfolder should correspond to one of the four data families in the abstract.
+# Document the cleaning pipeline that produces data/processed/*.csv.

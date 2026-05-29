@@ -1,0 +1,25 @@
+city,country,region_type,price_to_income_ratio,mortgage_pct_of_income,renter_share,young_adult_population_share,year,source_url,fetch_date,notes
+New York City,United States,western,14.3,,67.0,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,PTI Numbeo; renter share 67% NYC Comptroller 2024 + Census ACS 2018
+Los Angeles,United States,western,9.5,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+San Francisco,United States,western,7.0,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Chicago,United States,western,3.3,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Washington DC,United States,western,4.8,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+London,United Kingdom,western,15.8,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,UK Gov 2025: first-time buyer age 35 in London
+Manchester,United Kingdom,western,7.0,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Berlin,Germany,western,10.3,,75.0,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,Berlin renter share 75%+ per Eurostat (more than three-quarters); Germany country avg 53%
+Munich,Germany,western,11.4,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Hamburg,Germany,western,9.7,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,Hamburg shares Berlins very-high renter share per Eurostat
+Vienna,Austria,western,13.1,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Paris,France,western,15.6,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Toronto,Canada,western,10.7,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Vancouver,Canada,western,11.2,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Beijing,China,east_asia,29.7,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Shanghai,China,east_asia,30.94,211.57,,,2026,https://www.numbeo.com/property-investment/in/Shanghai,2026-05-26,Per-city page fetched directly
+Shenzhen,China,east_asia,29.1,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Guangzhou,China,east_asia,22.9,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Chengdu,China,east_asia,13.48,95.81,,,2026,https://www.numbeo.com/property-investment/in/Chengdu,2026-05-26,Per-city page fetched directly
+Hong Kong,Hong Kong,east_asia,31.6,,50.0,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,~50% non-ownership: private rent 46% + public rent 30% per HK 2016 census; nuanced due to subsidised ownership
+Tokyo,Japan,east_asia,16.2,,50.0,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,Tokyo 23 wards homeownership just under 50% per Tokyo Statistical Yearbook 2023; Japan country avg 39% renter
+Seoul,South Korea,east_asia,27.8,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,Jeonse system complicates conventional renter/owner classification per OECD HM1.3
+Taipei,Taiwan,east_asia,34.5,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,
+Singapore,Singapore,east_asia,23.4,,,,2026,https://www.numbeo.com/quality-of-life/rankings_current.jsp?displayColumn=5,2026-05-26,~80% live in HDB public housing (mostly owner-occupied)

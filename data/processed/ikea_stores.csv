@@ -1,0 +1,58 @@
+store_id,store_name,country,city,latitude,longitude,opening_year,closure_year,store_format,region_type,source_url,notes
+1,Älmhult,Sweden,Älmhult,56.5500,14.1333,1958,,big-box,origin,https://en.wikipedia.org/wiki/IKEA,First IKEA store opened October 28 1958
+2,Asker,Norway,Asker,59.8333,10.4333,1963,,big-box,western,https://en.wikipedia.org/wiki/List_of_countries_with_IKEA_stores,First store outside Sweden
+3,Spreitenbach,Switzerland,Spreitenbach,47.4167,8.3667,1973,,big-box,western,https://www.ikea.com/,First IKEA in continental Europe
+4,Munich-Eching,Germany,Munich,48.2333,11.6167,1974,,big-box,western,https://www.ikea.com/,First German store
+5,Warrington,United Kingdom,Warrington,53.3900,-2.5970,1987,,big-box,western,https://www.ikea.com/gb/en/stores/warrington/,First UK store
+6,Croydon,United Kingdom,London,51.3870,-0.0918,1992,,big-box,western,https://www.ikea.com/gb/en/stores/croydon/,
+7,Manchester Ashton,United Kingdom,Manchester,53.4870,-2.0950,2006,,big-box,western,https://www.ikea.com/gb/en/stores/manchester/,Wellington Road Ashton-under-Lyne
+8,Tottenham Court Road Planning Studio,United Kingdom,London,51.5181,-0.1352,2018,2022,planning_studio,western,https://www.retailgazette.co.uk/blog/2018/10/ikea-launches-first-inner-city-store-tottenham-court-road/,Opened October 12 2018 first ever planning studio closed when Hammersmith opened
+9,Greenwich,United Kingdom,London,51.4934,0.0098,2019,,big-box,western,https://www.retailgazette.co.uk/blog/2019/02/ikea-officially-opens-new-greenwich-store/,Opened February 7 2019 BREEAM Outstanding sustainability flagship
+10,Hammersmith,United Kingdom,London,51.4927,-0.2229,2022,,city_store,western,https://www.ikea.com/gb/en/stores/hammersmith/,Opened February 24 2022 small format with in-store planning
+11,Oxford Street,United Kingdom,London,51.5145,-0.1413,2025,,city_store,western,https://www.ikea.com/gb/en/newsroom/corporate-news/opening-tomorrow-ikea-makes-a-new-home-on-londons-oxford-street-pube69d2d10/,Opened May 1 2025 in Grade II listed building 214 Oxford Street
+12,Plymouth Meeting,United States,Philadelphia,40.1090,-75.2780,1985,,big-box,western,https://www.ikea.com/us/en/stores/plymouth-meeting/,
+13,Schaumburg,United States,Chicago,42.0334,-88.0834,1985,,big-box,western,https://www.ikea.com/us/en/stores/schaumburg/,
+13a,Burbank,United States,Los Angeles,34.1700,-118.3300,2017,,big-box,western,https://www.ikea.com/us/en/stores/burbank/,Replaced original 1990 Burbank store at a larger nearby location
+14,Brooklyn,United States,New York City,40.6720,-74.0091,2008,,big-box,western,https://www.ikea.com/us/en/stores/brooklyn/,
+15,College Park,United States,Atlanta,33.6534,-84.4377,2005,,big-box,western,https://www.ikea.com/us/en/stores/atlanta/,
+16,Frisco,United States,Dallas,33.1507,-96.8236,2017,,big-box,western,https://www.ikea.com/us/en/stores/frisco/,
+17,Manhattan Planning Studio,United States,New York City,40.7607,-73.9685,2019,,planning_studio,western,https://www.ikea.com/us/en/newsroom/corporate-news/ikea-planning-studio-in-manhattan-is-now-open-pub4c32a867/,Opened April 15 2019 at 999 Third Avenue first US city center IKEA
+18,Queens Planning Studio,United States,New York City,40.7282,-73.7949,2020,,planning_studio,western,https://www.ikea.com/us/en/stores/,
+19,San Francisco Market Street,United States,San Francisco,37.7821,-122.4076,2023,,city_store,western,https://sfyimby.com/2023/08/ikea-opening-today-in-mid-market-san-francisco.html,Opened August 23 2023 at 945 Market Street 85000 sqft three-story
+20,Arlington Plan and Order Point,United States,Washington DC,38.8800,-77.1110,2022,,plan_order_point,western,https://www.ikea.com/us/en/stores/,
+21,Burnaby,Canada,Vancouver,49.2488,-122.9805,1976,,big-box,western,https://www.ikea.com/ca/en/stores/,
+22,North York,Canada,Toronto,43.7615,-79.4111,1977,,big-box,western,https://www.ikea.com/ca/en/stores/,
+23,Berlin Lichtenberg,Germany,Berlin,52.5293,13.4860,2010,,big-box,western,https://www.ikea.com/de/de/stores/berlin-lichtenberg/,Opened December 2010 Landsberger Allee 364 one of largest IKEA in Europe
+24,Hamburg Altona,Germany,Hamburg,53.5500,9.9333,2014,,city_store,western,https://www.ikea.com/de/de/stores/hamburg-altona/,First inner-city IKEA store in Germany
+25,Vienna Westbahnhof,Austria,Vienna,48.1957,16.3389,2021,,city_store,western,https://www.ingka.com/newsroom/the-new-inner-city-ikea-store-thats-rethinking-just-about-everything/,Opened August 26 2021 car-free first full-range inner-city store
+26,Paris La Madeleine,France,Paris,48.8703,2.3242,2019,,city_store,western,https://about.ikea.com/en/about-us/ikea-retail/ikea-paris-la-madeleine-small-store/,Opened May 6 2019 worlds first city-centre IKEA above Decathlon
+27,Beijing Wangjing,China,Beijing,40.0044,116.4748,1999,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,Second China store
+28,Shanghai Xuhui,China,Shanghai,31.1755,121.4317,1998,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,First China store IKEA entered China 1998
+29,Guangzhou Tianhe,China,Guangzhou,23.1291,113.3645,2005,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,
+30,Chengdu Beicheng,China,Chengdu,30.6924,104.0656,2006,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,
+31,Shenzhen Futian,China,Shenzhen,22.5400,114.0596,2007,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,
+32,Hong Kong Causeway Bay,Hong Kong,Hong Kong,22.2802,114.1840,1975,,big-box,east_asia,https://www.ikea.com.hk/,
+33,Shanghai Jing'an City Store,China,Shanghai,31.2304,121.4737,2020,2023,city_store,east_asia,https://www.yicaiglobal.com/news/ikea-to-close-only-city-store-in-chinese-mainland-at-year-end,Opened July 23 2020 (Pandaily) closed end of 2023 (Yicai Global July 14 2023)
+34,IKEA Shanghai Yangpu,China,Shanghai,31.2696,121.5217,2014,2022,big-box,east_asia,https://www.yicaiglobal.com/news/ikea-to-close-only-city-store-in-chinese-mainland-at-year-end,Closed July 2022 (Yicai Global)
+35,IKEA Guiyang,China,Guiyang,26.5783,106.7135,2017,2022,big-box,east_asia,https://www.yicaiglobal.com/news/ikea-to-close-only-city-store-in-chinese-mainland-at-year-end,Closed April 2022 (Yicai Global)
+36,Xi'an Saigao,China,Xi'an,34.3416,108.9398,2018,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,
+37,Wuhan Hankou,China,Wuhan,30.5928,114.3055,2015,,big-box,east_asia,https://www.ikea.cn/cn/zh/stores/,
+38,Funabashi,Japan,Tokyo,35.6948,139.9929,2006,,big-box,east_asia,https://ikeamuseum.com/en/explore/the-story-of-ikea/retail-revival-in-japan/,Re-entry to Japan after 1986 exit
+39,Tokyo-Bay,Japan,Tokyo,35.6628,139.9907,2006,,big-box,east_asia,https://www.ikea.com/jp/en/stores/,
+40,Kobe,Japan,Kobe,34.6736,135.2087,2008,,big-box,east_asia,https://www.ikea.com/jp/en/stores/kobe/,
+41,Tachikawa,Japan,Tokyo,35.7000,139.4167,2014,,big-box,east_asia,https://www.ikea.com/jp/en/stores/tachikawa/,
+42,Tokyo Harajuku,Japan,Tokyo,35.6702,139.7026,2020,2026,city_store,east_asia,https://www.ikea.com/jp/en/newsroom/corporate-news/20251219-harajuku-shinjuku-stores-pub4ab89270/,Opened June 8 2020 closed Feb 8 2026 (IKEA Japan)
+43,Tokyo Shibuya,Japan,Tokyo,35.6580,139.7016,2020,,city_store,east_asia,https://www.ikea.com/jp/en/newsroom/corporate-news/20201029-ikea-shibuya-opening-pub49011b67/,Opened Nov 30 2020 renewed Aug 27 2024 sole Tokyo hub post-Feb-2026
+44,Tokyo Shinjuku,Japan,Tokyo,35.6896,139.7006,2021,2026,city_store,east_asia,https://www.ikea.com/jp/en/newsroom/corporate-news/20251219-harajuku-shinjuku-stores-pub4ab89270/,Opened May 1 2021 closed Feb 8 2026 (IKEA Japan)
+45,Gwangmyeong,South Korea,Seoul,37.4783,126.8645,2014,,big-box,east_asia,https://www.ikea.com/kr/en/newsroom/corporate-news/page-title-h1-pub214cf7d1/,Opened December 18 2014 first Korean store worlds largest IKEA at the time
+46,Goyang,South Korea,Seoul,37.6584,126.8320,2017,,big-box,east_asia,https://www.ikea.com/kr/en/stores/goyang/,
+47,Giheung,South Korea,Yongin,37.2807,127.1075,2019,,big-box,east_asia,https://www.ikea.com/kr/en/stores/giheung/,
+48,Dongbusan,South Korea,Busan,35.1796,129.0756,2020,,big-box,east_asia,https://www.ikea.com/kr/en/stores/dongbusan/,
+49,Gangdong Seoul,South Korea,Seoul,37.5301,127.1238,2025,,city_store,east_asia,https://www.ingka.com/newsroom/ikea-comes-closer-to-customers-in-seoul-opens-major-store-in-new-shopping-complex/,Opened April 17 2025 first IKEA in Seoul proper Gangdong I-Park The River mixed-use
+50,Taipei Dunbei,Taiwan,Taipei,25.0420,121.5440,1998,2021,big-box,east_asia,https://www.taipeitimes.com/News/biz/archives/2021/03/16/2003753892,Opened 1998 first Taiwan store closed 2021 after 23 years (Taipei Times)
+51,Taipei Neihu,Taiwan,Taipei,25.0823,121.5750,2021,,big-box,east_asia,https://www.taipeitimes.com/News/taiwan/archives/2021/04/29/2003756543,Opened April 2021 replacing Dunbei
+52,Kaohsiung,Taiwan,Kaohsiung,22.6273,120.3014,2006,,big-box,east_asia,https://www.taipeitimes.com/News/biz/archives/2006/10/25/2003333366,4th Taiwan store first outside northern Taiwan (Taipei Times)
+53,Singapore Alexandra,Singapore,Singapore,1.2848,103.8024,1984,,big-box,east_asia,https://www.ikea.com/sg/en/stores/alexandra/,Moved from original 1978 Sixth Avenue store
+54,Singapore Tampines,Singapore,Singapore,1.3525,103.9447,2006,,big-box,east_asia,https://www.ikea.com/sg/en/stores/tampines/,One of largest IKEA stores globally
+55,Singapore Jurong,Singapore,Singapore,1.3329,103.7430,2021,,city_store,east_asia,https://group.ikano/stories/new-ikea-store-formats-in-southeast-asia/,Opened April 29 2021 first IKEA small-store format in SEA
+56,Pasay City,Philippines,Manila,14.5350,120.9810,2021,,big-box,other,https://www.ikea.com/ph/en/stores/pasay/,Worlds largest IKEA at opening
