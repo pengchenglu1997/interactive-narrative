@@ -93,8 +93,15 @@
 
                     sc.on('active', function (index) {
                         // highlight steps (light coupling — just visual text opacity)
+                        // Full-text sections (hero, scorecard, About authors) are
+                        // never dimmed: they aren't paired with a viz that some
+                        // other step's text is "competing" with, and the last
+                        // full-text section in particular often can't be scrolled
+                        // far enough for the scroller to mark it active — leaving
+                        // the reader staring at a ghost-grey block.
                         document.querySelectorAll('.step').forEach(function (el, i) {
-                            el.style.opacity = (i === index) ? '1' : '0.1';
+                            var isFullText = el.dataset && el.dataset.layout === 'full-text';
+                            el.style.opacity = (isFullText || i === index) ? '1' : '0.1';
                         });
 
                         // apply layout class from data-layout attribute

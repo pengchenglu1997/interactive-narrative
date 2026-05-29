@@ -212,7 +212,11 @@
   line-height: 1.5;
 }
 
-#extra-space { height: 300px; }
+/* Tall enough that the last .step's top can scroll up to the viewport
+   top so the scroller can promote it to active. Without this, the
+   author section's activeIndex never fires and (combined with the
+   non-active dimming) it reads as ghost-grey. */
+#extra-space { height: 80vh; }
 
 /* ============ Takeaway callout ============ */
 
