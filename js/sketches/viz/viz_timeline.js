@@ -150,11 +150,21 @@
             p.noStroke(); p.textSize(10); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
             var legY = H - innerB + 18;
             var lx = innerL;
-            var legendItems = regimeFilter
+            // Show one swatch per color the reader actually sees on screen.
+            // When a regime is highlighted, tiles from the OTHER regime are
+            // drawn with +'40' alpha — so the faded swatch must use the SAME
+            // base color, not a generic gray.
+            var legendItems = regimeFilter === 'east_asia'
                 ? [
-                    { c: regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB', label: regimeFilter === 'east_asia' ? 'East Asian' : 'Western' },
-                    { c: '#1a1a1a', label: 'Global / both' },
-                    { c: '#cccccc', label: 'Other regime (faded)' },
+                    { c: '#FBD914',   label: 'East Asian (focus)' },
+                    { c: '#1a1a1a',   label: 'Global / both' },
+                    { c: '#0058AB40', label: 'Western (faded)' },
+                ]
+                : regimeFilter === 'western'
+                ? [
+                    { c: '#0058AB',   label: 'Western (focus)' },
+                    { c: '#1a1a1a',   label: 'Global / both' },
+                    { c: '#FBD91440', label: 'East Asian (faded)' },
                 ]
                 : [
                     { c: '#0058AB', label: 'Western' },
@@ -162,7 +172,15 @@
                     { c: '#1a1a1a', label: 'Global / both' },
                 ];
             legendItems.forEach(function (it) {
-                p.fill(it.c); p.rect(lx, legY + 4, 9, 9);
+                // Faded swatches at 25% alpha are nearly invisible on the white
+                // toolbar strip — add a thin neutral border so the reader can
+                // still locate them.
+                var isFaded = /\(faded\)/.test(it.label);
+                if (isFaded) { p.stroke('#bbb'); p.strokeWeight(0.6); }
+                else         { p.noStroke(); }
+                p.fill(it.c);
+                p.rect(lx, legY + 4, 9, 9);
+                p.noStroke();
                 p.fill('#333'); p.text(it.label, lx + 13, legY + 2);
                 lx += p.textWidth(it.label) + 35;
             });
