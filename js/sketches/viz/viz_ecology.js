@@ -39,6 +39,28 @@
         }
     }
 
+    var MAX_CHALLENGE = 24;   // 6 dims × max level 4
+    function challengeTotal(row) {
+        var total = 0;
+        for (var i = 0; i < dims.length; i++) {
+            var k = dims[i].key;
+            total += (challengeMap[k] && challengeMap[k][row[k]]) || 0;
+        }
+        return total;
+    }
+
+    // Aggregate IKEA's actual presence in `market` from the stores table —
+    // this is the "so what" of the matrix: high challenge → does IKEA win or lose?
+    var CITY_FORMATS = ['city_store', 'planning_studio', 'plan_order_point'];
+    function outcomeFor(marketName, stores) {
+        var inMkt = (stores || []).filter(function (s) { return s.country === marketName; });
+        return {
+            bigOpen:    inMkt.filter(function (s) { return s.store_format === 'big-box' && !s.closure_year; }).length,
+            cityOpen:   inMkt.filter(function (s) { return CITY_FORMATS.indexOf(s.store_format) >= 0 && !s.closure_year; }).length,
+            cityClosed: inMkt.filter(function (s) { return CITY_FORMATS.indexOf(s.store_format) >= 0 &&  s.closure_year; }).length,
+        };
+    }
+
     window.VizEcology = {
         draw: function (p, manager, ai, progress) {
             var ecology = (manager.data && manager.data.ecology) || [];
@@ -53,9 +75,21 @@
             var cfg = (manager.state && manager.state.vizConfig) || {};
             var regimeFilter = cfg.regime || null;
 
-            var rows = ecology.filter(function (r) {
-                return !regimeFilter || r.region_type === regimeFilter;
-            });
+            // Filter to the active regime, then attach aggregate + outcome
+            // so we can sort and display them. The sort is the most direct
+            // answer to the professor's complaint that the matrix had no
+            // takeaway: highest challenge bubbles to the top, and the right
+            // edge shows what actually happened to IKEA in that market.
+            var stores = (manager.data && manager.data.stores) || [];
+            var rows = ecology
+                .filter(function (r) { return !regimeFilter || r.region_type === regimeFilter; })
+                .map(function (r) {
+                    return Object.assign({}, r, {
+                        _total:   challengeTotal(r),
+                        _outcome: outcomeFor(r.market, stores),
+                    });
+                })
+                .sort(function (a, b) { return b._total - a._total; });
 
             var W = manager.width, H = manager.height;
             var padL = (manager.margin && manager.margin.left) || 80;
@@ -64,9 +98,16 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerL = 130, innerR = 14, innerT = 78, innerB = 52;
-            var cellW = (W - innerL - innerR) / dims.length;
-            var rowH = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
+            // Layout — reserve right-side bands for the two new columns.
+            var CHAL_COL_W    = 84;     // bar (60) + "score/24" label
+            var OUTCOME_COL_W = 130;    // "7 big · 1 closed" badges
+            var innerL = 130;
+            var innerR = 14 + CHAL_COL_W + OUTCOME_COL_W;
+            var innerT = 78, innerB = 70;       // two-line legend needs more room
+            var cellW  = (W - innerL - innerR) / dims.length;
+            var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
+            var chalColX    = innerL + dims.length * cellW + 4;
+            var outcomeColX = chalColX + CHAL_COL_W + 4;
 
             // Section title — amber for East (yellow itself is unreadable as text)
             p.noStroke();
@@ -80,13 +121,14 @@
                     : 'RETAIL ECOLOGY MATRIX';
             p.text(title, innerL, innerT - 56);
 
-            // Subtitle
+            // Subtitle — make the causal payload explicit.
+            // Cells = structural friction; right side = what IKEA actually got.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
             var subtitle = regimeFilter === 'east_asia'
-                ? 'Warm cells = condition challenges IKEA\'s original big-box DIY model'
+                ? 'Sorted by total challenge. Right column = IKEA\'s actual result. Watch the gradient: more friction ↔ more closures.'
                 : regimeFilter === 'western'
-                    ? 'Cool cells = condition fits IKEA\'s original model well'
-                    : 'Cell color = challenge to IKEA\'s original model';
+                    ? 'Sorted by total challenge. Right column = IKEA\'s actual result. Watch the gradient: low friction ↔ stores stay open.'
+                    : 'Sorted by total challenge. Right columns show the aggregate friction score and IKEA\'s actual presence in each market.';
             p.text(subtitle, innerL, innerT - 40);
 
             // Column headers (horizontal, single line — was rotated -30°
@@ -98,6 +140,9 @@
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
+            // New right-side column headers
+            p.text('CHALLENGE / 24', chalColX + CHAL_COL_W / 2, innerT - 8);
+            p.text('IKEA RESULT',     outcomeColX + OUTCOME_COL_W / 2, innerT - 8);
             p.textStyle(p.NORMAL);
 
             // Convert canvas mouse → translated sketch coords
@@ -137,14 +182,60 @@
                         hoverCell = { row: row, dim: d, val: rawVal, level: level };
                     }
                 });
+
+                // === Challenge / 24 column ============================
+                var total = row._total;
+                var barW  = CHAL_COL_W - 28;
+                var barH  = 10;
+                var barX  = chalColX + 4;
+                var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
+                p.noStroke(); p.fill('#eee');
+                p.rect(barX, barY, barW, barH, 2);
+                // Fill color stays on the IKEA bipolar scale
+                p.fill(total >= 17 ? '#FBD914' : total >= 11 ? '#f8e288' : '#b9d0e6');
+                p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
+                p.fill('#1a1a1a'); p.textSize(10); p.textStyle(p.BOLD);
+                p.textAlign(p.LEFT, p.CENTER);
+                p.text(total + '/24', barX + barW + 6, barY + barH / 2);
+                p.textStyle(p.NORMAL);
+
+                // === IKEA Result column ===============================
+                var o = row._outcome;
+                var oy = innerT + i * rowH + rowH / 2;
+                var ox = outcomeColX + 4;
+                p.textSize(10.5); p.textAlign(p.LEFT, p.CENTER);
+                function drawBadge(text, col) {
+                    p.fill(col); p.textStyle(p.BOLD);
+                    p.text(text, ox, oy);
+                    ox += p.textWidth(text);
+                    p.textStyle(p.NORMAL);
+                }
+                function drawSep() {
+                    p.fill('#bbb'); p.text(' · ', ox, oy);
+                    ox += p.textWidth(' · ');
+                }
+                drawBadge(o.bigOpen + ' big', '#0058AB');
+                if (o.cityOpen) {
+                    drawSep();
+                    drawBadge(o.cityOpen + ' city', '#0058AB');
+                }
+                if (o.cityClosed) {
+                    drawSep();
+                    drawBadge(o.cityClosed + ' closed', '#C57F00');
+                }
+                if (!o.bigOpen && !o.cityOpen && !o.cityClosed) {
+                    p.fill('#999'); p.textStyle(p.NORMAL);
+                    p.text('no stores', ox, oy);
+                }
             });
 
-            // Legend (bottom — in the bottom margin)
+            // Legend (bottom — in the bottom margin).
+            // Two rows: cell-level scale, then a key for the result column.
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
-            var legY = H - innerB + 18;
-            p.text("Challenge to IKEA's original model:", innerL, legY);
-            var lx = innerL + 220;
+            var legY = H - innerB + 14;
+            p.text("Cell — challenge to IKEA's original model:", innerL, legY);
+            var lx = innerL + 226;
             [
                 { c: '#e6eef6', label: 'Low' },
                 { c: '#b9d0e6', label: 'Moderate' },
@@ -153,8 +244,19 @@
             ].forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY - 2, 10, 10);
                 p.fill('#333'); p.text(it.label, lx + 14, legY);
-                lx += p.textWidth(it.label) + 30;
+                lx += p.textWidth(it.label) + 26;
             });
+            var legY2 = legY + 16;
+            p.fill('#666');
+            p.text("Result — IKEA presence in the market:", innerL, legY2);
+            var lx2 = innerL + 226;
+            p.fill('#0058AB'); p.textStyle(p.BOLD);
+            p.text('N big', lx2, legY2); lx2 += p.textWidth('N big') + 14;
+            p.fill('#0058AB'); p.text('N city', lx2, legY2); lx2 += p.textWidth('N city') + 14;
+            p.fill('#C57F00'); p.text('N closed', lx2, legY2); lx2 += p.textWidth('N closed') + 14;
+            p.textStyle(p.NORMAL);
+            p.fill('#666');
+            p.text("= active big-box · active city-format · closed city-format stores", lx2, legY2);
 
             p.pop();
 
