@@ -103,7 +103,7 @@
             var OUTCOME_COL_W = 130;    // "7 big · 1 closed" badges
             var innerL = 130;
             var innerR = 14 + CHAL_COL_W + OUTCOME_COL_W;
-            var innerT = 78, innerB = 70;       // two-line legend needs more room
+            var innerT = 78, innerB = 52;
             var cellW  = (W - innerL - innerR) / dims.length;
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
             var chalColX    = innerL + dims.length * cellW + 4;
@@ -140,9 +140,19 @@
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
-            // New right-side column headers
+            // New right-side column headers.
+            // Replace the catch-all 'IKEA RESULT' with one micro-header per
+            // slot so each big number in the row has its own visible label
+            // directly above it (instead of forcing the reader to decode an
+            // inline 'N big · N city · N closed' string against a footer key).
             p.text('CHALLENGE / 24', chalColX + CHAL_COL_W / 2, innerT - 8);
-            p.text('IKEA RESULT',     outcomeColX + OUTCOME_COL_W / 2, innerT - 8);
+            var slotW = OUTCOME_COL_W / 3;
+            p.textSize(9);
+            ['BIG-BOX', 'CITY', 'CLOSED'].forEach(function (lab, k) {
+                var sx = outcomeColX + k * slotW + slotW / 2;
+                p.fill(k === 2 ? '#C57F00' : '#0058AB');
+                p.text(lab, sx, innerT - 8);
+            });
             p.textStyle(p.NORMAL);
 
             // Convert canvas mouse → translated sketch coords
@@ -199,41 +209,38 @@
                 p.text(total + '/24', barX + barW + 6, barY + barH / 2);
                 p.textStyle(p.NORMAL);
 
-                // === IKEA Result column ===============================
-                var o = row._outcome;
+                // === IKEA Result — 3 fixed slots, each aligned with its
+                //     column header above. Zero values are rendered as a
+                //     muted "—" so the eye can still register the slot
+                //     without the noise of a colored "0".
+                var o  = row._outcome;
                 var oy = innerT + i * rowH + rowH / 2;
-                var ox = outcomeColX + 4;
-                p.textSize(10.5); p.textAlign(p.LEFT, p.CENTER);
-                function drawBadge(text, col) {
-                    p.fill(col); p.textStyle(p.BOLD);
-                    p.text(text, ox, oy);
-                    ox += p.textWidth(text);
-                    p.textStyle(p.NORMAL);
-                }
-                function drawSep() {
-                    p.fill('#bbb'); p.text(' · ', ox, oy);
-                    ox += p.textWidth(' · ');
-                }
-                drawBadge(o.bigOpen + ' big', '#0058AB');
-                if (o.cityOpen) {
-                    drawSep();
-                    drawBadge(o.cityOpen + ' city', '#0058AB');
-                }
-                if (o.cityClosed) {
-                    drawSep();
-                    drawBadge(o.cityClosed + ' closed', '#C57F00');
-                }
-                if (!o.bigOpen && !o.cityOpen && !o.cityClosed) {
-                    p.fill('#999'); p.textStyle(p.NORMAL);
-                    p.text('no stores', ox, oy);
-                }
+                var slots = [
+                    { val: o.bigOpen,    col: '#0058AB' },
+                    { val: o.cityOpen,   col: '#0058AB' },
+                    { val: o.cityClosed, col: '#C57F00' },
+                ];
+                p.textStyle(p.BOLD);
+                p.textAlign(p.CENTER, p.CENTER);
+                slots.forEach(function (s, k) {
+                    var sx = outcomeColX + k * slotW + slotW / 2;
+                    if (s.val > 0) {
+                        p.fill(s.col); p.textSize(16);
+                        p.text(s.val, sx, oy);
+                    } else {
+                        p.fill('#cfcfcf'); p.textSize(13);
+                        p.text('—', sx, oy);
+                    }
+                });
+                p.textStyle(p.NORMAL);
             });
 
-            // Legend (bottom — in the bottom margin).
-            // Two rows: cell-level scale, then a key for the result column.
+            // Legend — cell scale only. The right-side slot headers
+            // (BIG-BOX / CITY / CLOSED) carry their own meaning, so no
+            // second legend row is needed.
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
-            var legY = H - innerB + 14;
+            var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 226;
             [
@@ -246,17 +253,6 @@
                 p.fill('#333'); p.text(it.label, lx + 14, legY);
                 lx += p.textWidth(it.label) + 26;
             });
-            var legY2 = legY + 16;
-            p.fill('#666');
-            p.text("Result — IKEA presence in the market:", innerL, legY2);
-            var lx2 = innerL + 226;
-            p.fill('#0058AB'); p.textStyle(p.BOLD);
-            p.text('N big', lx2, legY2); lx2 += p.textWidth('N big') + 14;
-            p.fill('#0058AB'); p.text('N city', lx2, legY2); lx2 += p.textWidth('N city') + 14;
-            p.fill('#C57F00'); p.text('N closed', lx2, legY2); lx2 += p.textWidth('N closed') + 14;
-            p.textStyle(p.NORMAL);
-            p.fill('#666');
-            p.text("= active big-box · active city-format · closed city-format stores", lx2, legY2);
 
             p.pop();
 
