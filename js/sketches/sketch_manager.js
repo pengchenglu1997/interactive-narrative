@@ -90,11 +90,23 @@ function startP5() {
                 p.canvas.style.transform = 'translateY(' + tx.toFixed(2) + 'px)';
                 p.canvas.style.opacity = op.toFixed(3);
 
-                // mirror transition on the active text step
+                // Mirror the canvas's scroll-in/out transition onto the
+                // active text step — BUT only for sections that actually
+                // have a viz next to them. Full-text sections (hero,
+                // scorecard, author) have the canvas hidden via CSS, so
+                // there's nothing to mirror; overwriting their .style every
+                // frame fights with the static `opacity:1` that sections.js
+                // sets on 'active' and produces visible flicker when scroll
+                // progress jitters near boundaries.
                 var activeStep = document.querySelector('.step[data-active-index="' + (self.state.activeIndex || 0) + '"]');
-                if (activeStep) {
+                if (activeStep && activeStep.dataset.layout !== 'full-text') {
                     activeStep.style.transform = 'translateY(' + tx.toFixed(2) + 'px)';
                     activeStep.style.opacity = op.toFixed(3);
+                } else if (activeStep) {
+                    // Clear any leftover inline styles from when the user
+                    // was on a viz section, so the static CSS controls layout.
+                    activeStep.style.transform = '';
+                    activeStep.style.opacity = '';
                 }
 
                 var dbg = document.getElementById('debug-state');
