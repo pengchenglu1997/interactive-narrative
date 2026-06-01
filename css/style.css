@@ -585,6 +585,18 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
+/* Override #sections a — Leaflet zoom buttons are <a> tags, so the
+   article-wide blue-link rule was painting +, −, and the new ↺
+   all in IKEA blue with an underline. Restore Leaflet's default
+   neutral dark for the whole bar. */
+.leaflet-bar a,
+.leaflet-bar a:hover,
+.leaflet-bar a:focus,
+.leaflet-bar a:visited {
+  color: #333;
+  border-bottom: none;
+}
+
 /* Per-map Reset-view button — appended into the Leaflet zoom bar so it
    sits flush under the minus button as the third item in the +/−/↺
    group. Restores the map's pan + zoom to its original fitBounds.
@@ -595,7 +607,7 @@
   height: 26px;
   line-height: 26px;
   font-size: 16px;
-  color: var(--ikea-blue);
+  color: #333;
   text-decoration: none;
   text-align: center;
   font-weight: 700;
@@ -605,8 +617,8 @@
   background: #fff;
 }
 .leaflet-control-zoom .map-reset-btn:hover {
-  background: var(--paper);
-  color: var(--ikea-blue);
+  background: #f4f4f4;
+  color: #000;
 }
 
 /* ============ Stat cards (Act 4) ============ */
