@@ -118,7 +118,12 @@
                 boxZoom: false,
                 keyboard: false,
             });
-            m.fitBounds(L.latLngBounds(r.bounds), { padding: [2, 2], animate: false });
+            // Initial framing — we also save it on the map object so the
+            // per-map Reset-view control below can restore it after the
+            // user pans / zooms.
+            var initialBounds = L.latLngBounds(r.bounds);
+            m._initialBounds = initialBounds;
+            m.fitBounds(initialBounds, { padding: [2, 2], animate: false });
             L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
                 maxZoom: 14,
                 subdomains: 'abcd',
@@ -131,6 +136,26 @@
                 return div;
             };
             label.addTo(m);
+            // Per-map Reset-view control — restores this map's pan +
+            // zoom to its original fitBounds without touching the year
+            // scrubber (which has its own reset on the toolbar above).
+            var resetView = L.control({ position: 'topright' });
+            resetView.onAdd = function () {
+                var div = L.DomUtil.create('div', 'leaflet-bar map-reset-view');
+                var btn = L.DomUtil.create('a', '', div);
+                btn.href = '#';
+                btn.title = 'Reset view';
+                btn.setAttribute('role', 'button');
+                btn.setAttribute('aria-label', 'Reset map view');
+                btn.innerHTML = '⌂';
+                L.DomEvent.on(btn, 'click', function (e) {
+                    L.DomEvent.stop(e);
+                    m.fitBounds(m._initialBounds, { padding: [2, 2], animate: true });
+                });
+                L.DomEvent.disableClickPropagation(div);
+                return div;
+            };
+            resetView.addTo(m);
             state.maps[r.id] = m;
             // Marker clustering — many IKEA stores share the same
             // metro (Shanghai 3 cluster, Tokyo 4 cluster, NYC 3 cluster,

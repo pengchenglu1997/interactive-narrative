@@ -585,6 +585,24 @@
   box-shadow: 0 1px 2px rgba(0,0,0,0.1);
 }
 
+/* Per-map Reset-view control — sits in the topright corner of each
+   region map and restores its pan + zoom to the original fitBounds.
+   Independent from the year scrubber's reset on the toolbar above. */
+.leaflet-bar.map-reset-view a {
+  width: 26px;
+  height: 26px;
+  line-height: 26px;
+  font-size: 15px;
+  color: var(--ikea-blue);
+  text-decoration: none;
+  text-align: center;
+  font-weight: 700;
+}
+.leaflet-bar.map-reset-view a:hover {
+  background: var(--paper);
+  color: var(--ikea-blue);
+}
+
 /* ============ Stat cards (Act 4) ============ */
 
 .stat-cards {
