@@ -13,8 +13,10 @@
 //     mixed-citation-based). Group caption + label-style differ so
 //     the reader knows which is which.
 //   - Single-hue heatmap PER regime (no mixed blue+yellow on a
-//     chart). Low/Moderate are gray; only High / Very-high carry
-//     the regime hue.
+//     chart). Every level — Low → Very-high — is shaded in the
+//     regime hue (pale → saturated). No gray steps, so the
+//     East panel reads as "all yellow" and the West panel reads
+//     as "all blue" at a glance.
 //   - CHALLENGE total now /12 (3 dims × max level 4) instead of /16.
 //   - Outcomes (BIG-BOX / CITY OPEN / CITY SHUT) remain in the prose,
 //     not in the matrix.
@@ -37,16 +39,23 @@
         domestic_competition: { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
     };
 
-    // Per-regime monochrome heatmap. Low/Moderate are neutral grays so
-    // the two regime views never visually mix blue and yellow.
+    // Per-regime single-hue heatmap. Every level is shaded in the
+    // regime hue from very pale → saturated. No gray steps — the
+    // East panel reads as "all yellow" and the West panel reads
+    // as "all blue" at a glance, with depth = challenge level.
     function challengeColor(level, regime) {
-        if (level <= 1) return '#efefef';                          // light gray
-        if (level <= 2) return '#d4d4d4';                          // mid gray
         if (regime === 'east_asia') {
-            return level <= 3 ? '#fff5b2' : '#FBD914';             // pale yellow → IKEA yellow
+            // Yellow gradient (pale → IKEA yellow)
+            if (level <= 1) return '#fff9d6';                      // very pale yellow
+            if (level <= 2) return '#fff0a8';                      // pale yellow
+            if (level <= 3) return '#ffe35c';                      // medium yellow
+            return '#FBD914';                                       // IKEA yellow
         }
         // western (and combined view) — single blue gradient
-        return level <= 3 ? '#b9d0e6' : '#0058AB';                 // pale blue → IKEA blue
+        if (level <= 1) return '#e6effa';                          // very pale blue
+        if (level <= 2) return '#b9d0e6';                          // pale blue
+        if (level <= 3) return '#6699cc';                          // medium blue
+        return '#0058AB';                                           // IKEA blue
     }
 
     function regimeColor(rt) {
@@ -119,8 +128,13 @@
 
             // Subtitle — explicit about which dims are quantitative vs observation.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            var hueLabel = regimeFilter === 'east_asia'
+                ? 'Cells shaded in a single yellow gradient — pale = low challenge, saturated = very high.'
+                : regimeFilter === 'western'
+                    ? 'Cells shaded in a single blue gradient — pale = low challenge, saturated = very high.'
+                    : '';
             var subtitle = (regimeFilter === 'east_asia' || regimeFilter === 'western')
-                ? 'Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Sorted by total challenge. See data/SOURCING.md for per-cell sources.'
+                ? hueLabel + ' Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Sorted by total challenge. See data/SOURCING.md for per-cell sources.'
                 : 'Density is quantitative; service and competition are observation-based. Sorted by total challenge.';
             p.text(subtitle, innerL, innerT - 58);
 
@@ -211,12 +225,13 @@
                 var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
                 p.noStroke(); p.fill('#eee');
                 p.rect(barX, barY, barW, barH, 2);
-                // Bar fill stays in the regime hue family. Thresholds
-                // rescaled for the /12 scale: 8+ = saturated, 5+ = pale,
-                // below = neutral gray.
+                // Bar fill — single-hue per regime, three depths,
+                // no gray. Matches the cell palette: 8+ = saturated
+                // regime hue, 5+ = medium, below = palest shade.
                 var topShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
-                var midShade = row.region_type === 'east_asia' ? '#fff5b2' : '#b9d0e6';
-                p.fill(total >= 8 ? topShade : total >= 5 ? midShade : '#d4d4d4');
+                var midShade = row.region_type === 'east_asia' ? '#ffe35c' : '#6699cc';
+                var lowShade = row.region_type === 'east_asia' ? '#fff9d6' : '#e6effa';
+                p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(10); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
@@ -231,13 +246,17 @@
             var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 226;
+            // Single-hue gradient legend, 4 stops — matches the
+            // challengeColor() ladder (pale → IKEA hue), no gray.
             var topHi  = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
-            var midHi  = regimeFilter === 'east_asia' ? '#fff5b2' : '#b9d0e6';
+            var medHi  = regimeFilter === 'east_asia' ? '#ffe35c' : '#6699cc';
+            var palHi  = regimeFilter === 'east_asia' ? '#fff0a8' : '#b9d0e6';
+            var palest = regimeFilter === 'east_asia' ? '#fff9d6' : '#e6effa';
             [
-                { c: '#efefef', label: 'Low' },
-                { c: '#d4d4d4', label: 'Moderate' },
-                { c: midHi,     label: 'High' },
-                { c: topHi,     label: 'Very high' },
+                { c: palest, label: 'Low' },
+                { c: palHi,  label: 'Moderate' },
+                { c: medHi,  label: 'High' },
+                { c: topHi,  label: 'Very high' },
             ].forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY - 2, 10, 10);
                 p.fill('#333'); p.text(it.label, lx + 14, legY);
