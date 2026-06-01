@@ -131,25 +131,35 @@
         <section class="step" data-active-index="7">
           <div class="act-label">Act 4 · East Asia</div>
           <div class="title">Why East Asia Faces Defensive Pressure</div>
-          <p class="takeaway">Dense cities, less DIY-oriented consumer behavior, and stronger local competition create pressure on IKEA's original model.</p>
+          <p class="takeaway">High urban density and stronger local competition create measurable pressure on IKEA's original model in East Asian markets.</p>
           <p>
             The retail ecology matrix suggests that IKEA faces stronger structural headwinds
-            across several East Asian markets. Dense urban environments, less DIY-oriented
-            consumer behavior, higher service expectations, and stronger local competition
-            make the original big-box, self-service model harder to translate directly.
+            across several East Asian markets. Urban density is the dimension we can cite
+            directly: Tokyo's 23 wards average about 15,000 people per km², Seoul ~16,000,
+            and Hong Kong / Singapore are denser still. The matrix also tracks
+            service-bundling norms and local competition as observation-based dimensions
+            (see <code>data/SOURCING.md</code> for per-cell sources).
           </p>
           <p>
             The business context reinforces this pressure: strong regional competitors such as
             <strong>Nitori</strong> and <strong>Hanssem</strong>, combined with
             <strong>IKEA China's reported revenue decline from its 2019 peak</strong>, suggest
             that East Asian markets require more localized adaptation rather than a simple
-            replication of the original model.
+            replication of the original model. The consumer-behavior side of the story —
+            including the documented lower willingness to self-assemble furniture — is
+            described in Burt, Dawson, Johansson &amp; Hultman (2020) and stays in the text
+            rather than in the matrix, because no comparable country-level metric for
+            "DIY culture" exists.
           </p>
           <p class="src">
-            Method note: Retail ecology scores are coded from external sources and project
-            notes. Detailed scoring rules will be included in the data-processing documentation.
-            Sources: Nitori IR; Statista on Hanssem; ConCall analysis of IKEA financials;
-            Lifeweek and 21st Century Business Herald on China pricing.
+            Method note: Retail ecology cells are sourced per dimension in
+            <code>data/processed/retail_ecology.csv</code> (density_source,
+            competition_source, service_source, diy_source). Density is sourced from
+            national statistical agencies; competition is anchored where market-share
+            data exists (Statista Hanssem ~25%, Nitori IR ~¥929B) and labelled as
+            observation across mid-size players where it does not.
+            Other sources: ConCall analysis of IKEA financials; Lifeweek and 21st Century
+            Business Herald on China pricing.
           </p>
         </section>
 
@@ -157,20 +167,32 @@
         <section class="step" data-active-index="8">
           <div class="act-label">Act 4 · West</div>
           <div class="title">Why the Original Model Still Fits Many Western Markets</div>
-          <p class="takeaway">Several Western markets preserve conditions that support IKEA's original big-box and DIY model.</p>
+          <p class="takeaway">Several Western markets preserve the density and competition conditions that support IKEA's original big-box model.</p>
           <p>
             Compared with East Asian markets, many Western markets show conditions that
-            better support IKEA's original model: stronger DIY culture, higher car dependence,
-            lower density in many areas, and less intense local manufacturing competition.
-            This helps explain why the Western response can build on the existing big-box
-            network through city stores and service additions, rather than shifting as
-            defensively.
+            better support IKEA's original model. Density is the dimension most directly
+            citable: US Census and Statistics Canada data put US / Canada metropolitan
+            density well below East Asian peers, with most IKEA store catchments
+            calibrated to suburban / exurban densities of 500–1,500 people per km².
+            Competition is also weaker by negative observation — no single dominant
+            domestic furniture chain operates at IKEA's price-and-format scale in the
+            US, UK, Germany, or Canada.
+          </p>
+          <p>
+            The consumer-side observation about stronger DIY culture in Western markets
+            (Home Depot ~USD 157B FY24 + Lowe's ~USD 83B; OBI / Hornbach / Bauhaus all
+            multi-billion-euro retailers in DACH) is documented here rather than scored
+            in the matrix because no clean country-level DIY metric exists. The Western
+            response builds on the existing big-box network through city stores and
+            service additions, rather than shifting defensively.
           </p>
           <p class="src">
-            Method note: Retail ecology scores are coded from external sources and project
-            notes. Detailed scoring rules will be included in the data-processing documentation.
-            Anchored in Burt, Johansson &amp; Thelander (2011); Burt, Dawson, Johansson &amp;
-            Hultman (2020); Ivarsson &amp; Alvstam (2010).
+            Method note: Per-cell sources are in <code>data/processed/retail_ecology.csv</code>
+            and surveyed in <code>data/SOURCING.md</code>. Density figures: US Census Bureau,
+            UK ONS, Eurostat, Statistics Canada, INSEE. DIY-retail figures: Home Depot 10-K
+            FY24, Kingfisher Annual Report, OBI / Hornbach / Bauhaus annual disclosures.
+            Anchored academically in Burt, Johansson &amp; Thelander (2011); Burt, Dawson,
+            Johansson &amp; Hultman (2020); Ivarsson &amp; Alvstam (2010).
           </p>
         </section>
 
@@ -248,17 +270,26 @@
             shows different strategic emphasis.
           </p>
           <p>
-            Western markets build more on the original model: big-box network, urban-format
-            city stores, service partnerships, and resale/circularity. East Asian markets
-            emphasize repositioning, local design integration, channel innovation, and
-            price defense. East Asian markets show a more locally adaptive playbook shaped
-            by price pressure, platform shifts, and local competition.
+            On the Western side, the dominant signal is the global EUR 2.1B price
+            commitment, then urban-format city stores and the maintained big-box
+            network — a strategy that extends the original model with additions rather
+            than replacing it. On the East Asian side, the dominant signal is also
+            price defense, but it is paired with strategy repositioning (China #5 → #10,
+            announced reinvestment, Tokyo Harajuku and Shinjuku closures) and local
+            design integration (Nitori ¥929B, Hanssem ~25% of Korean interior) — a more
+            locally adaptive playbook shaped by price pressure, platform shifts, and
+            local competition.
           </p>
           <p>
             The takeaway: one global IKEA model becomes two regional playbooks under
             different housing pressures and retail ecologies.
           </p>
-          <p class="src">Intensities computed algorithmically with time decay (τ = 6y), parsed USD-equivalent magnitudes, and min-max normalization within regime. See <code>data/PLAYBOOK_COMPUTATION.md</code> for the per-row math.</p>
+          <p class="src">
+            Intensities computed algorithmically with time decay (τ = 6y), parsed
+            USD-equivalent magnitudes, and min-max normalization within regime. Anchor
+            metrics + per-cell provenance: <code>data/SOURCING.md</code>. Per-row
+            algorithm audit: <code>data/PLAYBOOK_COMPUTATION.md</code>.
+          </p>
         </section>
 
         <!-- ===== 11  About authors ===== -->
