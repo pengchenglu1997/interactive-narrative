@@ -284,7 +284,286 @@ How our anchor maps: `metric_value = 2.1` is the headline EUR-billion figure; `u
 
 ## 2. `retail_ecology.csv` — 40 cells (10 markets × 4 dimensions)
 
-*Pending — see follow-up commit. This is the file with the largest open-source risk. Per-cell entries with HIGH / LOW confidence flags by dimension to follow.*
+**This is the dataset with the largest open-source risk.** Two structural problems:
+
+1. The categorical ratings (`weak / moderate / strong / very_strong`) are **not directly stated** in any single source. They are *interpretations* by the author of available evidence.
+2. The `primary_sources` column is **per-row, not per-cell** — so even the listed citations don't tell you which of the 4 dimensions in that row they support.
+
+### 2A. Dimension-level confidence assessment
+
+Before going cell-by-cell, here is an honest assessment of each *dimension's* general supportability:
+
+| Dimension | Can it be backed by an external metric? | Recommended treatment |
+|---|---|---|
+| **urban_density** | **YES — HIGH confidence.** Each market has published population-density data (US Census, Eurostat, HK Census, Tokyo Statistical Yearbook, etc.). Categorical ratings can be defended by binding them to actual person/km² ranges for the largest 1-2 metros per market. | **Keep** as quantitative-backed dimension; add per-market density figure to the row. |
+| **domestic_competition** | **PARTIAL.** Furniture / interior market share data exists for some markets (Hanssem Korea via Statista; Nitori Japan via IR; IKEA China via Yicai). Other markets have weaker data (UK, France, Canada — no single dominant local furniture brand to cite). | **Keep** for markets with citable market-leader data (Korea, Japan, China); **flag as observation** for markets without (UK, France, Germany, Canada, US). |
+| **service_expectation** | **INTERPRETIVE.** No single canonical metric. Proxies include same-day-delivery availability, e-commerce penetration, service-bundled retail share. Each proxy is debatable. | **Reduce confidence to observational**; rephrase as "service-bundle norms in retail" rather than a measurable rating. |
+| **diy_culture** | **NO direct metric exists.** This is fieldwork / industry observation. The closest indirect signals are home-improvement retail market sizes (Home Depot, B&Q, etc.) and IKEA's documented choice to bundle assembly in some markets. | **Relabel as "fieldwork observation — not a primary metric"** and lower the contribution to the CHALLENGE total, OR drop entirely. |
+
+### 2B. Per-cell entries
+
+The 40 cells are organised by dimension (4 sub-sections), so the reader can scan the strongest dimension first (urban_density) and the weakest last (diy_culture).
+
+#### 2B.1 `urban_density` — 10 cells
+
+Categorical scale: `low → moderate → high → very_high` (4 levels). Maps to challenge score 1-4 (higher density = harder for big-box stores).
+
+Each entry below proposes a quantitative anchor (the metric_value the categorical should bind to) and tags confidence.
+
+---
+
+**2B.1.1 United States · urban_density = low**
+
+Suggested quantitative anchor: continental US largest-metro densities — NYC ~11,000 /km², LA ~3,200 /km², Chicago ~4,600 /km², Houston ~1,400 /km², Phoenix ~1,200 /km². Average of largest 5 ≈ 4,300 /km², but the *typical* US metro (median) is closer to 1,500 /km². Big-box retail planning is calibrated to suburban / exurban densities of ~500-1,500 /km².
+Source candidate: US Census Bureau, "Population Density by County", 2020 census.
+Mapping: "low" because the bulk of IKEA's US store catchment is in low-density suburbs accessible by car (not the NYC metro proper).
+**Confidence: HIGH** — this can be defended with one Census Bureau line.
+Verify URL: https://www.census.gov/library/visualizations/2021/dec/2020-population-and-housing-state-data.html
+
+---
+
+**2B.1.2 United Kingdom · urban_density = moderate**
+
+Suggested quantitative anchor: London ~5,700 /km², Manchester ~4,700 /km², Birmingham ~4,200 /km². Median UK city density meaningfully higher than US, lower than HK / Singapore.
+Source candidate: Office for National Statistics, "Population estimates for the UK".
+**Confidence: HIGH**
+Verify URL: https://www.ons.gov.uk/peoplepopulationandcommunity/populationandmigration/populationestimates
+
+---
+
+**2B.1.3 Germany · urban_density = moderate**
+
+Suggested quantitative anchor: Berlin ~4,100 /km², Munich ~4,800 /km², Hamburg ~2,500 /km². Lower than UK average.
+Source candidate: Eurostat regional density data (NUTS 3).
+**Confidence: HIGH**
+Verify URL: https://ec.europa.eu/eurostat/databrowser/view/demo_r_d3dens
+
+---
+
+**2B.1.4 Canada · urban_density = low**
+
+Suggested quantitative anchor: Toronto metro ~4,400 /km², Montreal ~4,800 /km², Vancouver ~5,500 /km², but the dominant Canadian residential pattern is suburban/exurban (lower than 1,500 /km² across most metros' commuter belts).
+Source candidate: Statistics Canada, "Population Density".
+**Confidence: HIGH**
+Verify URL: https://www150.statcan.gc.ca/n1/pub/91-215-x/2022001/sec3-eng.htm
+
+---
+
+**2B.1.5 France · urban_density = high**
+
+Suggested quantitative anchor: Paris (the city, not Île-de-France) is ~20,500 /km² — among the densest large city cores in Europe. Lyon ~10,800 /km², Marseille ~3,600 /km².
+Source candidate: INSEE, "Densités de population par commune", 2020.
+**Confidence: HIGH** — Paris's exceptional density is well-documented and is the specific anchor for the La Madeleine city-format experiment.
+Verify URL: https://www.insee.fr/fr/statistiques
+
+---
+
+**2B.1.6 China · urban_density = high**
+
+Suggested quantitative anchor: Shanghai ~3,900 /km², Beijing ~1,400 /km², Shenzhen ~6,700 /km², Guangzhou ~2,100 /km². (Lower than HK / Singapore but high by global standards.)
+Source candidate: National Bureau of Statistics of China, "China City Statistical Yearbook", latest edition.
+**Confidence: HIGH** for the qualitative rating; **PROBABLE** for specific city figures (year of measurement matters).
+Verify URL: https://data.stats.gov.cn/english/
+
+---
+
+**2B.1.7 Japan · urban_density = very_high**
+
+Suggested quantitative anchor: Tokyo 23 wards ~15,200 /km² (Shibuya ~15,000 /km², Shinjuku ~19,500 /km² — the specific wards where IKEA opened then closed city stores). Osaka City ~12,200 /km².
+Source candidate: Tokyo Statistical Yearbook, Statistics Bureau of Japan.
+**Confidence: HIGH**
+Verify URL: https://www.toukei.metro.tokyo.lg.jp/
+
+---
+
+**2B.1.8 South Korea · urban_density = high**
+
+Suggested quantitative anchor: Seoul ~16,000 /km² (similar to Tokyo wards); Busan ~4,300 /km², Incheon ~2,800 /km².
+Source candidate: Statistics Korea, "Population by Administrative District".
+**Confidence: HIGH** for Seoul; the South Korea row's "high" rating (one level below Japan's "very_high") is defensible if it averages Seoul with smaller cities.
+Verify URL: https://kostat.go.kr/anse/
+
+---
+
+**2B.1.9 Hong Kong · urban_density = very_high**
+
+Suggested quantitative anchor: Hong Kong overall ~7,100 /km² but Kowloon ~50,000 /km² — among the highest urban densities in the world.
+Source candidate: HK Census and Statistics Department.
+**Confidence: HIGH** — this is one of the most-cited density figures globally.
+Verify URL: https://www.censtatd.gov.hk/
+
+---
+
+**2B.1.10 Singapore · urban_density = very_high**
+
+Suggested quantitative anchor: Singapore overall ~8,400 /km² — entire city-state operates at urban density.
+Source candidate: Singapore Department of Statistics.
+**Confidence: HIGH**
+Verify URL: https://www.singstat.gov.sg/
+
+---
+
+**2B.1 (urban_density) summary: all 10 cells are HIGH confidence given the right citation.** Recommended action: add per-row `density_value_per_km2` numeric column to retail_ecology.csv and use it to derive the categorical rating mechanically rather than judgmentally.
+
+---
+
+#### 2B.2 `domestic_competition` — 10 cells
+
+Categorical scale: `weak → moderate → strong → very_strong`. Maps to challenge score 1-4 (stronger local competition = harder for IKEA).
+
+---
+
+**2B.2.1 United States · domestic_competition = weak**
+
+Suggested anchor: no dominant US furniture retailer at scale that competes with IKEA's price-point + format. Ashley Furniture is large but operates a different distribution model. Wayfair is online-only. No comparable big-box / DIY-style competitor.
+**Confidence: MEDIUM-HIGH** (defensible by negative observation — IKEA's main US competitors are Target / Walmart in adjacent home-goods, not direct furniture).
+
+---
+
+**2B.2.2 United Kingdom · domestic_competition = moderate**
+
+Suggested anchor: Argos, B&Q (Kingfisher), Dunelm operate adjacent / overlapping categories. None matches IKEA's scale 1:1 but combined market share is meaningful.
+**Confidence: MEDIUM** — subjective synthesis of multiple retailers; no single market-share statistic.
+
+---
+
+**2B.2.3 Germany · domestic_competition = moderate**
+
+Suggested anchor: XXXLutz / Mömax (Austrian, dominant in DACH), Höffner, OBI. XXXLutz is the largest European furniture retailer overall.
+**Confidence: MEDIUM** — XXXLutz's scale is well-documented; "moderate" is a defensible rating relative to East Asia.
+
+---
+
+**2B.2.4 Canada · domestic_competition = weak**
+
+Suggested anchor: similar to US; no dominant Canadian furniture chain. Leon's / The Brick are mid-size but don't replicate IKEA's positioning.
+**Confidence: MEDIUM-HIGH** (negative observation).
+
+---
+
+**2B.2.5 France · domestic_competition = moderate**
+
+Suggested anchor: Conforama, BUT, Maisons du Monde — multiple mid-size French furniture retailers but no single dominant competitor at IKEA's scale.
+**Confidence: MEDIUM**
+
+---
+
+**2B.2.6 China · domestic_competition = strong**
+
+Suggested anchor: **Quantitative backing available.** IKEA China's FY24 revenue ~RMB 11.15B (Yicai), versus combined market share of platform-mediated competitors (Pinduoduo Home, Tmall Home, JD Home) and offline brands (Red Star Macalline / 红星美凯龙).
+**Confidence: HIGH** — backed by Yicai FY24 reporting + the existence of named competitors in our `east_asian_competitors.csv`.
+
+---
+
+**2B.2.7 Japan · domestic_competition = strong**
+
+Suggested anchor: **Quantitative backing available.** Nitori FY25 ~¥929B (≈USD 6B) versus IKEA Japan's much smaller footprint (4 big-box + 1 city store). Nitori dwarfs IKEA in Japan by roughly 4×.
+**Confidence: HIGH** — anchored by Nitori IR + IKEA Japan store count.
+Source: https://ir.nitorihd.co.jp/en/library/result_briefing.html
+
+---
+
+**2B.2.8 South Korea · domestic_competition = strong**
+
+Suggested anchor: **Quantitative backing available.** Hanssem ~25% Korean interior market share (Statista) — the dominant domestic player. Plus Coupang's same-day delivery model competing on convenience.
+**Confidence: HIGH** — anchored by Statista's Hanssem share figure.
+Source: https://www.statista.com/statistics/1280018/
+
+---
+
+**2B.2.9 Hong Kong · domestic_competition = moderate**
+
+Suggested anchor: HK is small enough that domestic furniture retailers are mostly local SMEs; HK's main competition for IKEA is online cross-border + Mainland brands rather than a single domestic giant.
+**Confidence: MEDIUM** — relative rating defensible; no single market-share figure to cite.
+
+---
+
+**2B.2.10 Singapore · domestic_competition = moderate**
+
+Suggested anchor: similar to HK — small market, no single dominant local furniture brand. Cellini and HomePro operate but are mid-size.
+**Confidence: MEDIUM**
+
+---
+
+**2B.2 (domestic_competition) summary: 5 HIGH-confidence cells (US, Canada, China, Japan, Korea); 5 MEDIUM-confidence (UK, Germany, France, HK, Singapore).** Recommended action: keep HIGH cells as-is; soften the 5 MEDIUM cells to "moderate (observed across multiple mid-size players)" in the matrix tooltip.
+
+---
+
+#### 2B.3 `service_expectation` — 10 cells
+
+Categorical scale: `weak → moderate → strong → very_strong`. Maps to challenge score 1-4 (higher service expectation = harder for IKEA's self-service model).
+
+**Dimension-level honesty: this is the dimension where ratings are most interpretive.** "Service expectation" is not a published metric anywhere. Proxies considered:
+
+- Same-day delivery availability across retail
+- E-commerce penetration
+- Norms around bundled assembly / installation in furniture retail specifically
+- Customer-service-intensive retail formats (department stores still significant)
+
+**Author's honest position:** the four East-Asian cells (China strong, Japan very_strong, Korea strong, HK strong, Singapore strong) are *defensible relative to Western markets* but the specific level ("strong" vs "very_strong") is judgemental, not measured. Recommended: keep dimension but **document this dimension as "observation-based / proxy-driven" in the matrix subtitle** rather than presenting it as if it were a measured value.
+
+Per-cell entries are brief because the underlying problem is structural:
+
+| Market | Cell | Honest justification |
+|---|---|---|
+| **2B.3.1 US** | moderate | Furniture retail uses standard delivery options; same-day not the norm in furniture specifically. |
+| **2B.3.2 UK** | moderate | Similar to US. |
+| **2B.3.3 Germany** | moderate | Similar to UK; strong DIY culture in DACH means lower bundled-service expectation. |
+| **2B.3.4 Canada** | moderate | Similar to US. |
+| **2B.3.5 France** | moderate | Similar to UK. |
+| **2B.3.6 China** | strong | Platform retailers (JD, Tmall) ship same-day in tier-1 cities; "送装一体" (delivery + assembly) is standard. |
+| **2B.3.7 Japan** | very_strong | Service is a cultural baseline; assembly + delivery historically bundled in department-store-adjacent furniture retail. |
+| **2B.3.8 South Korea** | strong | Coupang's same-day model now extends to furniture; bundled installation common. |
+| **2B.3.9 Hong Kong** | strong | High service expectations in retail broadly; small apartments favour bundled-service delivery. |
+| **2B.3.10 Singapore** | strong | Similar to HK. |
+
+**Confidence: MEDIUM-LOW across all 10 cells.** Recommended action: relabel matrix subtitle to "Service-bundling norms in furniture retail (observation-based)" and de-emphasise the dimension's contribution to the CHALLENGE total.
+
+---
+
+#### 2B.4 `diy_culture` — 10 cells
+
+Categorical scale: `weak → moderate → strong → very_strong`. Maps to challenge score 0-3 (strong DIY = low challenge — fits IKEA's flat-pack model).
+
+**Dimension-level honesty: there is no published metric for "DIY culture" at the country level.** Closest proxies: home-improvement market size (Home Depot / Lowe's combined ~USD 200B+ in US; B&Q ~£3.3B in UK; etc.) — but these measure home improvement broadly, not consumer willingness to self-assemble furniture specifically.
+
+**This is the weakest dimension in the matrix.** Honest recommendation: either
+
+(a) **Drop the dimension entirely** from CHALLENGE total. Use it as a text annotation per market ("IKEA China bundles delivery + assembly because consumers do not self-assemble at scale — Burt 2020"), not as a scored cell.
+
+(b) **Keep the dimension but mark it as "observation only"** in the matrix subtitle, and reduce its contribution to the total by half.
+
+(c) **Replace with a proxy metric**: e.g., per-capita home-improvement retail spend (defensible per market but a different conceptual entity).
+
+Per-cell entries are short because the underlying signal is the same across all of them — IKEA's documented choice to bundle assembly in East-Asia + research papers (Burt 2020) describing localised service in China:
+
+| Market | Cell | Justification |
+|---|---|---|
+| **2B.4.1 US** | strong | Large home-improvement retail sector (Home Depot, Lowe's); IKEA's standard flat-pack model worked here unchanged. |
+| **2B.4.2 UK** | moderate | B&Q / Wickes are large but smaller than US home-improvement scale; moderate DIY culture. |
+| **2B.4.3 Germany** | strong | OBI / Hornbach / Bauhaus all >€1B revenue; DIY culture historically strong in DACH. |
+| **2B.4.4 Canada** | strong | Mirrors US pattern. |
+| **2B.4.5 France** | moderate | Castorama / Leroy Merlin large but per-capita smaller than DACH or US. |
+| **2B.4.6 China** | weak | Burt 2020 documents IKEA China's adaptation to bundled assembly. |
+| **2B.4.7 Japan** | weak | Nitori bundles assembly; Japanese furniture retail does not assume self-assembly. |
+| **2B.4.8 South Korea** | weak | Similar to Japan. |
+| **2B.4.9 Hong Kong** | weak | Small apartments + bundled delivery norm. |
+| **2B.4.10 Singapore** | weak | Similar to HK. |
+
+**Confidence: LOW across all 10 cells** as a measured value; MEDIUM as a qualitative observation. **Recommended action: choose between (a)/(b)/(c) above and document the choice in the matrix subtitle.**
+
+---
+
+### 2C. Dimension-level recommendation summary
+
+| Dimension | Confidence | Recommended treatment |
+|---|---|---|
+| urban_density | HIGH (all 10 cells) | **Keep + add per-market density figure**; derive categorical mechanically. |
+| domestic_competition | HIGH (5 cells) / MEDIUM (5 cells) | **Keep**; soften MEDIUM cells in tooltip. |
+| service_expectation | MEDIUM-LOW (all 10) | **Keep but relabel as observation-based** in matrix subtitle. |
+| diy_culture | LOW as measured / MEDIUM as observation | **Relabel as "observation only — not a primary metric"** and either reduce weight or drop from CHALLENGE total. |
+
+**Implementing this is the next step.** See follow-up commit for `viz_ecology.js` + `retail_ecology.csv` restructure.
 
 ---
 
