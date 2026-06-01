@@ -72,7 +72,17 @@
             function yFor(idx) { return innerT + idx * rowH + rowH / 2; }
             function radius(v) { return 8 + v * 3; }
 
-            // Connector lines (draw first so nodes overlay)
+            // Connector lines (draw first so nodes overlay).
+            //
+            // Visual encoding here: position (rank on each side) +
+            // colour (which side weighs it more) + dot size (intensity).
+            // The earlier version also encoded magnitude-of-flip in
+            // line THICKNESS, giving the chart four simultaneous
+            // encodings. That was redundant — the rank position
+            // already shows how steep the flip is, and the dot size
+            // already shows magnitude per side. Lines now have a
+            // constant 2px weight so the reader has fewer visual
+            // variables to decode.
             items.forEach(function (it) {
                 var yL = yFor(westPos[it.priority_key]);
                 var yR = yFor(eastPos[it.priority_key]);
@@ -80,9 +90,9 @@
                 var strokeCol;
                 if (Math.abs(diff) <= 0.5) strokeCol = p.color(180, 180, 180, 170);
                 else if (diff > 0) strokeCol = p.color(REGIME_WEST + 'CC');
-                else strokeCol = p.color(REGIME_EAST_TEXT + 'CC');   // amber, not raw yellow — readable on white
+                else strokeCol = p.color(REGIME_EAST_TEXT + 'CC');   // amber, readable on white
                 p.stroke(strokeCol);
-                p.strokeWeight(2 + Math.abs(diff));
+                p.strokeWeight(2);
                 p.noFill();
                 p.beginShape();
                 p.vertex(leftX, yL);
@@ -144,10 +154,10 @@
             // Legend + algorithm note (bottom)
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.CENTER, p.TOP);
-            p.text('Line color: blue = higher Western priority · gold/orange = higher East Asian priority · gray = similar priority · thickness = magnitude of flip',
+            p.text('Line color: blue = higher Western priority · gold = higher East Asian priority · gray = similar priority · dot size = intensity',
                 W / 2, H - 28);
             p.fill('#999'); p.textSize(9);
-            p.text('Intensities computed from strategic_events.csv + documented external signals (data/PLAYBOOK_COMPUTATION.md)',
+            p.text('Intensities synthesized from documented strategic events using time decay and within-region normalization. See colophon for the full methodology.',
                 W / 2, H - 14);
 
             p.pop();
