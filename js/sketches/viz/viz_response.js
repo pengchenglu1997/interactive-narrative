@@ -84,6 +84,12 @@
                     : 'HOUSING PRESSURE × IKEA RESPONSE',
                 10, innerT - 38);
 
+            // PTI definition note — reader shouldn't need external
+            // knowledge to read the bars.
+            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            p.textAlign(p.LEFT, p.BOTTOM);
+            p.text('PTI = price-to-income ratio, used here as a housing affordability proxy.', 10, innerT - 22);
+
             // Column headers
             p.fill('#888'); p.textStyle(p.NORMAL); p.textSize(11);
             p.textAlign(p.LEFT, p.BOTTOM);
