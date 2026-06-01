@@ -4,24 +4,30 @@
 //
 // Filter passed via manager.state.vizConfig.regime ("east_asia" | "western" | null).
 (function () {
-    // Lanes grouped narratively (top to bottom):
-    //   Physical network → urban_format, big-box expansion, closures
-    //                       (the article's primary opening/closing pair sits
-    //                        adjacent — easier to read the East-Asia retreat
-    //                        directly beneath the Western city-format push)
-    //   Service / channel → channel innovation, service partnership, resale
+    // Lanes grouped narratively, with a dashed divider between groups.
+    // `groupAfter: true` means "draw the dashed divider line below this
+    // lane" (so it sits between the last lane of group N and the first
+    // lane of group N+1).
+    //
+    //   Physical network  → urban_format, city-store closure
+    //   Service / channel → channel innovation, service partner., resale
     //   Pricing / strategy → price cut, strategy pivot
+    //
+    // store_expansion (big-box) dropped per author feedback — only 1
+    // dated event in the data anyway (Gwangmyeong 2014, outside the new
+    // 2016+ window) and it competed visually with the city-format story.
     var lanes = [
-        { key: 'urban_format',        label: 'Urban format' },
-        { key: 'store_expansion',     label: 'Big-box expansion' },
-        { key: 'closure',             label: 'City-store closure' },
-        { key: 'channel_innovation',  label: 'Channel innov.' },
-        { key: 'service_partnership', label: 'Service partner.' },
-        { key: 'resale_circularity',  label: 'Resale / circ.' },
-        { key: 'price_cut',           label: 'Price cut' },
-        { key: 'strategy_pivot',      label: 'Strategy pivot' },
+        { key: 'urban_format',        label: 'Urban format',         groupAfter: false },
+        { key: 'closure',             label: 'City-store closure',   groupAfter: true  },
+        { key: 'channel_innovation',  label: 'Channel innov.',       groupAfter: false },
+        { key: 'service_partnership', label: 'Service partner.',     groupAfter: false },
+        { key: 'resale_circularity',  label: 'Resale / circ.',       groupAfter: true  },
+        { key: 'price_cut',           label: 'Price cut',            groupAfter: false },
+        { key: 'strategy_pivot',      label: 'Strategy pivot',       groupAfter: false },
     ];
-    var Y_MIN = 2014, Y_MAX = 2026;
+    // Y_MIN starts at the CEO urban-strategy announcement; the
+    // pre-2016 events were big-box openings that aren't in this chart.
+    var Y_MIN = 2016, Y_MAX = 2026;
 
     function regimeFill(ev, dimmed) {
         var base;
@@ -90,9 +96,9 @@
             p.textStyle(p.BOLD); p.textSize(13);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
-                ? 'EAST ASIAN STRATEGIC RESPONSE (2014-2026)'
+                ? 'EAST ASIAN STRATEGIC RESPONSE (' + Y_MIN + '-' + Y_MAX + ')'
                 : regimeFilter === 'western'
-                    ? 'WESTERN STRATEGIC RESPONSE (2014-2026)'
+                    ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '-' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
             p.text(title, innerL, innerT - 24);
 
@@ -106,6 +112,27 @@
                 p.text(lane.label, innerL - 8, innerT + i * laneH + laneH / 2);
                 p.textStyle(p.NORMAL);
             });
+
+            // Dashed group dividers — drawn between lanes that have
+            // `groupAfter: true`. Sits on the lane boundary (laneH * (i+1))
+            // and spans the chart's data area + the label strip so the
+            // group break reads in the label column too.
+            p.stroke('#bbb'); p.strokeWeight(0.9);
+            // p5 doesn't have built-in dashed lines; draw a sequence
+            // of short segments instead.
+            function drawDashed(x1, y, x2, dash, gap) {
+                var dx = dash + gap;
+                for (var x = x1; x < x2; x += dx) {
+                    var xe = Math.min(x + dash, x2);
+                    p.line(x, y, xe, y);
+                }
+            }
+            lanes.forEach(function (lane, i) {
+                if (!lane.groupAfter) return;
+                var dy = innerT + (i + 1) * laneH;
+                drawDashed(innerL - 100, dy, W - innerR, 6, 4);
+            });
+            p.noStroke();
 
             // Year axis ticks
             p.fill('#888'); p.textSize(10); p.textAlign(p.CENTER, p.BOTTOM);
