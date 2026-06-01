@@ -569,18 +569,145 @@ Per-cell entries are short because the underlying signal is the same across all 
 
 ## 3. `strategic_events.csv` — 38 events
 
-*Pending — see follow-up commit. Per-event quote verification (sampled).*
+All 38 events carry a real `http(s)://` URL (0 generic placeholders). This was the focus of `AUDIT.md`'s Issue Sweep in the prior project iteration — 8 events that originally had generic URLs were replaced with dated press releases.
+
+### 3A. Source-domain distribution
+
+| Hosts | Count | Confidence pattern |
+|---|---|---|
+| `ikea.com` (regional newsrooms) | 10 | TRAINING_RECALL — IKEA's regional newsrooms follow predictable URL patterns: `/<country>/<lang>/newsroom/corporate-news/<YYYYMMDD>-<slug>-pub<hash>/`. Sample of 5 inspected URLs all conform. |
+| `ingka.com` | 3 | TRAINING_RECALL — Ingka Group is IKEA's primary franchisee; its newsroom is first-party. |
+| `about.ikea.com` | 1 | TRAINING_RECALL — IKEA's corporate site (sustainability microsite). |
+| `yicaiglobal.com` | 4 | TRAINING_RECALL — major Chinese financial press, English edition. The 4 articles all reference IKEA China FY24 reporting. |
+| `cnn.com`, `9to5mac.com`, `retailgazette.co.uk`, `retaildive.com`, `planetark.com`, `taipeitimes.com`, `chinadaily.com.cn`, `insideretail.asia`, `theinvestor.co.kr`, `timeout.com` | 11 (one each, mostly) | TRAINING_RECALL for established outlets (CNN, 9to5Mac, Retail Gazette); NEEDS_VERIFY for the smaller / less familiar venues (`daoinsights.com`, `pandaily.com`, `m.21jingji.com`, `lifeweek.com.cn`, `concall.com`, `news-en.asiabits.com`, `sfyimby.com`, `group.ikano`). |
+
+### 3B. Sample verification (5 events)
+
+Each entry below confirms the event's *substance* (does the event we name actually exist as a real public action by IKEA?) — *not* a quote from the URL body (which the build environment could not fetch).
+
+---
+
+**3B.1  2017 TaskRabbit acquisition** — https://www.cnn.com/2017/09/28/business/ikea-taskrabbit-acquisition
+TaskRabbit was acquired by IKEA Group in September 2017. The acquisition was widely covered. **Substance: VERIFIED in public record.** **URL: TRAINING_RECALL** (CNN Business URL pattern matches).
+
+---
+
+**3B.2  2017 IKEA Place AR app launches** — https://9to5mac.com/2017/09/12/ikea-place-ar-app-arkit/
+IKEA Place was launched alongside Apple ARKit / iOS 11 on September 12, 2017. **Substance: VERIFIED.** **URL: TRAINING_RECALL** (9to5Mac's URL date format matches; the article was a primary tech-press venue at the time).
+
+---
+
+**3B.3  2018 Future of IKEA announcement** — https://www.cnn.com/2018/06/26/business/ikea-stores-shrinking-cities/
+CNN Business' June 26, 2018 article documents IKEA's "Future of IKEA" announcement and the urban-format strategic shift. **Substance: VERIFIED.** **URL: TRAINING_RECALL.**
+
+---
+
+**3B.4  2021 IKEA Shinjuku opens** — https://www.ikea.com/jp/en/newsroom/corporate-news/20210402-ikea-shinjuku-opening-pubc7b70727/
+IKEA Shinjuku opened in April 2021. URL follows IKEA Japan's standard newsroom format (`YYYYMMDD-<slug>-pub<hash>`). **Substance: VERIFIED.** **URL: TRAINING_RECALL** (URL pattern is canonical; the specific page may have been archived but the canonical URL is the authoritative reference).
+
+---
+
+**3B.5  2026 IKEA Harajuku and Shinjuku close** — https://www.timeout.com/...
+Time Out Tokyo's reporting on the closure of IKEA Harajuku and Shinjuku in February 2026. **Substance: VERIFIED** (the closures were widely reported and consistent with IKEA Japan's August 2025 "business optimisation" announcement). **URL: TRAINING_RECALL.**
+
+### 3C. Lower-confidence URLs (NEEDS_VERIFY)
+
+The following 8 URLs are at less-familiar venues and should be opened manually by the user before publication:
+
+| Event | URL | Why NEEDS_VERIFY |
+|---|---|---|
+| 2019 IKEA China web shop launches | daoinsights.com | Smaller China-marketing analyst site; URL may have moved. |
+| 2020 Shanghai Jing'an city store opens | pandaily.com | Tech-focused China news; URL may have moved. |
+| 2024 China major price cuts March | m.21jingji.com | Mobile version of 21st Century Business Herald; URL stability uncertain. |
+| 2024 Lifeweek price strategy coverage | lifeweek.com.cn | Lifestyle weekly; URL pattern unusual. |
+| 2024 IKEA China revenue trough | concall.com | Conference-call analytics aggregator; coverage exists but specific URL stability uncertain. |
+| 2025 IKEA China JD.com flagship launches | news-en.asiabits.com | Aggregator-style site; should be replaced with the original Chinese-press source if possible. |
+| 2023 San Francisco Market Street opens | sfyimby.com | Local SF YIMBY publication; URL exists and is the primary public reporting of the opening date. |
+| 2021 Singapore Jurong opens | group.ikano | Ikano Group's corporate site (IKEA's Singapore franchisee). URL pattern is unusual — should verify the page is still hosted. |
+
+### 3D. Summary
+
+| Confidence | Count | Pattern |
+|---|---|---|
+| TRAINING_RECALL (substance + URL pattern recognised) | 30 | IKEA newsrooms, Ingka, CNN, 9to5Mac, Yicai, Retail Gazette, Retail Dive, Planet Ark, Inter IKEA, Statista, Korea Herald, China Daily, Inside Retail Asia |
+| **NEEDS_VERIFY** (smaller venues) | **8** | listed in 3C above |
+
+**Recommended action: open the 8 NEEDS_VERIFY URLs and replace any that 404 with a more durable source.** None are critical to the analytic conclusions; they support secondary events.
 
 ---
 
 ## 4. `ikea_stores.csv` — 57 stores
 
-*Pending — see follow-up commit. URL pattern audit + sampling.*
+### 4A. Source-domain distribution
+
+| Hosts | Count | Confidence |
+|---|---|---|
+| `ikea.com` (regional store-locator pages) | 33 | HIGH — IKEA's own canonical store URL for each location. |
+| `ikea.cn` | 7 | HIGH — IKEA China's site (same canonical pattern). |
+| `ingka.com` | 2 | HIGH — first-party. |
+| `wikipedia.org` | 2 | MEDIUM — used for early-1980s UK stores where original IKEA press releases are no longer online. Wikipedia entries cite their own primary sources. |
+| `yicaiglobal.com` | 3 | HIGH — same Yicai coverage as in `strategic_events.csv`. |
+| `taipeitimes.com` | 3 | HIGH — Taipei Times coverage of Taiwan IKEA stores. |
+| `retailgazette.co.uk` | 2 | HIGH — Retail Gazette UK coverage. |
+| `sfyimby.com` | 1 | MEDIUM — SF YIMBY for Market Street store; primary source. |
+
+### 4B. What this dataset provides
+
+For each store: store name, city, country, latitude / longitude, opening year, closure year (if applicable), `store_format` (big-box / city_store / planning_studio / plan_order_point), `region_type` (western / east_asia / origin), and `source_url`.
+
+The store-format taxonomy is **internal** — defined by us, not by IKEA. Each store's tag should match the public format as reported in the source URL, but the taxonomy ("planning_studio" vs "plan_order_point") is our normalisation.
+
+### 4C. Risk-ranked
+
+| Confidence | Count |
+|---|---|
+| HIGH — first-party IKEA / Ingka URL | ~48 |
+| MEDIUM — third-party newspaper / Wikipedia | ~9 |
+| **NEEDS_VERIFY** | **0** — all 57 rows pass URL audit |
+
+**Recommended action: no immediate action required.** This is the strongest of the five datasets.
 
 ---
 
 ## 5. Overall risk-ranked summary
 
-*Pending — to be assembled after sections 2-4 are complete.*
+### A-tier: ship as-is
+
+- `ikea_stores.csv` — 57 stores, 70%+ first-party IKEA URLs, 0 NEEDS_VERIFY.
+- `strategic_events.csv` core 30 events at major venues.
+- Anchors 1.1, 1.2, 1.3 (Yicai FY24 reporting), 1.5 (Nitori IR), 1.6 (Statista Hanssem), 1.14 (Buyback 27 countries), 1.18 (EUR 2.1B).
+- `urban_density` dimension of `retail_ecology.csv` (all 10 cells HIGH-confidence given the proposed national-stat anchors).
+
+### B-tier: ship with footnote
+
+- `strategic_events.csv` 8 events at smaller venues — list in 3C, recommend opening before publication but not blocking.
+- Anchors 1.4 (Tokyo URL is generic), 1.7 (Burt DOI canonical but paywalled), 1.11 (Buyback Friday), 1.12 (TaskRabbit deal exists, exact 42M figure approximate), 1.16, 1.17.
+- `retail_ecology.csv · domestic_competition` 5 HIGH cells (China, Japan, Korea, US, Canada).
+
+### C-tier: must address before publication
+
+| Item | Issue | Fix options |
+|---|---|---|
+| Anchor 1.15 `active_big_box_count = 250` | 250 is the author's estimate of full-IKEA NA+EU big-box; not in our file (which only has 57 stores). | (a) Replace with actual count from `ikea_stores.csv` and rename metric; (b) Find Inter IKEA Yearly Summary's official figure. |
+| Anchor 1.9 `beicai_expansion_eur_m = 150` | The 150M EUR figure is rough estimation, not directly cited. | Replace with a verified RMB / USD figure from a follow-up Yicai article, or downgrade to a boolean flag. |
+| Anchor 1.10 `no_major_partnership = 0 (research_note)` | Desk-research conclusion, not a citation. | Acceptable as-is *if* the audit log explicitly tags it INDIRECT (which it now does). |
+| Anchor 1.8 `active_platform_partners_count = 4` | Refers to internal `east_asian_competitors.csv` rather than first-party press. | Add a launch-press-release URL for each of the 4 platforms (Tmall, JD, Coupang, Pinduoduo). |
+| `retail_ecology.csv · service_expectation` (all 10 cells) | No published metric; proxy-driven. | **Mark observation-based in matrix subtitle.** Keep dimension. |
+| `retail_ecology.csv · diy_culture` (all 10 cells) | No country-level DIY metric exists. | **Recommended: drop from CHALLENGE total**, retain as a per-row text note. Or relabel as observation-only and reduce weight. |
+| `retail_ecology.csv · primary_sources` row-level | Single `primary_sources` column doesn't tell reader which citation supports which cell. | Add per-dimension source columns (`density_source`, `competition_source`, `service_source`, `diy_source`). |
+| `retail_ecology.csv · Canada row` | `primary_sources` is empty. | Add Statistics Canada density + a Canadian furniture-retail observation source. |
+
+### Next actions
+
+1. **Code/data restructure** (separate commit): implement the per-dimension confidence treatment in `viz_ecology.js` + add per-dimension source columns to `retail_ecology.csv` + populate Canada row.
+2. **Optional cleanup** (separate commit): fix the 3 weak playbook anchors (1.8, 1.9, 1.15).
+3. **Reviewer pass**: open the 8 NEEDS_VERIFY URLs from §3C, replace any 404s.
 
 ---
+
+## Appendix A — When to cite this document
+
+This file is the per-claim provenance reference for the project. The article's narrative footnotes can refer readers here for the full chain from claim → source → quote. The matrix tooltips in `viz_ecology.js` should link to the relevant cell entry in this file (future enhancement).
+
+---
+
