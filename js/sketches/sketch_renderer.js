@@ -6,8 +6,8 @@
 //   1, 2   Act 1: One IKEA           → Leaflet single global map (auto-play)
 //   3      Act 2: East Asian PTI     → VizResponse {regime: east_asia}
 //   4      Act 2: Western PTI        → VizResponse {regime: western}
-//   5      Act 3: Western response   → VizTimeline {regime: western}
-//   6      Act 3: East Asian resp.   → VizTimeline {regime: east_asia}
+//   5      Act 3: East Asian resp.   → VizTimeline {regime: east_asia}
+//   6      Act 3: Western response   → VizTimeline {regime: western}
 //   7      Act 4: East ecology       → VizEcology  {regime: east_asia}
 //   8      Act 4: West ecology       → VizEcology  {regime: western}
 //   9      Coda · Scorecard          — no viz (full-text scorecard table)
@@ -20,8 +20,9 @@
         2: { viz: 'map' },
         3: { viz: 'response', config: { regime: 'east_asia' } },
         4: { viz: 'response', config: { regime: 'western'  } },
-        5: { viz: 'timeline', config: { regime: 'western'  } },
-        6: { viz: 'timeline', config: { regime: 'east_asia' } },
+        // East-first throughout the article (matches Act 2 + Act 4 ordering).
+        5: { viz: 'timeline', config: { regime: 'east_asia' } },
+        6: { viz: 'timeline', config: { regime: 'western'  } },
         7: { viz: 'ecology',  config: { regime: 'east_asia' } },
         8: { viz: 'ecology',  config: { regime: 'western'  } },
         10:{ viz: 'playbook' },
