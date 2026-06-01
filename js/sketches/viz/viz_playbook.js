@@ -50,11 +50,11 @@
             p.noStroke();
             p.fill('#1a1a1a'); p.textStyle(p.BOLD); p.textSize(13);
             p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('TWO IKEAS — PLAYBOOK PRIORITIES SIDE BY SIDE', 20, innerT - 56);
+            p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 56);
 
-            // Subtitle (single line; algorithm note moved to the footer)
+            // Subtitle
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
-            p.text('Each item appears in both columns at its rank in that regime. Steep lines = rank flips.', 20, innerT - 38);
+            p.text('Each strategy appears in both regions. Steeper lines show larger ranking shifts.', 20, innerT - 38);
 
             // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
             p.textStyle(p.BOLD); p.textSize(14);
@@ -144,7 +144,7 @@
             // Legend + algorithm note (bottom)
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.CENTER, p.TOP);
-            p.text('Line color: blue → Western priority higher · red → East-Asian priority higher · gray → ≈ equal · thickness = magnitude of flip',
+            p.text('Line color: blue = higher Western priority · gold/orange = higher East Asian priority · gray = similar priority · thickness = magnitude of flip',
                 W / 2, H - 28);
             p.fill('#999'); p.textSize(9);
             p.text('Intensities computed from strategic_events.csv + documented external signals (data/PLAYBOOK_COMPUTATION.md)',
