@@ -75,18 +75,18 @@
             // Section title — amber for East (raw yellow is unreadable as text)
             p.noStroke();
             p.fill(regime === 'east_asia' ? '#C9A800' : regime === 'western' ? '#0058AB' : '#333');
-            p.textStyle(p.BOLD); p.textSize(14);
+            p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
             p.text(regime === 'east_asia'
                 ? 'EAST ASIAN CITIES — HOUSING PRESSURE × IKEA RESPONSE'
                 : regime === 'western'
                     ? 'WESTERN CITIES — HOUSING PRESSURE × IKEA RESPONSE'
                     : 'HOUSING PRESSURE × IKEA RESPONSE',
-                10, innerT - 38);
+                10, innerT - 42);
 
             // PTI definition note — reader shouldn't need external
             // knowledge to read the bars.
-            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(12);
             p.textAlign(p.LEFT, p.BOTTOM);
             p.text('PTI = price-to-income ratio, used here as a housing affordability proxy.', 10, innerT - 22);
 

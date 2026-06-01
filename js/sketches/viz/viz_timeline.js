@@ -173,14 +173,14 @@
             // Section title — amber for East (yellow itself is unreadable as text)
             p.noStroke();
             p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
-            p.textStyle(p.BOLD); p.textSize(13);
+            p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
                 ? 'EAST ASIAN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                 : regimeFilter === 'western'
                     ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
-            p.text(title, innerL, innerT - 24);
+            p.text(title, innerL, innerT - 28);
 
             // Lane backgrounds + labels
             lanes.forEach(function (lane, i) {
@@ -267,7 +267,7 @@
             });
 
             // Legend (bottom — placed in the dedicated bottom-margin band)
-            p.noStroke(); p.textSize(10); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
+            p.noStroke(); p.textSize(12); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
             var legY = H - innerB + 18;
             var lx = innerL;
             // Show one swatch per color the reader actually sees on screen.

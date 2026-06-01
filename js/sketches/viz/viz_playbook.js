@@ -48,9 +48,9 @@
 
             // Section title
             p.noStroke();
-            p.fill('#1a1a1a'); p.textStyle(p.BOLD); p.textSize(13);
+            p.fill('#1a1a1a'); p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 56);
+            p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 60);
 
             // Subtitle
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
@@ -152,11 +152,11 @@
             });
 
             // Legend + algorithm note (bottom)
-            p.noStroke(); p.textSize(10); p.fill('#666');
+            p.noStroke(); p.textSize(12); p.fill('#666');
             p.textAlign(p.CENTER, p.TOP);
             p.text('Line color: blue = higher Western priority · gold = higher East Asian priority · gray = similar priority · dot size = intensity',
-                W / 2, H - 28);
-            p.fill('#999'); p.textSize(9);
+                W / 2, H - 32);
+            p.fill('#999'); p.textSize(10);
             p.text('Intensities synthesized from documented strategic events using time decay and within-region normalization. See colophon for the full methodology.',
                 W / 2, H - 14);
 

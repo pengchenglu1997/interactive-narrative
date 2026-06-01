@@ -108,14 +108,14 @@
             // Section title — amber for East (yellow text unreadable).
             p.noStroke();
             p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
-            p.textStyle(p.BOLD); p.textSize(13);
+            p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
                 ? 'EAST ASIAN MARKETS — RETAIL ECOLOGY'
                 : regimeFilter === 'western'
                     ? 'WESTERN MARKETS — RETAIL ECOLOGY'
                     : 'RETAIL ECOLOGY MATRIX';
-            p.text(title, innerL, innerT - 74);
+            p.text(title, innerL, innerT - 78);
 
             // Subtitle — explicit about which dims are quantitative vs observation.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
@@ -226,7 +226,7 @@
 
             // Legend — cell scale only. Per-regime monochrome means one
             // legend row is enough.
-            p.noStroke(); p.textSize(10); p.fill('#666');
+            p.noStroke(); p.textSize(12); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
             var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
