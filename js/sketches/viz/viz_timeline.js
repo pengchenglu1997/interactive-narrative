@@ -155,9 +155,9 @@
             p.textStyle(p.BOLD); p.textSize(13);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
-                ? 'EAST ASIAN STRATEGIC RESPONSE (' + Y_MIN + '-' + Y_MAX + ')'
+                ? 'EAST ASIAN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                 : regimeFilter === 'western'
-                    ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '-' + Y_MAX + ')'
+                    ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
             p.text(title, innerL, innerT - 24);
 
