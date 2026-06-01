@@ -514,15 +514,32 @@
 .leaflet-marker-legend .lm-swatch.lm-circle { border-radius: 50%; }
 .leaflet-marker-legend .lm-swatch.lm-dim    { opacity: 0.32; }
 
-/* Region row keeps regime fill colours — Region IS about colour. */
+/* Region row keeps regime fill colours — Region IS about colour.
+   Borders removed per doc-3 feedback ('Region 的蓝色和黄色，不要
+   有边框'). The reader reads the swatches as 'this colour means
+   this region', not as bordered chips. */
 .leaflet-marker-legend .lm-swatch.lm-west {
   background: var(--ikea-blue);
-  border: 1.5px solid #fff;
-  box-shadow: 0 0 0 1px rgba(0,0,0,.15);
 }
 .leaflet-marker-legend .lm-swatch.lm-east {
   background: var(--ikea-yellow);
-  border: 1.5px solid var(--ikea-blue);
+}
+/* Closed-store swatch: black square with a tiny white ✗ — matches
+   the new map-marker treatment for closures. */
+.leaflet-marker-legend .lm-swatch.lm-closed {
+  background: #1a1a1a;
+  position: relative;
+}
+.leaflet-marker-legend .lm-swatch.lm-closed::after {
+  content: "✗";
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  font-size: 8px;
+  font-weight: 700;
 }
 
 .leaflet-marker-legend .lm-sep {

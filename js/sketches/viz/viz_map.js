@@ -39,23 +39,37 @@
         }
     }
 
-    function formatHTML(format, color, dim) {
-        var op = dim ? 0.32 : 0.95;
+    function formatHTML(format, color, closed) {
         var sz = 14;
-        // Yellow markers need a dark IKEA-blue border to stay legible on the light basemap.
+        // Closed / scheduled-to-close stores: black background + white ✗
+        // (replaces the prior "fade the regime color to 32% alpha" treatment
+        // which was hard to spot at small map sizes).
+        if (closed) {
+            var radius = (format === 'big-box') ? '1px' : '50%';
+            return '<div style="' +
+                'display:flex;align-items:center;justify-content:center;' +
+                'width:' + sz + 'px;height:' + sz + 'px;' +
+                'background:#1a1a1a;border:1px solid #fff;border-radius:' + radius + ';' +
+                'box-shadow:0 0 1px rgba(0,0,0,0.4);' +
+                'color:#fff;font:bold ' + (sz - 4) + 'px/1 -apple-system,Helvetica,Arial,sans-serif;' +
+                '">✗</div>';
+        }
+        // Active markers — yellow needs a dark blue border, others use a white border.
         var bord = (color === '#FBD914') ? '1.5px solid #0058AB' : '1.5px solid #fff';
-        var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:' + op +
-            ';background:' + color + ';border:' + bord + ';box-shadow:0 0 1px rgba(0,0,0,0.4)';
+        var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:0.95;' +
+            'background:' + color + ';border:' + bord + ';box-shadow:0 0 1px rgba(0,0,0,0.4)';
         switch (format) {
-            case 'big-box': return '<div style="' + base + '"></div>';
-            case 'city_store': return '<div style="' + base + ';border-radius:50%"></div>';
-            case 'planning_studio': return '<div style="' + base + ';transform:rotate(45deg)"></div>';
-            case 'plan_order_point':
-                return '<div style="width:0;height:0;border-left:' + (sz/2) +
-                    'px solid transparent;border-right:' + (sz/2) +
-                    'px solid transparent;border-bottom:' + sz + 'px solid ' + color +
-                    ';opacity:' + op + '"></div>';
-            default: return '<div style="' + base + ';border-radius:50%"></div>';
+            case 'big-box':         return '<div style="' + base + '"></div>';
+            case 'city_store':      return '<div style="' + base + ';border-radius:50%"></div>';
+            // planning_studio + plan_order_point both render as circles now —
+            // the prior diamond / triangle shapes added a third symbol the
+            // reader had to decode without enough visual budget on the small
+            // markers. They are all small-format urban stores, so one shape
+            // (circle) communicates 'city-format' adequately. Subtype lives
+            // in the popup metadata.
+            case 'planning_studio':  return '<div style="' + base + ';border-radius:50%"></div>';
+            case 'plan_order_point': return '<div style="' + base + ';border-radius:50%"></div>';
+            default:                 return '<div style="' + base + ';border-radius:50%"></div>';
         }
     }
 
