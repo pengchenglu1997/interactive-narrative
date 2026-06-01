@@ -57,51 +57,71 @@
         return '#fff';
     }
 
-    // Tile labels were often truncated to "IKEA Sh…" because most
-    // event_name values carry verbose prefixes ("IKEA Korea ...",
-    // "IKEA China ... launches", "... opens" etc.). shortLabel
-    // applies a series of lossless trims so the tile gets the
-    // *content* of the event without the boilerplate. Falls back to
-    // the raw name when no rule fires.
+    // Tile labels target 7-10 characters because the year columns
+    // are only ~60-70 px wide at typical viewport, fitting roughly
+    // 10 chars at 11pt. Earlier 12-18 char outputs were still
+    // truncating to '…' on screen.
     function shortLabel(name) {
         if (!name) return '';
         return name
-            // Word-level replacements first (run on full string)
-            .replace(/Harajuku and Shinjuku/i, 'HRJ+SHJ')
-            .replace(/^Tottenham Court Road.*$/i, 'Tottenham studio')
-            .replace(/^San Francisco Market Street.*$/i, 'SF Market St')
-            .replace(/^Oxford Street London flagship opens$/i, 'Oxford St flgshp')
-            .replace(/^Greenwich sustainability flagship opens$/i, 'Greenwich flgshp')
-            .replace(/^Vienna Westbahnhof.*$/i, 'Vienna Westbahnhof')
-            .replace(/^Manhattan Planning Studio opens$/i, 'Manhattan studio')
-            .replace(/^Hammersmith London opens$/i, 'Hammersmith')
-            .replace(/^Taipei Neihu.*$/i, 'Taipei Neihu')
+            // Per-event explicit short forms (target 7-10 chars).
+            .replace(/^IKEA Harajuku and Shinjuku close$/i, 'HRJ+SHJ')
+            .replace(/^Tottenham Court Road.*$/i, 'Tottenham')
+            .replace(/^San Francisco Market Street.*$/i, 'SF Market')
+            .replace(/^Oxford Street London flagship opens$/i, 'Oxford St')
+            .replace(/^Greenwich sustainability flagship opens$/i, 'Greenwich')
+            .replace(/^Vienna Westbahnhof.*$/i, 'Vienna')
+            .replace(/^Manhattan Planning Studio opens$/i, 'Manhattan')
+            .replace(/^Hammersmith London opens$/i, 'Hammersm.')
+            .replace(/^Taipei Neihu.*$/i, 'Taipei')
             .replace(/^Singapore Jurong opens$/i, 'Jurong')
             .replace(/^Gangdong Seoul opens$/i, 'Gangdong')
-            .replace(/^Tokyo Harajuku format optimization reset$/i, 'HRJ format reset')
-            .replace(/^Tokyo business optimization announcement$/i, 'Tokyo optim annc')
-            .replace(/^IKEA Shibuya renewal reopens$/i, 'Shibuya reopens')
-            .replace(/^IKEA global price cuts EUR 2\.1B$/i, 'Global EUR 2.1B cut')
-            .replace(/^China major price cuts March$/i, 'CN price cuts Mar')
-            .replace(/^IKEA China RMB 6\.3B reinvestment$/i, 'CN RMB 6.3B reinv')
-            .replace(/^IKEA China revenue trough$/i, 'CN rev −30%')
-            .replace(/^Lifeweek price strategy coverage$/i, 'Lifeweek coverage')
-            .replace(/^Future of IKEA announcement$/i, 'Future of IKEA annc')
-            .replace(/^CEO urban strategy announcement$/i, 'CEO urban annc')
-            .replace(/^Buyback and Resell launched$/i, 'Buyback & Resell')
-            .replace(/^TaskRabbit acquisition$/i, 'TaskRabbit acq')
-            // Generic prefixes / suffixes for the rest
+            .replace(/^Paris La Madeleine opens$/i, 'Paris')
+            .replace(/^Tokyo business optimization announcement$/i, 'Tokyo opt')
+            .replace(/^IKEA Shibuya renewal reopens$/i, 'Shibuya re')
+            .replace(/^IKEA Shibuya opens$/i, 'Shibuya')
+            .replace(/^IKEA Harajuku opens$/i, 'Harajuku')
+            .replace(/^IKEA Shinjuku opens$/i, 'Shinjuku')
+            .replace(/^Shanghai Jing'an city store opens$/i, "Jing'an")
+            .replace(/^Shanghai Jing'an closure announced$/i, "Jing'an x")
+            .replace(/^IKEA Shanghai Yangpu closes$/i, 'Yangpu')
+            .replace(/^IKEA Guiyang closes$/i, 'Guiyang')
+            .replace(/^IKEA global price cuts EUR 2\.1B$/i, 'EUR 2.1B')
+            .replace(/^China major price cuts March$/i, 'Price cut')
+            .replace(/^IKEA China RMB 6\.3B reinvestment$/i, 'RMB 6.3B')
+            .replace(/^IKEA China revenue trough$/i, 'Rev −30%')
+            .replace(/^Lifeweek price strategy coverage$/i, 'Lifeweek')
+            .replace(/^Future of IKEA announcement$/i, 'Future IK')
+            .replace(/^CEO urban strategy announcement$/i, 'CEO urban')
+            .replace(/^Buyback and Resell launched$/i, 'Buyback')
+            .replace(/^TaskRabbit acquisition$/i, 'TaskRabbt')
+            .replace(/^IKEA Place AR app launches$/i, 'Place AR')
+            .replace(/^IKEA Japan online shop launches$/i, 'Japan onl')
+            .replace(/^IKEA Korea e-commerce launches$/i, 'Korea EC')
+            .replace(/^IKEA China web shop launches$/i, 'CN web')
+            .replace(/^IKEA China Tmall flagship launches$/i, 'Tmall')
+            .replace(/^IKEA China JD\.com flagship launches$/i, 'JD.com')
+            // Generic safety net for anything else
             .replace(/^IKEA\s+/, '')
-            .replace(/^Shanghai\s+/, 'SH ')
-            .replace(/^China\s+/, 'CN ')
-            .replace(/\s+closure announced$/i, ' close annc')
-            .replace(/\s+opens?$/i, '')
-            .replace(/\s+closes?$/i, ' close')
             .replace(/\s+launches?$/i, '')
-            .replace(/\s+announcement$/i, ' annc')
-            .replace(/\s+flagship/i, ' flgshp')
-            .replace(/\s+city store$/i, '')
-            .replace(/\s+planning studio/i, ' studio');
+            .replace(/\s+opens?$/i, '')
+            .replace(/\s+closes?$/i, ' close');
+    }
+
+    // Display-time filter for redundant near-duplicate events:
+    //   - 2025 "Harajuku and Shinjuku closure announced" duplicates
+    //     2026 "IKEA Harajuku and Shinjuku close" (same event, two
+    //     reporting moments). Keep the 2026 actual closure tile.
+    //   - 2025 "Tokyo Harajuku format optimization reset" overlaps
+    //     2025 "Tokyo business optimization announcement" (same
+    //     IKEA Japan strategic reset). Keep the broader business
+    //     optimization tile.
+    var REDUNDANT_EVENTS = [
+        'Harajuku and Shinjuku closure announced',
+        'Tokyo Harajuku format optimization reset',
+    ];
+    function isRedundantForTimeline(ev) {
+        return REDUNDANT_EVENTS.indexOf(ev.event_name) >= 0;
     }
 
     function isHighlighted(ev, regimeFilter) {
@@ -116,7 +136,8 @@
                 var y = e.event_year;
                 return y >= Y_MIN && y <= Y_MAX &&
                     e.response_type !== 'context_report' &&
-                    e.response_type !== 'corporate_report';
+                    e.response_type !== 'corporate_report' &&
+                    !isRedundantForTimeline(e);
             });
             if (!events.length) {
                 p.push();
