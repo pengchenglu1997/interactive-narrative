@@ -30,7 +30,11 @@
         switch ((rt || '').toLowerCase()) {
             case 'western':   return '#0058AB';   // IKEA blue
             case 'east_asia': return '#FBD914';   // IKEA yellow
-            case 'origin':    return '#1a1a1a';   // neutral anchor (was yellow — clashed with East)
+            // 'origin' (Älmhult) now uses Western blue — it's geographically
+            // Western anyway. The founding-store identity lives in the popup
+            // text. Keeps the map's colour grammar to exactly two regimes,
+            // matching the legend strip below the year scrubber.
+            case 'origin':    return '#0058AB';
             default:          return '#888';
         }
     }

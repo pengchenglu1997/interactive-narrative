@@ -439,12 +439,26 @@
 .leaflet-marker-legend .lm-swatch {
   display: inline-block;
   width: 12px; height: 12px;
-  background: #1a1a1a;
   vertical-align: middle;
 }
-.leaflet-marker-legend .lm-swatch.lm-square  { border-radius: 1px; }
-.leaflet-marker-legend .lm-swatch.lm-circle  { border-radius: 50%; }
-.leaflet-marker-legend .lm-swatch.lm-dim     { opacity: 0.32; }
+/* Shape swatches (square / circle / dim) use neutral dark fill —
+   they communicate marker SHAPE, not regime color. */
+.leaflet-marker-legend .lm-swatch.lm-shape { background: #1a1a1a; }
+.leaflet-marker-legend .lm-swatch.lm-square { border-radius: 1px; }
+.leaflet-marker-legend .lm-swatch.lm-circle { border-radius: 50%; }
+.leaflet-marker-legend .lm-swatch.lm-dim    { opacity: 0.32; }
+
+/* Regime-color swatches sit after a divider so the reader sees
+   the two sub-legends as distinct: shape grammar | regime palette. */
+.leaflet-marker-legend .lm-swatch.lm-west { background: var(--ikea-blue); border: 1.5px solid #fff; box-shadow: 0 0 0 1px rgba(0,0,0,.15); }
+.leaflet-marker-legend .lm-swatch.lm-east { background: var(--ikea-yellow); border: 1.5px solid var(--ikea-blue); }
+.leaflet-marker-legend .lm-divider {
+  display: inline-block;
+  width: 1px; height: 14px;
+  background: var(--rule);
+  margin: 0 4px;
+  vertical-align: middle;
+}
 .leaflet-marker-legend .lm-label {
   font-weight: 500;
   letter-spacing: 0.01em;
