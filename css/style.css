@@ -199,6 +199,18 @@
   color: var(--muted);
   margin: 8px 0 0;
 }
+/* Audience statement — sits below the byline as a single italic
+   line in the hero. Tells the reader, on first contact, who this
+   article is written for. */
+#sections .audience {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 15.5px;
+  color: var(--ink-soft);
+  max-width: 640px;
+  margin: 24px 0 0;
+  line-height: 1.55;
+}
 
 #sections a {
   color: var(--ikea-blue);
@@ -669,6 +681,35 @@
   margin: 28px auto 0;
   line-height: 1.6;
   text-align: center;
+}
+/* Methodology + Limitations colophon, sits between the author
+   cards and the paper-footer-note. Two-column block on wide
+   screens, stacked on narrow. Quieter typography than the body
+   prose because this is back-matter, not narrative. */
+.colophon {
+  max-width: 880px;
+  margin: 40px auto 0;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 32px;
+}
+.colophon-block { font-family: var(--font-sans); }
+.colophon-h {
+  font-size: 11px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+  margin: 0 0 10px;
+}
+.colophon-block p {
+  font-size: 13px;
+  color: var(--ink-soft);
+  line-height: 1.65;
+  margin: 0;
+}
+@media (max-width: 700px) {
+  .colophon { grid-template-columns: 1fr; gap: 22px; }
 }
 
 /* ============ Misc ============ */
