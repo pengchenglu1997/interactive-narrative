@@ -422,6 +422,34 @@
   font-weight: 500;
 }
 
+/* Marker legend strip — sits below the year scrubber, explains the
+   square / circle / faded shape language used by the map markers. */
+.leaflet-marker-legend {
+  display: flex;
+  align-items: center;
+  gap: 8px 16px;
+  padding: 6px 4px 10px;
+  font-family: var(--font-sans);
+  font-size: 11px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.leaflet-marker-legend .lm-swatch {
+  display: inline-block;
+  width: 12px; height: 12px;
+  background: #1a1a1a;
+  vertical-align: middle;
+}
+.leaflet-marker-legend .lm-swatch.lm-square  { border-radius: 1px; }
+.leaflet-marker-legend .lm-swatch.lm-circle  { border-radius: 50%; }
+.leaflet-marker-legend .lm-swatch.lm-dim     { opacity: 0.32; }
+.leaflet-marker-legend .lm-label {
+  font-weight: 500;
+  letter-spacing: 0.01em;
+}
+
 .leaflet-control.region-label {
   background: rgba(255,255,255,0.92);
   padding: 3px 8px;
