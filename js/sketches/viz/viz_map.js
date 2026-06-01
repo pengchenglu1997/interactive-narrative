@@ -161,20 +161,46 @@
                 L.DomEvent.disableClickPropagation(btn);
             }
             state.maps[r.id] = m;
-            // Marker clustering — many IKEA stores share the same
-            // metro (Shanghai 3 cluster, Tokyo 4 cluster, NYC 3 cluster,
-            // London 4 cluster) and their dots overlap into one blob at
-            // typical region zoom. MarkerClusterGroup groups nearby
-            // markers into a numbered bubble; clicking expands.
-            var Cluster = (typeof L.markerClusterGroup === 'function')
+            // Marker layering — split open vs closed:
+            //   - openLayer: a markerClusterGroup. Many IKEA stores
+            //     share the same metro (Shanghai 3, Tokyo 4, NYC 3,
+            //     London 4); clustering collapses them into a numbered
+            //     bubble coloured in the region's regime hue.
+            //   - closedLayer: a plain L.layerGroup, no clustering.
+            //     Closed stores stay individually visible as black ✗
+            //     markers so the reader can still see "this metro had
+            //     a store, IKEA shut it" without it being absorbed
+            //     into an open-store count.
+            var regimeFill = (r.id === 'ea') ? '#FBD914' : '#0058AB';   // EA = yellow, NA/EU = blue
+            var regimeText = (r.id === 'ea') ? '#0058AB' : '#ffffff';
+            var openLayer = (typeof L.markerClusterGroup === 'function')
                 ? L.markerClusterGroup({
                     maxClusterRadius: 28,
                     spiderfyOnMaxZoom: true,
                     showCoverageOnHover: false,
                     zoomToBoundsOnClick: true,
+                    iconCreateFunction: function (cluster) {
+                        var n = cluster.getChildCount();
+                        var sz = n < 10 ? 28 : n < 30 ? 34 : 40;
+                        var html =
+                            '<div class="ikea-cluster-bubble" style="' +
+                                'width:' + sz + 'px;height:' + sz + 'px;' +
+                                'background:' + regimeFill + ';' +
+                                'color:' + regimeText + ';' +
+                                'border:2px solid ' + regimeText + ';' +
+                            '">' + n + '</div>';
+                        return L.divIcon({
+                            html: html,
+                            className: 'ikea-cluster',
+                            iconSize: L.point(sz, sz),
+                        });
+                    },
                 })
                 : L.layerGroup();   // fallback if plugin failed to load
-            state.markerLayers[r.id] = Cluster.addTo(m);
+            var closedLayer = L.layerGroup();
+            openLayer.addTo(m);
+            closedLayer.addTo(m);
+            state.markerLayers[r.id] = { open: openLayer, closed: closedLayer };
         });
         state.ready = true;
         wireToolbar();
@@ -192,7 +218,10 @@
 
     function rebuildAll() {
         if (!state.ready) return;
-        REGIONS.forEach(function (r) { state.markerLayers[r.id].clearLayers(); });
+        REGIONS.forEach(function (r) {
+            state.markerLayers[r.id].open.clearLayers();
+            state.markerLayers[r.id].closed.clearLayers();
+        });
         var totals = { open: 0, closed: 0 };
         var perRegion = { na: 0, eu: 0, ea: 0 };
 
@@ -209,12 +238,19 @@
                 iconSize: [16, 16],
                 iconAnchor: [8, 8],
             });
+            // Open stores → cluster group; closed stores → flat layer.
+            // Keeps "this metro had a store IKEA shut" visible as an
+            // individual black ✗ instead of being absorbed into the
+            // open-store count bubble.
+            var targetLayer = closed
+                ? state.markerLayers[region].closed
+                : state.markerLayers[region].open;
             var marker = L.marker([s.latitude, s.longitude], {
                 icon: icon,
                 interactive: true,         // ← clickable
                 keyboard: false,
                 riseOnHover: true,
-            }).addTo(state.markerLayers[region]);
+            }).addTo(targetLayer);
             marker.bindPopup(buildPopupHTML(s, closed), {
                 maxWidth: 260,
                 className: 'ikea-popup',

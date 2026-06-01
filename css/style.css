@@ -621,6 +621,38 @@
   color: #000;
 }
 
+/* Marker cluster bubble — overrides Leaflet.markercluster's default
+   green/yellow/red palette with the IKEA regime hue (blue for NA/EU,
+   yellow for EA). The default outer 'leaflet-marker-icon' translucent
+   ring is suppressed; the count lives inside our solid .ikea-cluster-
+   bubble below. Closed stores intentionally bypass clustering and stay
+   visible as individual black ✗ markers. */
+.leaflet-marker-icon.ikea-cluster {
+  background: transparent !important;
+  border: none !important;
+  box-shadow: none !important;
+}
+.leaflet-marker-icon.marker-cluster,
+.leaflet-marker-icon.marker-cluster-small,
+.leaflet-marker-icon.marker-cluster-medium,
+.leaflet-marker-icon.marker-cluster-large,
+.marker-cluster-small div,
+.marker-cluster-medium div,
+.marker-cluster-large div {
+  background: transparent !important;
+}
+.ikea-cluster-bubble {
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: -apple-system, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+}
+
 /* ============ Stat cards (Act 4) ============ */
 
 .stat-cards {
