@@ -201,17 +201,33 @@
   color: var(--muted);
   margin: 8px 0 0;
 }
-/* Audience statement — sits below the byline as a single italic
-   line in the hero. Tells the reader, on first contact, who this
-   article is written for. */
-#sections .audience {
+/* Story introduction — sits below the byline as a brief
+   thesis statement. Gives the reader the article's argument
+   on first contact (one playbook → pressure → divergence). */
+#sections .story-intro {
   font-family: var(--font-serif);
-  font-style: italic;
-  font-size: 15.5px;
+  font-size: 16.5px;
   color: var(--ink-soft);
-  max-width: 640px;
-  margin: 24px 0 0;
+  max-width: 720px;
+  margin: 28px 0 0;
+  line-height: 1.6;
+}
+/* Quick glossary block — sits under the body so the reader can
+   tell big-box from city-format the first time the terms appear. */
+#sections .definitions {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  background: #f4f1ec;
+  border-left: 3px solid var(--rule);
+  padding: 8px 12px;
+  margin: 8px 0 16px;
+  border-radius: 2px;
   line-height: 1.55;
+}
+#sections .definitions strong {
+  color: var(--ink);
+  font-weight: 600;
 }
 
 #sections a {
