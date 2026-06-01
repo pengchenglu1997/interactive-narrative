@@ -112,8 +112,25 @@
                 p.text(c.city, innerL - 10, yPos);
                 p.textStyle(p.NORMAL);
 
-                // PTI bar
-                var col = regimeColor(c.region_type);
+                // Compute city-format status first — it controls both the
+                // PTI bar color AND the verdict.
+                var cityStores = storesIn(stores, c.city);
+                var cityFormatStores = cityStores.filter(function (s) {
+                    var f = s.store_format;
+                    return f === 'city_store' || f === 'planning_studio' || f === 'plan_order_point';
+                });
+                var openCity   = cityFormatStores.filter(function (s) { return s.closure_year == null; }).length;
+                var closedCity = cityFormatStores.filter(function (s) { return s.closure_year != null; }).length;
+                var bigBoxCount = cityStores.filter(function (s) { return s.store_format === 'big-box'; }).length;
+
+                // PTI bar — regime color (IKEA blue for West, IKEA yellow
+                // for East) only when the city actually HAS an active
+                // city-format store. Cities without one get a neutral gray
+                // bar so the eye doesn't misread 'colored bar' as
+                // 'IKEA showed up'. Per user feedback: the prior all-bars-
+                // colored variant was misleading.
+                var hasCityStore = openCity > 0;
+                var col = hasCityStore ? regimeColor(c.region_type) : '#cfcfcf';
                 var bw = xPTI(c.price_to_income_ratio) - contentX;
                 var bh = Math.min(20, rowH - 8);
                 p.fill(col);
@@ -121,31 +138,25 @@
                 p.fill('#1a1a1a'); p.textAlign(p.LEFT, p.CENTER); p.textSize(11);
                 p.text(c.price_to_income_ratio.toFixed(1), contentX + bw + 6, yPos);
 
-                // Verdict
-                var cityStores = storesIn(stores, c.city);
-                var cityFormatStores = cityStores.filter(function (s) {
-                    var f = s.store_format;
-                    return f === 'city_store' || f === 'planning_studio' || f === 'plan_order_point';
-                });
-                var openCity = cityFormatStores.filter(function (s) { return s.closure_year == null; }).length;
-                var closedCity = cityFormatStores.filter(function (s) { return s.closure_year != null; }).length;
-                var bigBoxCount = cityStores.filter(function (s) { return s.store_format === 'big-box'; }).length;
-
-                // Verdict color: failure/warning stays warm (amber → IKEA on-brand);
-                // success uses IKEA blue.
+                // Verdict color matches the new bar logic:
+                //   ✓ open   → regime color (blue / amber-yellow text)
+                //   ✗ none   → neutral gray
+                //   ⚠ closed → amber warn
                 var verdict, verdictColor;
                 if (openCity === 0 && closedCity === 0) {
                     verdict = '✗  No city-format store';
-                    verdictColor = '#C9A800';                  // amber
+                    verdictColor = '#888';                     // neutral
                 } else if (closedCity > 0 && openCity === 0) {
                     verdict = '⚠  ' + closedCity + ' opened, all closed';
-                    verdictColor = '#C9A800';
+                    verdictColor = '#C57F00';                  // amber warn
                 } else if (closedCity > 0) {
                     verdict = '⚠  ' + openCity + ' open · ' + closedCity + ' closed';
-                    verdictColor = '#C57F00';                  // darker warn for mixed
+                    verdictColor = '#C57F00';                  // amber warn
                 } else {
                     verdict = '✓  ' + openCity + ' city store' + (openCity > 1 ? 's' : '') + ' open';
-                    verdictColor = '#0058AB';                  // IKEA blue
+                    // Yellow itself is unreadable as small bold text on white —
+                    // use amber (#C9A800) for East verdicts; IKEA blue for West.
+                    verdictColor = c.region_type === 'east_asia' ? '#C9A800' : '#0058AB';
                 }
                 p.noStroke(); p.fill(verdictColor);
                 p.textSize(13); p.textStyle(p.BOLD);
