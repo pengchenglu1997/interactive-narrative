@@ -161,43 +161,65 @@
                 L.DomEvent.disableClickPropagation(btn);
             }
             state.maps[r.id] = m;
-            // Marker layering — split open vs closed:
-            //   - openLayer: a markerClusterGroup. Many IKEA stores
-            //     share the same metro (Shanghai 3, Tokyo 4, NYC 3,
-            //     London 4); clustering collapses them into a numbered
-            //     bubble coloured in the region's regime hue.
-            //   - closedLayer: a plain L.layerGroup, no clustering.
-            //     Closed stores stay individually visible as black ✗
-            //     markers so the reader can still see "this metro had
-            //     a store, IKEA shut it" without it being absorbed
-            //     into an open-store count.
-            var regimeFill = (r.id === 'ea') ? '#FBD914' : '#0058AB';   // EA = yellow, NA/EU = blue
-            var regimeText = (r.id === 'ea') ? '#0058AB' : '#ffffff';
-            var openLayer = (typeof L.markerClusterGroup === 'function')
-                ? L.markerClusterGroup({
-                    maxClusterRadius: 28,
-                    spiderfyOnMaxZoom: true,
-                    showCoverageOnHover: false,
-                    zoomToBoundsOnClick: true,
-                    iconCreateFunction: function (cluster) {
-                        var n = cluster.getChildCount();
-                        var sz = n < 10 ? 28 : n < 30 ? 34 : 40;
-                        var html =
-                            '<div class="ikea-cluster-bubble" style="' +
-                                'width:' + sz + 'px;height:' + sz + 'px;' +
-                                'background:' + regimeFill + ';' +
-                                'color:' + regimeText + ';' +
-                                'border:2px solid ' + regimeText + ';' +
-                            '">' + n + '</div>';
-                        return L.divIcon({
-                            html: html,
-                            className: 'ikea-cluster',
-                            iconSize: L.point(sz, sz),
-                        });
-                    },
-                })
-                : L.layerGroup();   // fallback if plugin failed to load
-            var closedLayer = L.layerGroup();
+            // Marker layering — split open vs closed into two
+            // INDEPENDENT cluster groups so they never share a bubble
+            // and visually stay distinct:
+            //   - openLayer: regime-coloured bubble (IKEA two-tone
+            //     inversion — West is blue with a yellow ring, East
+            //     is yellow with a blue ring).
+            //   - closedLayer: a separate cluster group with a black
+            //     bubble + white digits + dashed ring. Because the
+            //     two cluster groups compute centroids independently,
+            //     their bubbles offset themselves naturally at metros
+            //     with both kinds of stores (e.g. Shanghai 3 open +
+            //     2 closed).
+            var isEast    = (r.id === 'ea');
+            var openFill  = isEast ? '#FBD914' : '#0058AB';   // bubble background
+            var openText  = isEast ? '#0058AB' : '#FBD914';   // digits
+            var openRing  = isEast ? '#0058AB' : '#FBD914';   // border
+            function makeIcon(opts) {
+                return function (cluster) {
+                    var n = cluster.getChildCount();
+                    var sz = n < 10 ? 28 : n < 30 ? 34 : 40;
+                    var html =
+                        '<div class="ikea-cluster-bubble" style="' +
+                            'width:' + sz + 'px;height:' + sz + 'px;' +
+                            'background:' + opts.fill + ';' +
+                            'color:' + opts.text + ';' +
+                            'border:' + (opts.dashed ? '2px dashed ' : '2px solid ') + opts.ring + ';' +
+                        '">' + (opts.prefix || '') + n + '</div>';
+                    return L.divIcon({
+                        html: html,
+                        className: 'ikea-cluster',
+                        iconSize: L.point(sz, sz),
+                    });
+                };
+            }
+            var clusterOpts = {
+                maxClusterRadius: 28,
+                spiderfyOnMaxZoom: true,
+                showCoverageOnHover: false,
+                zoomToBoundsOnClick: true,
+            };
+            var hasPlugin = (typeof L.markerClusterGroup === 'function');
+            var openLayer = hasPlugin
+                ? L.markerClusterGroup(Object.assign({}, clusterOpts, {
+                    iconCreateFunction: makeIcon({
+                        fill: openFill, text: openText, ring: openRing,
+                    }),
+                }))
+                : L.layerGroup();
+            // Closed bubble — black, white digits, dashed white ring,
+            // "✗ " prefix so even at a glance the bubble reads as
+            // "closed × N" rather than a regime count.
+            var closedLayer = hasPlugin
+                ? L.markerClusterGroup(Object.assign({}, clusterOpts, {
+                    iconCreateFunction: makeIcon({
+                        fill: '#1a1a1a', text: '#ffffff', ring: '#ffffff',
+                        dashed: true, prefix: '✗ ',
+                    }),
+                }))
+                : L.layerGroup();
             openLayer.addTo(m);
             closedLayer.addTo(m);
             state.markerLayers[r.id] = { open: openLayer, closed: closedLayer };
