@@ -553,7 +553,11 @@
 }
 
 .scorecard th.col-west { color: var(--ikea-blue-soft); }
-.scorecard th.col-east { color: var(--regime-east); }
+/* Use amber instead of var(--regime-east) (pure IKEA yellow #FBD914)
+   because yellow text is unreadable on the white scorecard background.
+   --regime-east-text is the amber token already declared for this kind
+   of typographic East-Asia accent. */
+.scorecard th.col-east { color: var(--regime-east-text); }
 
 .scorecard tbody td {
   padding: 8px 8px;
@@ -589,7 +593,11 @@
    anywhere else. */
 .scorecard .verdict.west       { background: #d6e4f3; color: #154a8a; }
 .scorecard .verdict.east       { background: #fff4c4; color: #6e5400; }
-.scorecard .verdict.east-loss  { background: #ffe97a; color: #5c4400; border: 1px solid #e1c34a; }
+/* east-loss used #ffe97a (saturated yellow) which read 'loud' on a
+   table with three east-loss rows. Soften to the same warm cream as
+   .east, distinguished by a thin amber border instead of by colour
+   intensity. */
+.scorecard .verdict.east-loss  { background: #fff4c4; color: #5c4400; border: 1px solid #d9ba3a; }
 .scorecard .verdict.both       { background: #f3f3f3; color: var(--muted); }
 
 /* ============ Author section ============ */

@@ -111,6 +111,16 @@
                             var layout = sc.steps[index] && sc.steps[index].dataset && sc.steps[index].dataset.layout;
                             if (layout) graphic.classList.add('layout-' + layout);
                             requestAnimationFrame(function () {
+                                // CSS layout change (layout-full-text widens / narrows
+                                // #sections, which reflows every step's height) makes
+                                // the scroller's cached sectionPositions stale. The
+                                // next scroll event uses the old positions, decides
+                                // active=N-1, the class flips back, heights shift,
+                                // and the page flicker-bounces between sections N and
+                                // N-1 (most visible at the last 'About authors' step).
+                                // Recompute the scroller positions after the reflow
+                                // settles so the next scroll event uses fresh values.
+                                if (sc && typeof sc.resize === 'function') sc.resize();
                                 if (window.__sketchAPI && window.__sketchAPI.p5 &&
                                     typeof window.__sketchAPI.p5.windowResized === 'function') {
                                     window.__sketchAPI.p5.windowResized();
