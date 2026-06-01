@@ -246,16 +246,28 @@
 
             p.pop();
 
-            // Tooltip
+            // Tooltip — now uses the per-dimension source from retail_ecology.csv
+            // (density_source / competition_source / service_source).
+            // This is the per-cell provenance the reader / reviewer asked for.
             if (hoverCell && window.VizTooltip) {
                 var h = hoverCell;
                 var challengeLabel = ['Low', 'Low', 'Moderate', 'High', 'Very high'][Math.min(4, h.level)];
+                var srcKey = ({
+                    urban_density:        'density_source',
+                    service_expectation:  'service_source',
+                    domestic_competition: 'competition_source',
+                })[h.dim.key];
+                var perCellSource = srcKey ? h.row[srcKey] : '';
+                var groupLabel = h.dim.group === 'quantitative'
+                    ? 'Quantitative — sourced from a national statistics agency'
+                    : 'Observational — observation-based, see source for details';
                 var html =
                     '<div class="tt-name">' + h.row.market + ' · ' + h.dim.label + '</div>' +
                     '<div class="tt-row"><b>Value</b> ' + (h.val || '').replace(/_/g, ' ') + '</div>' +
                     '<div class="tt-row"><b>Challenge to IKEA</b> ' + challengeLabel + '</div>' +
-                    (h.row.short_summary  ? '<div class="tt-note">' + h.row.short_summary + '</div>' : '') +
-                    (h.row.primary_sources ? '<div class="tt-src">Sources: ' + h.row.primary_sources + '</div>' : '');
+                    '<div class="tt-row" style="opacity:0.8"><i>' + groupLabel + '</i></div>' +
+                    (perCellSource ? '<div class="tt-src">Source: ' + perCellSource + '</div>' : '') +
+                    (h.row.short_summary  ? '<div class="tt-note">' + h.row.short_summary + '</div>' : '');
                 window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
             } else if (window.VizTooltip) {
                 window.VizTooltip.hide();
