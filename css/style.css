@@ -627,14 +627,14 @@
    yellow). The prior .east / .east-loss styles used legacy reds
    (#8c2618, #6e2218) that read as a third color the page never uses
    anywhere else. */
-.scorecard .verdict.west       { background: #d6e4f3; color: #154a8a; }
-.scorecard .verdict.east       { background: #fff4c4; color: #6e5400; }
-/* east-loss used #ffe97a (saturated yellow) which read 'loud' on a
-   table with three east-loss rows. Soften to the same warm cream as
-   .east, distinguished by a thin amber border instead of by colour
-   intensity. */
+/* All verdict variants now carry a 1px border in their own colour
+   family — visual consistency across the column (previously only
+   .east-loss had a border, which made the second row read as
+   missing a frame). */
+.scorecard .verdict.west       { background: #d6e4f3; color: #154a8a; border: 1px solid #9bb5d4; }
+.scorecard .verdict.east       { background: #fff4c4; color: #6e5400; border: 1px solid #d9ba3a; }
 .scorecard .verdict.east-loss  { background: #fff4c4; color: #5c4400; border: 1px solid #d9ba3a; }
-.scorecard .verdict.both       { background: #f3f3f3; color: var(--muted); }
+.scorecard .verdict.both       { background: #f3f3f3; color: var(--muted); border: 1px solid #d6d6d6; }
 
 /* ============ Author section ============ */
 
