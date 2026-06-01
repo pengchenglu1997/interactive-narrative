@@ -138,34 +138,51 @@
                 p.fill('#1a1a1a'); p.textAlign(p.LEFT, p.CENTER); p.textSize(11);
                 p.text(c.price_to_income_ratio.toFixed(1), contentX + bw + 6, yPos);
 
-                // Verdict color matches the new bar logic:
-                //   ✓ open   → regime color (blue / amber-yellow text)
-                //   ✗ none   → neutral gray
-                //   ⚠ closed → amber warn
-                var verdict, verdictColor;
+                // Verdict — no amber on either page. The "warning" weight
+                // of mixed / all-closed status is communicated by a gray
+                // subtitle ("(N closed since)") rather than by a third
+                // colour that competed with the regime palette. Verdict
+                // main color stays binary: regime if any city store is
+                // currently open, gray if none.
+                //
+                //   ✓ N open                  → regime color (blue / amber-yellow text)
+                //   ⚠ N open + M closed       → regime color + gray "(M closed since)" subtitle
+                //   ⚠ all opened then closed → gray + gray "(was N)" subtitle
+                //   ✗ none ever               → gray
+                var verdict, subtitle, verdictColor;
+                // Yellow itself is unreadable as small bold text on white —
+                // use amber (#C9A800) for East verdicts; IKEA blue for West.
+                var regimeText = c.region_type === 'east_asia' ? '#C9A800' : '#0058AB';
                 if (openCity === 0 && closedCity === 0) {
-                    verdict = '✗  No city-format store';
-                    verdictColor = '#888';                     // neutral
+                    verdict      = '✗  No city store';
+                    verdictColor = '#888';
+                    subtitle     = '';
                 } else if (closedCity > 0 && openCity === 0) {
-                    verdict = '⚠  ' + closedCity + ' opened, all closed';
-                    verdictColor = '#C57F00';                  // amber warn
+                    verdict      = '⚠  All closed';
+                    verdictColor = '#888';
+                    subtitle     = '(was ' + closedCity + ')';
                 } else if (closedCity > 0) {
-                    verdict = '⚠  ' + openCity + ' open · ' + closedCity + ' closed';
-                    verdictColor = '#C57F00';                  // amber warn
+                    verdict      = '✓  ' + openCity + ' city store' + (openCity > 1 ? 's' : '') + ' open';
+                    verdictColor = regimeText;
+                    subtitle     = '(' + closedCity + ' closed since)';
                 } else {
-                    verdict = '✓  ' + openCity + ' city store' + (openCity > 1 ? 's' : '') + ' open';
-                    // Yellow itself is unreadable as small bold text on white —
-                    // use amber (#C9A800) for East verdicts; IKEA blue for West.
-                    verdictColor = c.region_type === 'east_asia' ? '#C9A800' : '#0058AB';
+                    verdict      = '✓  ' + openCity + ' city store' + (openCity > 1 ? 's' : '') + ' open';
+                    verdictColor = regimeText;
+                    subtitle     = '';
                 }
                 p.noStroke(); p.fill(verdictColor);
                 p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(verdict, verdictX, yPos);
-                if (bigBoxCount > 0) {
-                    var verdictTextWidth = p.textWidth(verdict);
+                var cursor = verdictX + p.textWidth(verdict);
+                if (subtitle) {
                     p.fill('#888'); p.textStyle(p.NORMAL); p.textSize(11);
-                    p.text('(+' + bigBoxCount + ' big-box)', verdictX + verdictTextWidth + 8, yPos);
+                    p.text(' ' + subtitle, cursor, yPos);
+                    cursor += p.textWidth(' ' + subtitle);
+                }
+                if (bigBoxCount > 0) {
+                    p.fill('#888'); p.textStyle(p.NORMAL); p.textSize(11);
+                    p.text('  (+' + bigBoxCount + ' big-box)', cursor, yPos);
                 }
             });
 
