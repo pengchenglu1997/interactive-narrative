@@ -57,6 +57,53 @@
         return '#fff';
     }
 
+    // Tile labels were often truncated to "IKEA Sh…" because most
+    // event_name values carry verbose prefixes ("IKEA Korea ...",
+    // "IKEA China ... launches", "... opens" etc.). shortLabel
+    // applies a series of lossless trims so the tile gets the
+    // *content* of the event without the boilerplate. Falls back to
+    // the raw name when no rule fires.
+    function shortLabel(name) {
+        if (!name) return '';
+        return name
+            // Word-level replacements first (run on full string)
+            .replace(/Harajuku and Shinjuku/i, 'HRJ+SHJ')
+            .replace(/^Tottenham Court Road.*$/i, 'Tottenham studio')
+            .replace(/^San Francisco Market Street.*$/i, 'SF Market St')
+            .replace(/^Oxford Street London flagship opens$/i, 'Oxford St flgshp')
+            .replace(/^Greenwich sustainability flagship opens$/i, 'Greenwich flgshp')
+            .replace(/^Vienna Westbahnhof.*$/i, 'Vienna Westbahnhof')
+            .replace(/^Manhattan Planning Studio opens$/i, 'Manhattan studio')
+            .replace(/^Hammersmith London opens$/i, 'Hammersmith')
+            .replace(/^Taipei Neihu.*$/i, 'Taipei Neihu')
+            .replace(/^Singapore Jurong opens$/i, 'Jurong')
+            .replace(/^Gangdong Seoul opens$/i, 'Gangdong')
+            .replace(/^Tokyo Harajuku format optimization reset$/i, 'HRJ format reset')
+            .replace(/^Tokyo business optimization announcement$/i, 'Tokyo optim annc')
+            .replace(/^IKEA Shibuya renewal reopens$/i, 'Shibuya reopens')
+            .replace(/^IKEA global price cuts EUR 2\.1B$/i, 'Global EUR 2.1B cut')
+            .replace(/^China major price cuts March$/i, 'CN price cuts Mar')
+            .replace(/^IKEA China RMB 6\.3B reinvestment$/i, 'CN RMB 6.3B reinv')
+            .replace(/^IKEA China revenue trough$/i, 'CN rev −30%')
+            .replace(/^Lifeweek price strategy coverage$/i, 'Lifeweek coverage')
+            .replace(/^Future of IKEA announcement$/i, 'Future of IKEA annc')
+            .replace(/^CEO urban strategy announcement$/i, 'CEO urban annc')
+            .replace(/^Buyback and Resell launched$/i, 'Buyback & Resell')
+            .replace(/^TaskRabbit acquisition$/i, 'TaskRabbit acq')
+            // Generic prefixes / suffixes for the rest
+            .replace(/^IKEA\s+/, '')
+            .replace(/^Shanghai\s+/, 'SH ')
+            .replace(/^China\s+/, 'CN ')
+            .replace(/\s+closure announced$/i, ' close annc')
+            .replace(/\s+opens?$/i, '')
+            .replace(/\s+closes?$/i, ' close')
+            .replace(/\s+launches?$/i, '')
+            .replace(/\s+announcement$/i, ' annc')
+            .replace(/\s+flagship/i, ' flgshp')
+            .replace(/\s+city store$/i, '')
+            .replace(/\s+planning studio/i, ' studio');
+    }
+
     function isHighlighted(ev, regimeFilter) {
         if (!regimeFilter) return true;
         return ev.regime_type === regimeFilter || ev.regime_type === 'both';
@@ -167,7 +214,11 @@
                     var k = lane.key + '|' + yr;
                     var evs = grouped[k];
                     if (!evs) continue;
-                    var tileW = Math.min(yearW - 3, 78);
+                    // Tile width: capped at 110 (was 78) — gives event text
+                    // ~40% more room. Font cap raised to 11 (was 9). Both
+                    // changes assume the new 6-lane / merged-resale layout
+                    // gives laneH more room vertically too.
+                    var tileW = Math.min(yearW - 3, 110);
                     var tileH = (laneH - 6) / evs.length;
                     evs.forEach(function (ev, ei) {
                         var tx = xYear(yr) - tileW / 2;
@@ -178,10 +229,10 @@
                         p.rect(tx, ty, tileW, tileH - 1.5, 2);
                         if (hi) {
                             p.fill(tileTextColor(ev));
-                            p.textSize(Math.max(7, Math.min(9, tileH - 4)));
+                            p.textSize(Math.max(8, Math.min(11, tileH - 4)));
                             p.textAlign(p.LEFT, p.CENTER);
-                            var label = ev.event_name || '';
-                            var maxChars = Math.max(8, Math.floor(tileW / 5));
+                            var label = shortLabel(ev.event_name || '');
+                            var maxChars = Math.max(10, Math.floor(tileW / 5.5));
                             var shown = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
                             p.text(shown, tx + 4, ty + (tileH - 1.5) / 2);
                         }
