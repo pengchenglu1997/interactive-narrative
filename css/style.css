@@ -541,9 +541,13 @@
   display: inline-block;
 }
 
+/* Verdict badges — all stay inside the IKEA palette (blue + amber/
+   yellow). The prior .east / .east-loss styles used legacy reds
+   (#8c2618, #6e2218) that read as a third color the page never uses
+   anywhere else. */
 .scorecard .verdict.west       { background: #d6e4f3; color: #154a8a; }
-.scorecard .verdict.east       { background: #fadcd5; color: #8c2618; }
-.scorecard .verdict.east-loss  { background: #f3d6cf; color: #6e2218; border: 1px solid #d8a6a0; }
+.scorecard .verdict.east       { background: #fff4c4; color: #6e5400; }
+.scorecard .verdict.east-loss  { background: #ffe97a; color: #5c4400; border: 1px solid #e1c34a; }
 .scorecard .verdict.both       { background: #f3f3f3; color: var(--muted); }
 
 /* ============ Author section ============ */
