@@ -6,14 +6,13 @@ strategy_pivot,east_asia,tokyo_format_reset_count,1,events,2025,1,0.6,"Tokyo Har
 local_integration,east_asia,nitori_fy25_revenue_jpy_bn,929,jpy_bn,2025,1,1.0,"Nitori revenue ¥929B (~4x IKEA China scale)",https://ir.nitorihd.co.jp/en/library/result_briefing.html
 local_integration,east_asia,hanssem_korea_interior_share_pct,25,pct,2024,1,0.6,"Hanssem holds ~25% of Korean interior market",https://www.statista.com/statistics/1280018/south-korea-furniture-retail-market-share-by-brand/
 local_integration,east_asia,burt_2020_localization_signal,1,boolean,2020,1,0.5,"Burt et al. (2020) document deep China localization adaptation",https://doi.org/10.1108/IJRDM-04-2020-0136
-channel_innovation,east_asia,active_platform_partners_count,4,partners,2024,1,0.5,"Pinduoduo + Coupang + JD + Tmall — continuous platform pressure",data/processed/east_asian_competitors.csv
-big_box,east_asia,beicai_expansion_eur_m,150,eur_m,2024,1,0.4,"Beicai big-box reinvestment estimate",https://www.yicaiglobal.com/news/ikea-china-fy24-revenue-fell-rmb-1115-billion
+big_box,east_asia,beicai_reinvestment_announced,1,boolean,2024,1,0.4,"Beicai (Shanghai Pudong) big-box reinvestment announced — specific RMB / EUR figure not independently citable",https://www.yicaiglobal.com/news/ikea-china-fy24-revenue-fell-rmb-1115-billion
 service_partnership,east_asia,no_major_partnership,0,boolean,2024,-1,0.3,"No TaskRabbit-equivalent acquisition in East Asia",research_note
 resale_circularity,east_asia,buyback_program_active,1,boolean,2024,1,0.2,"Buyback program available but not headline message",https://newsroom.inter.ikea.com/news/buy-back-friday
 service_partnership,western,taskrabbit_acquisition_eur_m,42,eur_m,2017,1,1.5,"TaskRabbit acquisition (reported ~$42M)",https://www.cnn.com/2017/09/28/business/ikea-taskrabbit-acquisition
-service_partnership,western,planning_studios_active_count,40,stores,2026,1,0.7,"Planning Studios across NA/EU",data/processed/ikea_stores.csv
+service_partnership,western,active_city_format_in_dataset_count,9,stores,2026,1,0.7,"Western active city-format stores in our store dataset (city_store + planning_studio + plan_order_point) — service-oriented small-format presence",data/processed/ikea_stores.csv
 resale_circularity,western,buyback_countries_count,27,countries,2020,1,1.2,"Global Buyback & Resell program in 27 countries — Western flagship narrative",https://about.ikea.com/en/sustainability/sustainable-everyday/we-create-a-better-everyday-life
-big_box,western,active_big_box_count,250,stores,2026,1,1.5,"Stable Western big-box backbone (approx)",data/processed/ikea_stores.csv
+big_box,western,active_big_box_in_dataset_count,16,stores,2026,1,1.5,"Western active big-box stores in our store dataset — represents the maintained suburban backbone (the full IKEA NA+EU network is larger and not fully enumerated here)",data/processed/ikea_stores.csv
 channel_innovation,western,ikea_place_ar_launch,1,events,2017,1,0.6,"IKEA Place AR app at Apple ARKit launch",https://9to5mac.com/2017/09/12/ikea-place-ar-app-arkit/
 strategy_pivot,western,urban_shift_announcements_count,2,events,2018,1,0.4,"2016 + 2018 public urban-shift announcements",https://www.cnn.com/2018/06/26/business/ikea-stores-shrinking-cities/
 price_cut,western,fy24_global_price_cut_eur_bn,2.1,eur_bn,2024,1,2.0,"Global FY24 EUR 2.1B price-cut commitment",https://newsroom.inter.ikea.com/news/ikea-investments-2024-prices-quality-products
