@@ -132,7 +132,20 @@
             };
             label.addTo(m);
             state.maps[r.id] = m;
-            state.markerLayers[r.id] = L.layerGroup().addTo(m);
+            // Marker clustering — many IKEA stores share the same
+            // metro (Shanghai 3 cluster, Tokyo 4 cluster, NYC 3 cluster,
+            // London 4 cluster) and their dots overlap into one blob at
+            // typical region zoom. MarkerClusterGroup groups nearby
+            // markers into a numbered bubble; clicking expands.
+            var Cluster = (typeof L.markerClusterGroup === 'function')
+                ? L.markerClusterGroup({
+                    maxClusterRadius: 28,
+                    spiderfyOnMaxZoom: true,
+                    showCoverageOnHover: false,
+                    zoomToBoundsOnClick: true,
+                })
+                : L.layerGroup();   // fallback if plugin failed to load
+            state.markerLayers[r.id] = Cluster.addTo(m);
         });
         state.ready = true;
         wireToolbar();
