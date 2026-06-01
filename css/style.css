@@ -443,6 +443,25 @@
   border-color: var(--ikea-blue);
   color: var(--ikea-blue-dark);
 }
+.leaflet-toolbar #map-year-reset {
+  appearance: none;
+  border: 1px solid var(--rule);
+  background: #fff;
+  width: 30px; height: 30px;
+  border-radius: 15px;
+  cursor: pointer;
+  font-size: 14px;
+  color: var(--ikea-blue);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  line-height: 1;
+}
+.leaflet-toolbar #map-year-reset:hover {
+  background: var(--paper);
+  border-color: var(--ikea-blue);
+}
 
 .leaflet-toolbar #map-stats {
   margin-left: auto;

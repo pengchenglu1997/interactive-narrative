@@ -251,10 +251,12 @@
         setPlayUI(false);
     }
 
-    // Wire the scrubber + play button once the toolbar is in the DOM.
+    // Wire the scrubber + play + reset buttons once the toolbar is
+    // in the DOM.
     function wireToolbar() {
         var slider = document.getElementById('map-year-scrubber');
         var play   = document.getElementById('map-year-play');
+        var reset  = document.getElementById('map-year-reset');
         if (slider && !slider.__wired) {
             slider.__wired = true;
             slider.addEventListener('input', function () {
@@ -268,6 +270,13 @@
                 if (state.timer) { stopTimer(); return; }
                 if (state.year >= MAX_YEAR) setYear(MIN_YEAR);  // restart from start
                 startTimer();
+            });
+        }
+        if (reset && !reset.__wired) {
+            reset.__wired = true;
+            reset.addEventListener('click', function () {
+                stopTimer();
+                setYear(MIN_YEAR);
             });
         }
     }
