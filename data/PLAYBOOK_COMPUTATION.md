@@ -1,5 +1,5 @@
 # Playbook intensity computation log (v2)
-Generated: 2026-05-29T01:12:57.494Z
+Generated: 2026-06-01T04:11:16.647Z
 Anchor year = 2026, τ = 6 years
 
 ## Step 1 — Dated events  (magnitude × time_decay)
@@ -64,14 +64,13 @@ Anchor year = 2026, τ = 6 years
 | local_integration | east_asia | nitori_fy25_revenue_jpy_bn | 929 | jpy_bn | 2025 | +1 | 1.98 | 0.85 | +1.67 |
 | local_integration | east_asia | hanssem_korea_interior_share_pct | 25 | pct | 2024 | +0.6 | 0.81 | 0.72 | +0.35 |
 | local_integration | east_asia | burt_2020_localization_signal | 1 | boolean | 2020 | +0.5 | 0.69 | 0.37 | +0.13 |
-| channel_innovation | east_asia | active_platform_partners_count | 4 | partners | 2024 | +0.5 | 0.59 | 0.72 | +0.21 |
-| big_box | east_asia | beicai_expansion_eur_m | 150 | eur_m | 2024 | +0.4 | 0.15 | 0.72 | +0.04 |
+| big_box | east_asia | beicai_reinvestment_announced | 1 | boolean | 2024 | +0.4 | 0.69 | 0.72 | +0.20 |
 | service_partnership | east_asia | no_major_partnership | 0 | boolean | 2024 | −0.3 | 0.00 | 0.72 | +0.00 |
 | resale_circularity | east_asia | buyback_program_active | 1 | boolean | 2024 | +0.2 | 0.69 | 0.72 | +0.10 |
 | service_partnership | western | taskrabbit_acquisition_eur_m | 42 | eur_m | 2017 | +1.5 | 0.05 | 0.22 | +0.02 |
-| service_partnership | western | planning_studios_active_count | 40 | stores | 2026 | +0.7 | 0.96 | 1.00 | +0.67 |
+| service_partnership | western | active_city_format_in_dataset_count | 9 | stores | 2026 | +0.7 | 0.31 | 1.00 | +0.22 |
 | resale_circularity | western | buyback_countries_count | 27 | countries | 2020 | +1.2 | 1.31 | 0.37 | +0.58 |
-| big_box | western | active_big_box_count | 250 | stores | 2026 | +1.5 | 2.40 | 1.00 | +3.60 |
+| big_box | western | active_big_box_in_dataset_count | 16 | stores | 2026 | +1.5 | 0.49 | 1.00 | +0.74 |
 | channel_innovation | western | ikea_place_ar_launch | 1 | events | 2017 | +0.6 | 0.41 | 0.22 | +0.05 |
 | strategy_pivot | western | urban_shift_announcements_count | 2 | events | 2018 | +0.4 | 0.69 | 0.26 | +0.07 |
 | price_cut | western | fy24_global_price_cut_eur_bn | 2.1 | eur_bn | 2024 | +2 | 1.20 | 0.72 | +1.72 |
@@ -82,11 +81,11 @@ Anchor year = 2026, τ = 6 years
 
 | Rank | Lane | Raw score | norm | Intensity |
 |---|---|---|---|---|
-| 1 | big_box | 3.77 | 1.00 | 5/5 |
-| 2 | price_cut | 3.67 | 0.97 | 5/5 |
-| 3 | urban_format | 1.27 | 0.34 | 2/5 |
-| 4 | service_partnership | 0.71 | 0.19 | 2/5 |
-| 5 | resale_circularity | 0.60 | 0.16 | 2/5 |
+| 1 | price_cut | 3.67 | 1.00 | 5/5 |
+| 2 | urban_format | 1.27 | 0.34 | 2/5 |
+| 3 | big_box | 0.91 | 0.25 | 2/5 |
+| 4 | resale_circularity | 0.60 | 0.16 | 2/5 |
+| 5 | service_partnership | 0.25 | 0.07 | 1/5 |
 | 6 | strategy_pivot | 0.11 | 0.03 | 1/5 |
 | 7 | channel_innovation | 0.08 | 0.02 | 1/5 |
 | 8 | local_integration | 0.00 | 0.00 | 1/5 |
@@ -98,9 +97,9 @@ Anchor year = 2026, τ = 6 years
 | 1 | price_cut | 3.77 | 1.00 | 5/5 |
 | 2 | strategy_pivot | 2.68 | 0.71 | 4/5 |
 | 3 | local_integration | 2.15 | 0.57 | 3/5 |
-| 4 | channel_innovation | 0.40 | 0.11 | 1/5 |
-| 5 | big_box | 0.24 | 0.06 | 1/5 |
-| 6 | urban_format | 0.23 | 0.06 | 1/5 |
+| 4 | big_box | 0.39 | 0.10 | 1/5 |
+| 5 | urban_format | 0.23 | 0.06 | 1/5 |
+| 6 | channel_innovation | 0.19 | 0.05 | 1/5 |
 | 7 | resale_circularity | 0.12 | 0.03 | 1/5 |
 | 8 | service_partnership | 0.00 | 0.00 | 1/5 |
 
