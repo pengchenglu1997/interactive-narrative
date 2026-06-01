@@ -4,15 +4,22 @@
 //
 // Filter passed via manager.state.vizConfig.regime ("east_asia" | "western" | null).
 (function () {
+    // Lanes grouped narratively (top to bottom):
+    //   Physical network → urban_format, big-box expansion, closures
+    //                       (the article's primary opening/closing pair sits
+    //                        adjacent — easier to read the East-Asia retreat
+    //                        directly beneath the Western city-format push)
+    //   Service / channel → channel innovation, service partnership, resale
+    //   Pricing / strategy → price cut, strategy pivot
     var lanes = [
         { key: 'urban_format',        label: 'Urban format' },
+        { key: 'store_expansion',     label: 'Big-box expansion' },
+        { key: 'closure',             label: 'City-store closure' },
+        { key: 'channel_innovation',  label: 'Channel innov.' },
         { key: 'service_partnership', label: 'Service partner.' },
         { key: 'resale_circularity',  label: 'Resale / circ.' },
-        { key: 'channel_innovation',  label: 'Channel innov.' },
-        { key: 'strategy_pivot',      label: 'Strategy pivot' },
         { key: 'price_cut',           label: 'Price cut' },
-        { key: 'closure',             label: 'City-store closure' },
-        { key: 'store_expansion',     label: 'Big-box expansion' },
+        { key: 'strategy_pivot',      label: 'Strategy pivot' },
     ];
     var Y_MIN = 2014, Y_MAX = 2026;
 
@@ -20,14 +27,16 @@
         var base;
         if (ev.regime_type === 'east_asia') base = '#FBD914';      // IKEA yellow
         else if (ev.regime_type === 'western') base = '#0058AB';   // IKEA blue
-        else if (ev.regime_type === 'both') base = '#1a1a1a';      // neutral (was orange #E0A800)
-        else base = '#888';
+        else if (ev.regime_type === 'both') base = '#888';         // neutral gray (was black; black read as a heavier third regime)
+        else base = '#bbb';
         return dimmed ? base + '40' : base;
     }
 
-    // Tile label: dark ink on yellow, white on blue/black.
+    // Tile label: dark ink on yellow + gray (light fills), white on blue.
     function tileTextColor(ev) {
-        return ev.regime_type === 'east_asia' ? '#1a1a1a' : '#fff';
+        if (ev.regime_type === 'east_asia') return '#1a1a1a';
+        if (ev.regime_type === 'both')      return '#fff';
+        return '#fff';
     }
 
     function isHighlighted(ev, regimeFilter) {
@@ -157,13 +166,13 @@
             var legendItems = regimeFilter === 'east_asia'
                 ? [
                     { c: '#FBD914',   label: 'East Asian (focus)' },
-                    { c: '#1a1a1a',   label: 'Global / both' },
+                    { c: '#888',      label: 'Global / both' },
                     { c: '#0058AB40', label: 'Western (faded)' },
                 ]
                 : regimeFilter === 'western'
                 ? [
                     { c: '#0058AB',   label: 'Western (focus)' },
-                    { c: '#1a1a1a',   label: 'Global / both' },
+                    { c: '#888',      label: 'Global / both' },
                     { c: '#FBD91440', label: 'East Asian (faded)' },
                 ]
                 : [
