@@ -16,15 +16,27 @@
     // store_expansion (big-box) dropped per author feedback — only 1
     // dated event in the data anyway (Gwangmyeong 2014, outside the new
     // 2016+ window) and it competed visually with the city-format story.
+    // service_partnership + resale_circularity merged into one
+    // "Service & circular" lane — each had only 1 event in the
+    // post-2016 window (TaskRabbit 2017, Buyback 2020), and they
+    // both belong to the same "extends original model with
+    // service / sustainability additions" semantic group.
     var lanes = [
-        { key: 'urban_format',        label: 'Urban format',         groupAfter: false },
-        { key: 'closure',             label: 'City-store closure',   groupAfter: true  },
-        { key: 'channel_innovation',  label: 'Channel innov.',       groupAfter: false },
-        { key: 'service_partnership', label: 'Service partner.',     groupAfter: false },
-        { key: 'resale_circularity',  label: 'Resale / circ.',       groupAfter: true  },
-        { key: 'price_cut',           label: 'Price cut',            groupAfter: false },
-        { key: 'strategy_pivot',      label: 'Strategy pivot',       groupAfter: false },
+        { key: 'urban_format',       label: 'Urban format',         groupAfter: false },
+        { key: 'closure',            label: 'City-store closure',   groupAfter: true  },
+        { key: 'channel_innovation', label: 'Channel innov.',       groupAfter: false },
+        { key: 'service_circular',   label: 'Service & circular',   groupAfter: true  },
+        { key: 'price_cut',          label: 'Price cut',            groupAfter: false },
+        { key: 'strategy_pivot',     label: 'Strategy pivot',       groupAfter: false },
     ];
+
+    // event.response_type → lane.key. Most are identity; only the
+    // merged lane needs aliasing.
+    function laneKeyFor(responseType) {
+        if (responseType === 'service_partnership' ||
+            responseType === 'resale_circularity') return 'service_circular';
+        return responseType;
+    }
     // Y_MIN starts at the CEO urban-strategy announcement; the
     // pre-2016 events were big-box openings that aren't in this chart.
     var Y_MIN = 2016, Y_MAX = 2026;
@@ -85,7 +97,7 @@
 
             var grouped = {};
             events.forEach(function (e) {
-                var k = e.response_type + '|' + e.event_year;
+                var k = laneKeyFor(e.response_type) + '|' + e.event_year;
                 grouped[k] = grouped[k] || [];
                 grouped[k].push(e);
             });
