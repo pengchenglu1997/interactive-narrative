@@ -2,27 +2,36 @@
 // Section 7: East Asian markets (yellow scale)
 // Section 8: Western markets    (blue scale)
 //
-// Project-3 redesign (per professor + author feedback):
-//   - 6 dimensions cut to 4, grouped into Consumer / Market.
-//     car_dependence dropped (highly correlated with urban density);
-//     local_manufacturing dropped (highly correlated with local competition).
-//   - Single-hue heatmap PER regime (no mixed blue+yellow on one chart).
-//     Low/Moderate are gray; only High / Very-high carry the regime hue.
-//   - Right side keeps the CHALLENGE total bar (now /16) and sort,
-//     but the prior "IKEA Result" 3-slot column is removed —
-//     outcomes are already in the running prose.
+// Project-3 / SOURCING.md redesign:
+//   - 4 dimensions cut to 3 — diy_culture dropped because no
+//     country-level metric exists for it. The DIY observation
+//     stays in the prose, anchored to Burt 2020.
+//   - Dimensions regrouped along source-confidence (not topical
+//     similarity): QUANTITATIVE (density — backed by national
+//     statistical agencies for every market) vs OBSERVATIONAL
+//     (service expectation + local competition — observation- or
+//     mixed-citation-based). Group caption + label-style differ so
+//     the reader knows which is which.
+//   - Single-hue heatmap PER regime (no mixed blue+yellow on a
+//     chart). Low/Moderate are gray; only High / Very-high carry
+//     the regime hue.
+//   - CHALLENGE total now /12 (3 dims × max level 4) instead of /16.
+//   - Outcomes (BIG-BOX / CITY OPEN / CITY SHUT) remain in the prose,
+//     not in the matrix.
 (function () {
-    // Two grouped sub-axes — order matters; group divider is drawn
-    // between dim index 2 and 3 (i.e., after Service exp.).
+    // QUANTITATIVE: directly cited from a national statistics agency
+    //               per row (`density_source` column on retail_ecology.csv).
+    // OBSERVATIONAL: backed by mixed evidence — some markets have
+    //                published market-share data (China, Japan, Korea
+    //                for competition), others are author observation
+    //                across multiple mid-size players.
     var dims = [
-        { key: 'diy_culture',          label: 'DIY culture',         group: 'consumer' },
-        { key: 'service_expectation',  label: 'Service exp.',        group: 'consumer' },
-        { key: 'urban_density',        label: 'Density',             group: 'market'   },
-        { key: 'domestic_competition', label: 'Local comp.',         group: 'market'   },
+        { key: 'urban_density',        label: 'Density',      group: 'quantitative' },
+        { key: 'service_expectation',  label: 'Service exp.', group: 'observational' },
+        { key: 'domestic_competition', label: 'Local comp.',  group: 'observational' },
     ];
 
     var challengeMap = {
-        diy_culture:          { weak: 3, moderate: 2, strong: 1, very_strong: 0 },
         urban_density:        { low: 1, moderate: 2, high: 3, very_high: 4 },
         service_expectation:  { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
         domestic_competition: { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
@@ -48,7 +57,7 @@
         }
     }
 
-    var MAX_CHALLENGE = 16;   // 4 dims × max level 4
+    var MAX_CHALLENGE = 12;   // 3 dims × max level 4 (diy_culture dropped — no country-level metric)
 
     function challengeTotal(row) {
         var total = 0;
@@ -108,44 +117,49 @@
                     : 'RETAIL ECOLOGY MATRIX';
             p.text(title, innerL, innerT - 74);
 
-            // Subtitle — short. Outcomes live in the prose now.
+            // Subtitle — explicit about which dims are quantitative vs observation.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
-            var subtitle = regimeFilter === 'east_asia'
-                ? 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge to IKEA\'s original model.'
-                : regimeFilter === 'western'
-                    ? 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge to IKEA\'s original model.'
-                    : 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge.';
+            var subtitle = (regimeFilter === 'east_asia' || regimeFilter === 'western')
+                ? 'Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Sorted by total challenge. See data/SOURCING.md for per-cell sources.'
+                : 'Density is quantitative; service and competition are observation-based. Sorted by total challenge.';
             p.text(subtitle, innerL, innerT - 58);
 
-            // Group caption row (above the dimension headers)
+            // Group caption row — three dims:
+            //   index 0 = density (QUANTITATIVE, single col)
+            //   index 1-2 = service / competition (OBSERVATIONAL, two cols)
             p.fill('#888'); p.textSize(9.5); p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
-            // Consumer span = dims 0..1, Market span = dims 2..3
-            var consumerX = innerL + cellW;                     // center of dims 0+1
-            var marketX   = innerL + 3 * cellW;                 // center of dims 2+3
-            p.text('CONSUMER BEHAVIOR', consumerX, innerT - 36);
-            p.text('MARKET STRUCTURE',  marketX,   innerT - 36);
+            var quantX = innerL + 0.5 * cellW;                      // center of dim 0
+            var obsX   = innerL + 2   * cellW;                      // center of dims 1+2
+            p.fill('#0058AB');
+            p.text('QUANTITATIVE',  quantX, innerT - 36);
+            p.fill('#888');
+            p.text('OBSERVATIONAL', obsX,   innerT - 36);
 
             // Thin underline under each group caption
             p.stroke('#ddd'); p.strokeWeight(0.8);
-            p.line(innerL + 6,              innerT - 30, innerL + 2 * cellW - 6, innerT - 30);
-            p.line(innerL + 2 * cellW + 6,  innerT - 30, innerL + 4 * cellW - 6, innerT - 30);
+            p.line(innerL + 6,             innerT - 30, innerL + cellW - 6,     innerT - 30);
+            p.line(innerL + cellW + 6,     innerT - 30, innerL + 3 * cellW - 6, innerT - 30);
             p.noStroke();
 
-            // Dimension headers
-            p.fill('#1a1a1a'); p.textSize(10.5);
+            // Dimension headers — quantitative dim styled darker/bold,
+            // observational dims slightly faded.
+            p.textSize(10.5);
             p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
+                p.fill(d.group === 'quantitative' ? '#0058AB' : '#1a1a1a');
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
-            p.text('CHALLENGE / 16', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
+            p.fill('#1a1a1a');
+            p.text('CHALLENGE / 12', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
             p.textStyle(p.NORMAL);
 
-            // Group divider — light vertical line down the chart between groups
+            // Group divider — light vertical line between QUANTITATIVE (1 dim)
+            // and OBSERVATIONAL (2 dims). Sits between dim 0 and dim 1.
             p.stroke('#e8e8e8'); p.strokeWeight(1);
-            var groupX = innerL + 2 * cellW;
+            var groupX = innerL + 1 * cellW;
             p.line(groupX, innerT - 4, groupX, innerT + rows.length * rowH + 4);
             p.noStroke();
 
@@ -197,14 +211,16 @@
                 var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
                 p.noStroke(); p.fill('#eee');
                 p.rect(barX, barY, barW, barH, 2);
-                // Bar fill stays in the regime hue family
+                // Bar fill stays in the regime hue family. Thresholds
+                // rescaled for the /12 scale: 8+ = saturated, 5+ = pale,
+                // below = neutral gray.
                 var topShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
                 var midShade = row.region_type === 'east_asia' ? '#fff5b2' : '#b9d0e6';
-                p.fill(total >= 11 ? topShade : total >= 6 ? midShade : '#d4d4d4');
+                p.fill(total >= 8 ? topShade : total >= 5 ? midShade : '#d4d4d4');
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(10); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
-                p.text(total + '/16', barX + barW + 6, barY + barH / 2);
+                p.text(total + '/12', barX + barW + 6, barY + barH / 2);
                 p.textStyle(p.NORMAL);
             });
 
