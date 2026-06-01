@@ -136,26 +136,30 @@
                 return div;
             };
             label.addTo(m);
-            // Per-map Reset-view control — restores this map's pan +
-            // zoom to its original fitBounds without touching the year
-            // scrubber (which has its own reset on the toolbar above).
-            var resetView = L.control({ position: 'topright' });
-            resetView.onAdd = function () {
-                var div = L.DomUtil.create('div', 'leaflet-bar map-reset-view');
-                var btn = L.DomUtil.create('a', '', div);
+            // Per-map Reset-view button — appended directly to the
+            // existing zoom-control bar so it becomes the third button
+            // in the same rounded "+ / − / ↺" group (sits flush below
+            // the minus button instead of floating as a separate bar).
+            // Restores pan + zoom to the original fitBounds; does not
+            // touch the year scrubber (which has its own reset above).
+            if (m.zoomControl && m.zoomControl.getContainer()) {
+                var zoomBar = m.zoomControl.getContainer();
+                var btn = L.DomUtil.create(
+                    'a',
+                    'leaflet-control-zoom-reset map-reset-btn',
+                    zoomBar
+                );
                 btn.href = '#';
                 btn.title = 'Reset view';
                 btn.setAttribute('role', 'button');
                 btn.setAttribute('aria-label', 'Reset map view');
-                btn.innerHTML = '⌂';
+                btn.innerHTML = '↺';
                 L.DomEvent.on(btn, 'click', function (e) {
                     L.DomEvent.stop(e);
                     m.fitBounds(m._initialBounds, { padding: [2, 2], animate: true });
                 });
-                L.DomEvent.disableClickPropagation(div);
-                return div;
-            };
-            resetView.addTo(m);
+                L.DomEvent.disableClickPropagation(btn);
+            }
             state.maps[r.id] = m;
             // Marker clustering — many IKEA stores share the same
             // metro (Shanghai 3 cluster, Tokyo 4 cluster, NYC 3 cluster,
