@@ -1,45 +1,55 @@
-// viz_ecology.js — Two IKEAs viz 4: Retail ecology matrix
-// Section 7: Eastern markets only (the warm-glow side)
-// Section 8: Western markets only (the cool side) — comparison
+// viz_ecology.js — viz 4: Retail ecology matrix (Act 4)
+// Section 7: East Asian markets (yellow scale)
+// Section 8: Western markets    (blue scale)
 //
-// Filter passed via manager.state.vizConfig.regime ("east_asia" | "western" | null).
+// Project-3 redesign (per professor + author feedback):
+//   - 6 dimensions cut to 4, grouped into Consumer / Market.
+//     car_dependence dropped (highly correlated with urban density);
+//     local_manufacturing dropped (highly correlated with local competition).
+//   - Single-hue heatmap PER regime (no mixed blue+yellow on one chart).
+//     Low/Moderate are gray; only High / Very-high carry the regime hue.
+//   - Right side keeps the CHALLENGE total bar (now /16) and sort,
+//     but the prior "IKEA Result" 3-slot column is removed —
+//     outcomes are already in the running prose.
 (function () {
+    // Two grouped sub-axes — order matters; group divider is drawn
+    // between dim index 2 and 3 (i.e., after Service exp.).
     var dims = [
-        { key: 'diy_culture',         label: 'DIY culture' },
-        { key: 'car_dependence',      label: 'Car deps.' },
-        { key: 'urban_density',       label: 'Density' },
-        { key: 'service_expectation', label: 'Service exp.' },
-        { key: 'local_manufacturing', label: 'Local mfg.' },
-        { key: 'domestic_competition',label: 'Local comp.' },
+        { key: 'diy_culture',          label: 'DIY culture',         group: 'consumer' },
+        { key: 'service_expectation',  label: 'Service exp.',        group: 'consumer' },
+        { key: 'urban_density',        label: 'Density',             group: 'market'   },
+        { key: 'domestic_competition', label: 'Local comp.',         group: 'market'   },
     ];
 
     var challengeMap = {
         diy_culture:          { weak: 3, moderate: 2, strong: 1, very_strong: 0 },
-        car_dependence:       { weak: 3, moderate: 2, strong: 1, very_strong: 0 },
         urban_density:        { low: 1, moderate: 2, high: 3, very_high: 4 },
         service_expectation:  { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
-        local_manufacturing:  { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
         domestic_competition: { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
     };
 
-    // Heatmap palette: cool IKEA blue tones = condition fits the original model;
-    // warm IKEA yellow tones = condition challenges the model. On-brand bipolar scale.
-    function challengeColor(level) {
-        if (level <= 1) return '#e6eef6';   // pale blue — fits
-        if (level <= 2) return '#b9d0e6';   // blue
-        if (level <= 3) return '#f8e288';   // pale yellow — challenges
-        return '#FBD914';                    // IKEA yellow — very high challenge
+    // Per-regime monochrome heatmap. Low/Moderate are neutral grays so
+    // the two regime views never visually mix blue and yellow.
+    function challengeColor(level, regime) {
+        if (level <= 1) return '#efefef';                          // light gray
+        if (level <= 2) return '#d4d4d4';                          // mid gray
+        if (regime === 'east_asia') {
+            return level <= 3 ? '#fff5b2' : '#FBD914';             // pale yellow → IKEA yellow
+        }
+        // western (and combined view) — single blue gradient
+        return level <= 3 ? '#b9d0e6' : '#0058AB';                 // pale blue → IKEA blue
     }
 
     function regimeColor(rt) {
         switch ((rt || '').toLowerCase()) {
-            case 'western':   return '#0058AB';   // IKEA blue
-            case 'east_asia': return '#FBD914';   // IKEA yellow
+            case 'western':   return '#0058AB';
+            case 'east_asia': return '#FBD914';
             default: return '#888';
         }
     }
 
-    var MAX_CHALLENGE = 24;   // 6 dims × max level 4
+    var MAX_CHALLENGE = 16;   // 4 dims × max level 4
+
     function challengeTotal(row) {
         var total = 0;
         for (var i = 0; i < dims.length; i++) {
@@ -47,18 +57,6 @@
             total += (challengeMap[k] && challengeMap[k][row[k]]) || 0;
         }
         return total;
-    }
-
-    // Aggregate IKEA's actual presence in `market` from the stores table —
-    // this is the "so what" of the matrix: high challenge → does IKEA win or lose?
-    var CITY_FORMATS = ['city_store', 'planning_studio', 'plan_order_point'];
-    function outcomeFor(marketName, stores) {
-        var inMkt = (stores || []).filter(function (s) { return s.country === marketName; });
-        return {
-            bigOpen:    inMkt.filter(function (s) { return s.store_format === 'big-box' && !s.closure_year; }).length,
-            cityOpen:   inMkt.filter(function (s) { return CITY_FORMATS.indexOf(s.store_format) >= 0 && !s.closure_year; }).length,
-            cityClosed: inMkt.filter(function (s) { return CITY_FORMATS.indexOf(s.store_format) >= 0 &&  s.closure_year; }).length,
-        };
     }
 
     window.VizEcology = {
@@ -75,20 +73,10 @@
             var cfg = (manager.state && manager.state.vizConfig) || {};
             var regimeFilter = cfg.regime || null;
 
-            // Filter to the active regime, then attach aggregate + outcome
-            // so we can sort and display them. The sort is the most direct
-            // answer to the professor's complaint that the matrix had no
-            // takeaway: highest challenge bubbles to the top, and the right
-            // edge shows what actually happened to IKEA in that market.
-            var stores = (manager.data && manager.data.stores) || [];
+            // Filter to active regime + sort by total challenge desc.
             var rows = ecology
                 .filter(function (r) { return !regimeFilter || r.region_type === regimeFilter; })
-                .map(function (r) {
-                    return Object.assign({}, r, {
-                        _total:   challengeTotal(r),
-                        _outcome: outcomeFor(r.market, stores),
-                    });
-                })
+                .map(function (r) { return Object.assign({}, r, { _total: challengeTotal(r) }); })
                 .sort(function (a, b) { return b._total - a._total; });
 
             var W = manager.width, H = manager.height;
@@ -98,18 +86,17 @@
             p.push();
             p.translate(padL, padT);
 
-            // Layout — reserve right-side bands for the two new columns.
-            var CHAL_COL_W    = 84;     // bar (60) + "score/24" label
-            var OUTCOME_COL_W = 130;    // "7 big · 1 closed" badges
+            // Layout — wider cells because we cut 2 dims and dropped the
+            // IKEA Result column. innerB bumped to fit the group caption.
+            var CHAL_COL_W = 92;
             var innerL = 130;
-            var innerR = 14 + CHAL_COL_W + OUTCOME_COL_W;
-            var innerT = 78, innerB = 52;
+            var innerR = 14 + CHAL_COL_W;
+            var innerT = 96, innerB = 52;        // innerT +18 for group caption row
             var cellW  = (W - innerL - innerR) / dims.length;
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
-            var chalColX    = innerL + dims.length * cellW + 4;
-            var outcomeColX = chalColX + CHAL_COL_W + 4;
+            var chalColX = innerL + dims.length * cellW + 6;
 
-            // Section title — amber for East (yellow itself is unreadable as text)
+            // Section title — amber for East (yellow text unreadable).
             p.noStroke();
             p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(13);
@@ -119,77 +106,78 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN MARKETS — RETAIL ECOLOGY'
                     : 'RETAIL ECOLOGY MATRIX';
-            p.text(title, innerL, innerT - 56);
+            p.text(title, innerL, innerT - 74);
 
-            // Subtitle — explicit time horizons so the reader knows what
-            // each right-side number is measuring.
+            // Subtitle — short. Outcomes live in the prose now.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
             var subtitle = regimeFilter === 'east_asia'
-                ? 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018. Watch: more friction ↔ more shuts.'
+                ? 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge to IKEA\'s original model.'
                 : regimeFilter === 'western'
-                    ? 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018. Watch: low friction ↔ stores stay open.'
-                    : 'Sorted by total challenge. Right: open stores in 2026 + cumulative city-format closures since 2018.';
-            p.text(subtitle, innerL, innerT - 40);
+                    ? 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge to IKEA\'s original model.'
+                    : 'Four conditions grouped into Consumer behavior and Market structure. Sorted by total challenge.';
+            p.text(subtitle, innerL, innerT - 58);
 
-            // Column headers (horizontal, single line — was rotated -30°
-            // which extended ~55px upward and overlapped the subtitle)
-            p.noStroke(); p.fill('#1a1a1a'); p.textSize(10.5);
+            // Group caption row (above the dimension headers)
+            p.fill('#888'); p.textSize(9.5); p.textStyle(p.BOLD);
+            p.textAlign(p.CENTER, p.BOTTOM);
+            // Consumer span = dims 0..1, Market span = dims 2..3
+            var consumerX = innerL + cellW;                     // center of dims 0+1
+            var marketX   = innerL + 3 * cellW;                 // center of dims 2+3
+            p.text('CONSUMER BEHAVIOR', consumerX, innerT - 36);
+            p.text('MARKET STRUCTURE',  marketX,   innerT - 36);
+
+            // Thin underline under each group caption
+            p.stroke('#ddd'); p.strokeWeight(0.8);
+            p.line(innerL + 6,              innerT - 30, innerL + 2 * cellW - 6, innerT - 30);
+            p.line(innerL + 2 * cellW + 6,  innerT - 30, innerL + 4 * cellW - 6, innerT - 30);
+            p.noStroke();
+
+            // Dimension headers
+            p.fill('#1a1a1a'); p.textSize(10.5);
             p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
-            // New right-side column headers.
-            // Replace the catch-all 'IKEA RESULT' with one micro-header per
-            // slot so each big number in the row has its own visible label
-            // directly above it (instead of forcing the reader to decode an
-            // inline 'N big · N city · N closed' string against a footer key).
-            p.text('CHALLENGE / 24', chalColX + CHAL_COL_W / 2, innerT - 8);
-
-            // Three mutually-exclusive store-state slots. Labels spell out
-            // the time horizon so the reader doesn't have to wonder if the
-            // numbers are deltas or stocks:
-            //   BIG-BOX   = open big-box stores  (snapshot, 2026)
-            //   CITY OPEN = open city-format     (snapshot, 2026)
-            //   CITY SHUT = ever-closed city     (cumulative, since 2018)
-            // A city store is either OPEN or SHUT — no double-counting.
-            var slotW = OUTCOME_COL_W / 3;
-            p.textSize(9);
-            ['BIG-BOX', 'CITY OPEN', 'CITY SHUT'].forEach(function (lab, k) {
-                var sx = outcomeColX + k * slotW + slotW / 2;
-                p.fill(k === 2 ? '#C57F00' : '#0058AB');
-                p.text(lab, sx, innerT - 8);
-            });
+            p.text('CHALLENGE / 16', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
             p.textStyle(p.NORMAL);
 
-            // Convert canvas mouse → translated sketch coords
+            // Group divider — light vertical line down the chart between groups
+            p.stroke('#e8e8e8'); p.strokeWeight(1);
+            var groupX = innerL + 2 * cellW;
+            p.line(groupX, innerT - 4, groupX, innerT + rows.length * rowH + 4);
+            p.noStroke();
+
+            // Mouse coords (translated)
             var mx = p.mouseX - padL;
             var my = p.mouseY - padT;
-
-            // Hover state
             var hoverCell = null;
 
             // Rows
             rows.forEach(function (row, i) {
                 var y = innerT + i * rowH + rowH / 2;
+
+                // Regime stripe + market label
                 p.noStroke(); p.fill(regimeColor(row.region_type));
                 p.rect(2, y - 8, 4, 16);
                 p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(row.market, 12, y);
-
                 p.textStyle(p.NORMAL);
+
+                // Cells
                 dims.forEach(function (d, j) {
                     var x = innerL + j * cellW;
                     var rawVal = row[d.key];
                     var level = (challengeMap[d.key] && challengeMap[d.key][rawVal]) || 0;
-                    var col = challengeColor(level);
+                    var col = challengeColor(level, row.region_type);
                     p.noStroke(); p.fill(col);
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    // Dark ink on both blue and yellow cells — readable across the scale.
+                    // Dark ink always — readable on every shade in the
+                    // per-regime palette (gray / pale color / saturated).
                     p.fill('#1a1a1a');
                     p.textSize(10);
                     p.textAlign(p.CENTER, p.CENTER);
@@ -201,61 +189,39 @@
                     }
                 });
 
-                // === Challenge / 24 column ============================
+                // CHALLENGE / 16 — bar + numeric label, regime-tinted
                 var total = row._total;
-                var barW  = CHAL_COL_W - 28;
+                var barW  = CHAL_COL_W - 32;
                 var barH  = 10;
                 var barX  = chalColX + 4;
                 var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
                 p.noStroke(); p.fill('#eee');
                 p.rect(barX, barY, barW, barH, 2);
-                // Fill color stays on the IKEA bipolar scale
-                p.fill(total >= 17 ? '#FBD914' : total >= 11 ? '#f8e288' : '#b9d0e6');
+                // Bar fill stays in the regime hue family
+                var topShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
+                var midShade = row.region_type === 'east_asia' ? '#fff5b2' : '#b9d0e6';
+                p.fill(total >= 11 ? topShade : total >= 6 ? midShade : '#d4d4d4');
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(10); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
-                p.text(total + '/24', barX + barW + 6, barY + barH / 2);
-                p.textStyle(p.NORMAL);
-
-                // === IKEA Result — 3 fixed slots, each aligned with its
-                //     column header above. Zero values are rendered as a
-                //     muted "—" so the eye can still register the slot
-                //     without the noise of a colored "0".
-                var o  = row._outcome;
-                var oy = innerT + i * rowH + rowH / 2;
-                var slots = [
-                    { val: o.bigOpen,    col: '#0058AB' },
-                    { val: o.cityOpen,   col: '#0058AB' },
-                    { val: o.cityClosed, col: '#C57F00' },
-                ];
-                p.textStyle(p.BOLD);
-                p.textAlign(p.CENTER, p.CENTER);
-                slots.forEach(function (s, k) {
-                    var sx = outcomeColX + k * slotW + slotW / 2;
-                    if (s.val > 0) {
-                        p.fill(s.col); p.textSize(16);
-                        p.text(s.val, sx, oy);
-                    } else {
-                        p.fill('#cfcfcf'); p.textSize(13);
-                        p.text('—', sx, oy);
-                    }
-                });
+                p.text(total + '/16', barX + barW + 6, barY + barH / 2);
                 p.textStyle(p.NORMAL);
             });
 
-            // Legend — cell scale only. The right-side slot headers
-            // (BIG-BOX / CITY / CLOSED) carry their own meaning, so no
-            // second legend row is needed.
+            // Legend — cell scale only. Per-regime monochrome means one
+            // legend row is enough.
             p.noStroke(); p.textSize(10); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
             var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 226;
+            var topHi  = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
+            var midHi  = regimeFilter === 'east_asia' ? '#fff5b2' : '#b9d0e6';
             [
-                { c: '#e6eef6', label: 'Low' },
-                { c: '#b9d0e6', label: 'Moderate' },
-                { c: '#f8e288', label: 'High' },
-                { c: '#FBD914', label: 'Very high' },
+                { c: '#efefef', label: 'Low' },
+                { c: '#d4d4d4', label: 'Moderate' },
+                { c: midHi,     label: 'High' },
+                { c: topHi,     label: 'Very high' },
             ].forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY - 2, 10, 10);
                 p.fill('#333'); p.text(it.label, lx + 14, legY);
@@ -272,7 +238,7 @@
                     '<div class="tt-name">' + h.row.market + ' · ' + h.dim.label + '</div>' +
                     '<div class="tt-row"><b>Value</b> ' + (h.val || '').replace(/_/g, ' ') + '</div>' +
                     '<div class="tt-row"><b>Challenge to IKEA</b> ' + challengeLabel + '</div>' +
-                    (h.row.short_summary ? '<div class="tt-note">' + h.row.short_summary + '</div>' : '') +
+                    (h.row.short_summary  ? '<div class="tt-note">' + h.row.short_summary + '</div>' : '') +
                     (h.row.primary_sources ? '<div class="tt-src">Sources: ' + h.row.primary_sources + '</div>' : '');
                 window.VizTooltip.show(p, html, p.mouseX, p.mouseY);
             } else if (window.VizTooltip) {
