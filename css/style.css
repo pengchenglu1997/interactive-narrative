@@ -123,7 +123,15 @@
 
 .step {
   margin-bottom: 180px;
-  min-height: 60vh;
+  /* Locked at one full viewport. The flicker on Coda + author was
+     caused by .layout-full-text widening #sections from 38vw to 70vw,
+     which made every step's text reflow to fewer/more lines, which
+     changed every step's height, which changed total document height,
+     which desynced the scroller's cached sectionPositions and made
+     active oscillate between two sections at the boundary. With a
+     full-viewport floor, normal text content stays at exactly 100vh
+     regardless of width — width changes no longer alter total height. */
+  min-height: 100vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -212,11 +220,10 @@
   line-height: 1.5;
 }
 
-/* Tall enough that the last .step's top can scroll up to the viewport
-   top so the scroller can promote it to active. Without this, the
-   author section's activeIndex never fires and (combined with the
-   non-active dimming) it reads as ghost-grey. */
-#extra-space { height: 80vh; }
+/* With .step min-height now at 100vh the last step always has room
+   to be active on its own. Extra-space is now just a small visual
+   buffer at the page end. */
+#extra-space { height: 80px; }
 
 /* ============ Takeaway callout ============ */
 
