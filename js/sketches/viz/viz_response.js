@@ -78,16 +78,19 @@
             var rightX = colW + colGap;
 
             // Per-column internal layout — city label → bar → value → verdict.
+            // Compressed (vs the v1 layout): label 88→72, value zone 88→36,
+            // verdict 150→100. The ~104px saved goes straight to the bar,
+            // taking it from ~30px to ~140px on a typical viewport.
             function colLayout(baseX) {
-                var labelW   = 88;
-                var labelX   = baseX + labelW;            // right-edge of city name
-                var barX     = labelX + 8;                // bar start
-                var verdictGap = 88;                      // px reserved for value + small gap
-                var verdictW = 150;                       // verdict text column
-                var barW     = colW - labelW - 8 - verdictGap - verdictW;
+                var labelW    = 72;                       // city name column
+                var valueZone = 36;                       // just enough for "34.5" + small gap
+                var verdictW  = 100;                      // fits "(+1 closed since)" subtitle
+                var labelX    = baseX + labelW;           // right-edge of city name
+                var barX      = labelX + 8;               // bar start
+                var barW      = colW - labelW - 8 - valueZone - verdictW;
                 if (barW < 60) barW = 60;
-                var valueX   = barX + barW + 4;
-                var verdictX = valueX + verdictGap - 4;
+                var valueX    = barX + barW + 4;          // value floats with bar end
+                var verdictX  = baseX + colW - verdictW;  // verdict in its own fixed column
                 return {
                     labelX:   labelX,
                     barX:     barX,
@@ -162,22 +165,25 @@
                 p.textSize(11);
                 p.text(c.price_to_income_ratio.toFixed(1), layout.barX + bw + 4, yPos);
 
-                // Verdict (4 cases) — regime color for "any open", gray otherwise.
+                // Verdict (4 cases) — compressed wording. The footer
+                // microcopy below the chart sets the noun context
+                // ('city-format store status'), so a row just needs the
+                // count + state. Subtitle stays for change-over-time.
                 var verdict, subtitle, vcolor;
                 if (s.openCity === 0 && s.closedCity === 0) {
-                    verdict  = 'No city store';
+                    verdict  = 'None';
                     vcolor   = '#888';
                     subtitle = '';
                 } else if (s.openCity === 0 && s.closedCity > 0) {
-                    verdict  = 'All closed';
+                    verdict  = 'Closed';
                     vcolor   = '#888';
                     subtitle = '(was ' + s.closedCity + ')';
                 } else if (s.closedCity > 0) {
-                    verdict  = s.openCity + ' city store' + (s.openCity > 1 ? 's' : '') + ' open';
+                    verdict  = s.openCity + ' open';
                     vcolor   = regimeText;
-                    subtitle = '(' + s.closedCity + ' closed since)';
+                    subtitle = '(+' + s.closedCity + ' closed since)';
                 } else {
-                    verdict  = s.openCity + ' city store' + (s.openCity > 1 ? 's' : '') + ' open';
+                    verdict  = s.openCity + ' open';
                     vcolor   = regimeText;
                     subtitle = '';
                 }
@@ -201,12 +207,15 @@
             west.forEach(function (c, i) { drawRow(c, i, R, '#0058AB', '#0058AB'); });
 
             // === Footer note ===
+            // Sets the noun context for the compressed verdicts: "1 open",
+            // "Closed", "None" all refer to city-format stores. Also
+            // explains the gray-bar treatment.
             p.noStroke();
             p.fill('#888');
             p.textStyle(p.NORMAL);
             p.textSize(10);
             p.textAlign(p.LEFT, p.TOP);
-            p.text('PTI = price-to-income ratio (Numbeo). Bar gray = no city-format store; coloured = at least one city-format store currently open.',
+            p.text('PTI = price-to-income ratio (Numbeo). Right column = city-format store count (active / closed since). Bar gray = no city-format store; coloured = at least one currently open.',
                 0, innerT + maxRows * rowH + 4);
 
             p.pop();
