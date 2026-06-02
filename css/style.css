@@ -154,12 +154,54 @@
 }
 
 #sections .title.hero-title {
-  font-size: 72px;
+  font-size: 64px;
   font-weight: 900;
   color: var(--ikea-blue);
-  margin: 18px 0 12px;
+  margin: 24px 0 20px;
   letter-spacing: -0.02em;
-  line-height: 1.0;
+  line-height: 1.05;
+  text-align: center;
+}
+
+/* Hero section — centered layout with IKEA blue/yellow accent
+   hairlines top and bottom, giving the cover a 'masthead' rhythm
+   instead of the previous flat left-aligned stack. */
+#sections .step.hero-section {
+  text-align: center;
+  align-items: center;
+}
+#sections .step.hero-section .kicker,
+#sections .step.hero-section .byline,
+#sections .step.hero-section .byline-meta {
+  text-align: center;
+}
+#sections .step.hero-section .story-intro {
+  text-align: left;          /* paragraph stays left-aligned (body copy reads better) */
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 680px;
+}
+#sections .hero-rule {
+  width: 220px;
+  height: 4px;
+  margin: 28px auto 28px;
+  background: linear-gradient(to right,
+              var(--ikea-blue) 0%,
+              var(--ikea-blue) 70%,
+              var(--ikea-yellow) 70%,
+              var(--ikea-yellow) 100%);
+  border-radius: 2px;
+}
+/* New 'byline meta' chip — was crowded onto the same line as the
+   author names with a '·' separator. Splitting onto its own line
+   makes the '10 min read' read as a real signpost. */
+#sections .byline-meta {
+  font-family: var(--font-sans);
+  font-size: 11.5px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 4px 0 0;
 }
 
 #sections .subtitle {
