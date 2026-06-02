@@ -653,6 +653,35 @@
   box-shadow: 0 1px 3px rgba(0,0,0,0.3);
 }
 
+/* Mixed-cluster pill — one bubble whose left half shows the open
+   count in the regime palette and right half shows the closed count
+   in black, with a single regime-coloured outer border so the whole
+   thing reads as one connected unit (instead of two overlapping
+   bubbles competing for the same metro). */
+.ikea-cluster-pill {
+  display: flex;
+  align-items: stretch;
+  border-radius: 999px;
+  overflow: hidden;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-sizing: border-box;
+  font-family: -apple-system, Helvetica, Arial, sans-serif;
+  font-weight: 700;
+  font-size: 12px;
+  line-height: 1;
+}
+.ikea-cluster-pill .pill-half {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.ikea-cluster-pill .pill-closed {
+  background: #1a1a1a;
+  color: #ffffff;
+  border-left: 1px solid #ffffff;
+}
+
 /* ============ Stat cards (Act 4) ============ */
 
 .stat-cards {

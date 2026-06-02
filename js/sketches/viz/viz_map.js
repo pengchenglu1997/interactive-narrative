@@ -161,68 +161,86 @@
                 L.DomEvent.disableClickPropagation(btn);
             }
             state.maps[r.id] = m;
-            // Marker layering — split open vs closed into two
-            // INDEPENDENT cluster groups so they never share a bubble
-            // and visually stay distinct:
-            //   - openLayer: regime-coloured bubble (IKEA two-tone
-            //     inversion — West is blue with a yellow ring, East
-            //     is yellow with a blue ring).
-            //   - closedLayer: a separate cluster group with a black
-            //     bubble + white digits + dashed ring. Because the
-            //     two cluster groups compute centroids independently,
-            //     their bubbles offset themselves naturally at metros
-            //     with both kinds of stores (e.g. Shanghai 3 open +
-            //     2 closed).
+            // Marker clustering — one cluster group per region.
+            // Open + closed markers go into the SAME group, and the
+            // iconCreateFunction inspects each child's _closed flag
+            // to decide the bubble shape:
+            //   - all open (closedN=0)  → round regime bubble, "N"
+            //   - all closed (openN=0)  → round black bubble, "✗N"
+            //   - mixed                 → pill: regime half | black half
+            //                             with "N │ ✗N" inside, one
+            //                             unified regime-colour border
+            // Using one group (not two) guarantees the open count and
+            // the closed count for the same metro are rendered as a
+            // single visual element, never overlapping.
             var isEast    = (r.id === 'ea');
-            var openFill  = isEast ? '#FBD914' : '#0058AB';   // bubble background
-            var openText  = isEast ? '#0058AB' : '#FBD914';   // digits
-            var openRing  = isEast ? '#0058AB' : '#FBD914';   // border
-            function makeIcon(opts) {
-                return function (cluster) {
-                    var n = cluster.getChildCount();
-                    var sz = n < 10 ? 28 : n < 30 ? 34 : 40;
-                    var html =
-                        '<div class="ikea-cluster-bubble" style="' +
-                            'width:' + sz + 'px;height:' + sz + 'px;' +
-                            'background:' + opts.fill + ';' +
-                            'color:' + opts.text + ';' +
-                            'border:' + (opts.dashed ? '2px dashed ' : '2px solid ') + opts.ring + ';' +
-                        '">' + (opts.prefix || '') + n + '</div>';
+            var openFill  = isEast ? '#FBD914' : '#0058AB';
+            var openText  = isEast ? '#0058AB' : '#FBD914';
+            var openRing  = isEast ? '#0058AB' : '#FBD914';
+            function clusterIcon(cluster) {
+                var children = cluster.getAllChildMarkers();
+                var openN = 0, closedN = 0;
+                for (var i = 0; i < children.length; i++) {
+                    if (children[i].options._closed) closedN++;
+                    else openN++;
+                }
+                var total = openN + closedN;
+                var h = total < 10 ? 28 : total < 30 ? 34 : 40;
+                // ALL-OPEN → round regime bubble
+                if (closedN === 0) {
                     return L.divIcon({
-                        html: html,
+                        html:
+                            '<div class="ikea-cluster-bubble" style="' +
+                                'width:' + h + 'px;height:' + h + 'px;' +
+                                'background:' + openFill + ';color:' + openText + ';' +
+                                'border:2px solid ' + openRing + ';">' + openN + '</div>',
                         className: 'ikea-cluster',
-                        iconSize: L.point(sz, sz),
+                        iconSize: L.point(h, h),
                     });
-                };
+                }
+                // ALL-CLOSED → round black bubble with ✗ prefix
+                if (openN === 0) {
+                    return L.divIcon({
+                        html:
+                            '<div class="ikea-cluster-bubble" style="' +
+                                'width:' + h + 'px;height:' + h + 'px;' +
+                                'background:#1a1a1a;color:#ffffff;' +
+                                'border:2px solid #ffffff;">✗' + closedN + '</div>',
+                        className: 'ikea-cluster',
+                        iconSize: L.point(h, h),
+                    });
+                }
+                // MIXED → pill: regime half | black half
+                var w = Math.round(h * 1.8);
+                return L.divIcon({
+                    html:
+                        '<div class="ikea-cluster-pill" style="' +
+                            'width:' + w + 'px;height:' + h + 'px;' +
+                            'border:2px solid ' + openRing + ';">' +
+                            '<div class="pill-half pill-open" style="' +
+                                'background:' + openFill + ';color:' + openText + ';">' +
+                                openN +
+                            '</div>' +
+                            '<div class="pill-half pill-closed">' +
+                                '✗' + closedN +
+                            '</div>' +
+                        '</div>',
+                    className: 'ikea-cluster',
+                    iconSize: L.point(w, h),
+                });
             }
-            var clusterOpts = {
-                maxClusterRadius: 28,
-                spiderfyOnMaxZoom: true,
-                showCoverageOnHover: false,
-                zoomToBoundsOnClick: true,
-            };
-            var hasPlugin = (typeof L.markerClusterGroup === 'function');
-            var openLayer = hasPlugin
-                ? L.markerClusterGroup(Object.assign({}, clusterOpts, {
-                    iconCreateFunction: makeIcon({
-                        fill: openFill, text: openText, ring: openRing,
-                    }),
-                }))
+            var clusterLayer = (typeof L.markerClusterGroup === 'function')
+                ? L.markerClusterGroup({
+                    maxClusterRadius: 36,         // a touch wider so open+closed
+                                                  // at neighbouring blocks merge
+                    spiderfyOnMaxZoom: true,
+                    showCoverageOnHover: false,
+                    zoomToBoundsOnClick: true,
+                    iconCreateFunction: clusterIcon,
+                })
                 : L.layerGroup();
-            // Closed bubble — black, white digits, dashed white ring,
-            // "✗ " prefix so even at a glance the bubble reads as
-            // "closed × N" rather than a regime count.
-            var closedLayer = hasPlugin
-                ? L.markerClusterGroup(Object.assign({}, clusterOpts, {
-                    iconCreateFunction: makeIcon({
-                        fill: '#1a1a1a', text: '#ffffff', ring: '#ffffff',
-                        dashed: true, prefix: '✗ ',
-                    }),
-                }))
-                : L.layerGroup();
-            openLayer.addTo(m);
-            closedLayer.addTo(m);
-            state.markerLayers[r.id] = { open: openLayer, closed: closedLayer };
+            clusterLayer.addTo(m);
+            state.markerLayers[r.id] = clusterLayer;
         });
         state.ready = true;
         wireToolbar();
@@ -241,8 +259,7 @@
     function rebuildAll() {
         if (!state.ready) return;
         REGIONS.forEach(function (r) {
-            state.markerLayers[r.id].open.clearLayers();
-            state.markerLayers[r.id].closed.clearLayers();
+            state.markerLayers[r.id].clearLayers();
         });
         var totals = { open: 0, closed: 0 };
         var perRegion = { na: 0, eu: 0, ea: 0 };
@@ -260,19 +277,16 @@
                 iconSize: [16, 16],
                 iconAnchor: [8, 8],
             });
-            // Open stores → cluster group; closed stores → flat layer.
-            // Keeps "this metro had a store IKEA shut" visible as an
-            // individual black ✗ instead of being absorbed into the
-            // open-store count bubble.
-            var targetLayer = closed
-                ? state.markerLayers[region].closed
-                : state.markerLayers[region].open;
+            // Single cluster group per region — _closed is read back
+            // by the iconCreateFunction to compute open vs closed
+            // counts and render either a round bubble or a split pill.
             var marker = L.marker([s.latitude, s.longitude], {
                 icon: icon,
-                interactive: true,         // ← clickable
+                interactive: true,
                 keyboard: false,
                 riseOnHover: true,
-            }).addTo(targetLayer);
+                _closed: closed,
+            }).addTo(state.markerLayers[region]);
             marker.bindPopup(buildPopupHTML(s, closed), {
                 maxWidth: 260,
                 className: 'ikea-popup',
