@@ -169,10 +169,12 @@
             p.push();
             p.translate(padL, padT);
 
-            // Layout — innerL widened 130→170 to fit a group-label
-            // column to the left of the lane labels. innerT pushed
-            // 50→80 so title + subtitle both fit above the chart.
-            var innerL = 170, innerR = 30, innerT = 80, innerB = 50;
+            // Layout — innerL 150 leaves room for the group-label
+            // column (PHYSICAL/SERVICE/PRICING at innerL-80) without
+            // eating into the chart body. innerT 80 fits title +
+            // subtitle. Earlier 170 made every year column ~20px
+            // narrower than necessary.
+            var innerL = 150, innerR = 30, innerT = 80, innerB = 50;
             var laneH = (H - innerT - innerB) / lanes.length;
             // Pad both ends of the year range by 0.5 so 2014/2026 tiles don't clip
             function xYear(y) { return p.map(y, Y_MIN - 0.5, Y_MAX + 0.5, innerL + 10, W - innerR - 10); }
@@ -195,7 +197,7 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
-            p.text(title, innerL - 100, innerT - 52);
+            p.text(title, innerL - 80, innerT - 52);
 
             // Subtitle — short punchline so a fresh reader sees what
             // the chart says before reading any tile labels.
@@ -205,7 +207,7 @@
                 : regimeFilter === 'western'
                     ? 'Format additions: urban stores, services, AR — no closures.'
                     : 'Strategic responses, 2016–2026, across both regions.';
-            p.text(subtitle, innerL - 100, innerT - 28);
+            p.text(subtitle, innerL - 80, innerT - 28);
 
             // Lane backgrounds + labels — lane label font bumped 11→13
             // for legibility.
@@ -227,11 +229,8 @@
                 var midY = innerT + (gi * 2 + 1) * laneH;
                 p.fill('#888'); p.textSize(10); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
-                // Right-aligned at innerL - 100 so it sits well left of
-                // the lane labels (innerL - 8). Letter-spacing via
-                // p.text() isn't supported in p5, so the all-caps
-                // glyphs do the visual heavy lifting.
-                p.text(label, innerL - 100, midY);
+                // Right-aligned at innerL - 80; lane labels at innerL - 8.
+                p.text(label, innerL - 80, midY);
                 p.textStyle(p.NORMAL);
             });
 
@@ -279,8 +278,19 @@
             var my = p.mouseY - padT;
 
             // Tiles + hover detection — all tiles full opacity now,
-            // no East/West fade. tileW cap raised 110→140 and font cap
-            // raised 11→13 to fit the longer, more readable labels.
+            // no East/West fade. Two correctness fixes vs the previous
+            // pass:
+            //   - tileW gap raised from yearW-3 → yearW-6 so adjacent
+            //     year tiles have ~3px of breathing room on each side.
+            //     Previously they touched at the boundary and any
+            //     label that overflowed its tile got covered by the
+            //     next year's rect (which is why "Tottenham" rendered
+            //     as "Tottenh…" even though the maxChars logic said
+            //     it should fit).
+            //   - maxChars now computes from tileW and the actual
+            //     font size in use (charW ≈ font × 0.55 for our
+            //     system sans). The previous Math.max(12, ...) floor
+            //     was a lie when tileW couldn't actually hold 12 chars.
             var hoverEv = null;
             lanes.forEach(function (lane, li) {
                 var ly = innerT + li * laneH;
@@ -288,7 +298,7 @@
                     var k = lane.key + '|' + yr;
                     var evs = grouped[k];
                     if (!evs) continue;
-                    var tileW = Math.min(yearW - 3, 140);
+                    var tileW = Math.min(yearW - 6, 140);
                     var tileH = (laneH - 6) / evs.length;
                     evs.forEach(function (ev, ei) {
                         var tx = xYear(yr) - tileW / 2;
@@ -297,10 +307,12 @@
                         p.fill(regimeFill(ev));
                         p.rect(tx, ty, tileW, tileH - 1.5, 2);
                         p.fill(tileTextColor(ev));
-                        p.textSize(Math.max(9, Math.min(13, tileH - 4)));
+                        var fontSize = Math.max(9, Math.min(12, tileH - 4));
+                        p.textSize(fontSize);
                         p.textAlign(p.LEFT, p.CENTER);
                         var label = shortLabel(ev.event_name || '');
-                        var maxChars = Math.max(12, Math.floor(tileW / 5.5));
+                        var charW = fontSize * 0.55;
+                        var maxChars = Math.max(3, Math.floor((tileW - 10) / charW));
                         var shown = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
                         p.text(shown, tx + 5, ty + (tileH - 1.5) / 2);
                         // hover check (in translated sketch space)
