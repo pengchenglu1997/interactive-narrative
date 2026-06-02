@@ -179,10 +179,15 @@
             // single visual element, never overlapping.
             var isEast    = (r.id === 'ea');
             var openFill  = isEast ? '#FBD914' : '#0058AB';
-            var openText  = isEast ? '#0058AB' : '#FBD914';
-            // No colored ring on cluster bubbles (per user feedback) —
-            // white outer border is enough for separation against the
-            // basemap. The fill colour alone communicates the regime.
+            // Digit colour goes NEUTRAL — was yellow on blue / blue on
+            // yellow (IKEA brand inversion), but that put a bold
+            // regime-coloured glyph in the middle of every bubble, which
+            // perceptually read as "yellow bubble with blue border" on
+            // the East side. Now: dark digits on yellow, white digits on
+            // blue. Fill is the only regime signal.
+            var openText  = isEast ? '#1a1a1a' : '#ffffff';
+            // No colored ring on cluster bubbles either — white border
+            // for clean separation against the gray basemap.
             var openRing  = '#ffffff';
             function clusterIcon(cluster) {
                 var children = cluster.getAllChildMarkers();
