@@ -841,7 +841,12 @@
   font-size: 12px;
   color: var(--muted);
   max-width: 720px;
-  margin: 64px auto 0;          /* was 28 — too close to colophon */
+  /* Reads as a true closing note, well separated from the
+     colophon block above. Was 28 (too close), then 64 (still
+     felt cramped at this font size). 120px settles it. */
+  margin: 120px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--rule);
   line-height: 1.6;
   text-align: center;
 }
