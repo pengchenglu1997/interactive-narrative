@@ -4,8 +4,11 @@
 // v4 section index mapping (after Coda split):
 //   0      Hero / title              — no viz
 //   1, 2   Act 1: One IKEA           → Leaflet single global map (auto-play)
-//   3      Act 2: East Asian PTI     → VizResponse {regime: east_asia}
-//   4      Act 2: Western PTI        → VizResponse {regime: western}
+//   3, 4   Act 2: Combined PTI       → VizResponse — both columns side by side.
+//                                       The regime hint is ignored by the viz;
+//                                       it's kept on the routing so future
+//                                       variants (e.g. dim non-focused column)
+//                                       can read it without a routing change.
 //   5      Act 3: East Asian resp.   → VizTimeline {regime: east_asia}
 //   6      Act 3: Western response   → VizTimeline {regime: western}
 //   7      Act 4: East ecology       → VizEcology  {regime: east_asia}
