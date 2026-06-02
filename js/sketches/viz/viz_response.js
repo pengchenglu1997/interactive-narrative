@@ -64,33 +64,37 @@
             maxPTI = Math.ceil(maxPTI);   // a touch of headroom
 
             var W = manager.width, H = manager.height;
-            var padL = (manager.margin && manager.margin.left) || 20;
+            var padL = (manager.margin && manager.margin.left) || 10;
             var padT = (manager.margin && manager.margin.top)  || 0;
 
             p.push();
             p.translate(padL, padT);
 
             var innerT = 86, innerB = 20;
-            var contentW = W - padL * 2;                 // both pads inside
-            var colGap = 36;
+            // Right pad reduced 20→10, colGap 36→24 — claims ~22px back
+            // per column for the bar (in addition to the layout
+            // compression below).
+            var contentW = W - padL - 10;
+            var colGap = 24;
             var colW = (contentW - colGap) / 2;
             var leftX  = 0;
             var rightX = colW + colGap;
 
             // Per-column internal layout — city label → bar → value → verdict.
-            // Compressed (vs the v1 layout): label 88→72, value zone 88→36,
-            // verdict 150→100. The ~104px saved goes straight to the bar,
-            // taking it from ~30px to ~140px on a typical viewport.
+            // Value zone tightened (36→28) — "34.5" is ~22px, only need a
+            // tiny gap. Verdict stays 100px; big-box info goes onto a
+            // third line below the closure subtitle (see drawRow) so it
+            // doesn't compete with the closure text for horizontal space.
             function colLayout(baseX) {
-                var labelW    = 72;                       // city name column
-                var valueZone = 36;                       // just enough for "34.5" + small gap
-                var verdictW  = 100;                      // fits "(+1 closed since)" subtitle
-                var labelX    = baseX + labelW;           // right-edge of city name
-                var barX      = labelX + 8;               // bar start
+                var labelW    = 72;
+                var valueZone = 28;
+                var verdictW  = 100;
+                var labelX    = baseX + labelW;
+                var barX      = labelX + 8;
                 var barW      = colW - labelW - 8 - valueZone - verdictW;
                 if (barW < 60) barW = 60;
-                var valueX    = barX + barW + 4;          // value floats with bar end
-                var verdictX  = baseX + colW - verdictW;  // verdict in its own fixed column
+                var valueX    = barX + barW + 4;
+                var verdictX  = baseX + colW - verdictW;
                 return {
                     labelX:   labelX,
                     barX:     barX,
@@ -103,7 +107,9 @@
             var R = colLayout(rightX);
 
             var maxRows = Math.max(east.length, west.length);
-            var rowH = Math.max(28, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
+            // rowH bumped 28→36 so each row can stack verdict + closure
+            // subtitle + big-box subtitle vertically without crowding.
+            var rowH = Math.max(36, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
 
             // === Title (centered, spans both columns) ===
             p.noStroke();
@@ -187,17 +193,40 @@
                     vcolor   = regimeText;
                     subtitle = '';
                 }
+                // Big-box info on its own line — secondary fact, so
+                // a touch lighter than the closure subtitle and only
+                // rendered when N > 0. Stacks below closure subtitle
+                // when both exist; sits directly below verdict when
+                // closure subtitle is absent.
+                var bigBox = s.bigBoxCount > 0 ? '+' + s.bigBoxCount + ' big-box' : '';
+
                 p.noStroke();
                 p.fill(vcolor);
                 p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
-                var verdictY = subtitle ? yPos - 5 : yPos;
-                p.text(verdict, layout.verdictX, verdictY);
+                // Vertical stacking — three possible row layouts:
+                //   verdict only            → centered
+                //   verdict + 1 subtitle    → verdict above, subtitle below
+                //   verdict + 2 subtitles   → verdict on top, two below
+                var lineCount = 1 + (subtitle ? 1 : 0) + (bigBox ? 1 : 0);
+                var topOffset = lineCount === 1 ?  0
+                              : lineCount === 2 ? -7
+                              :                  -11;
+                p.text(verdict, layout.verdictX, yPos + topOffset);
+
+                var subY = yPos + topOffset + 11;
                 if (subtitle) {
                     p.fill('#888');
                     p.textStyle(p.NORMAL);
                     p.textSize(10);
-                    p.text(subtitle, layout.verdictX, yPos + 8);
+                    p.text(subtitle, layout.verdictX, subY);
+                    subY += 10;
+                }
+                if (bigBox) {
+                    p.fill('#aaa');                          // lighter — secondary detail
+                    p.textStyle(p.NORMAL);
+                    p.textSize(10);
+                    p.text(bigBox, layout.verdictX, subY);
                 }
                 p.textStyle(p.NORMAL);
             }
@@ -207,15 +236,12 @@
             west.forEach(function (c, i) { drawRow(c, i, R, '#0058AB', '#0058AB'); });
 
             // === Footer note ===
-            // Sets the noun context for the compressed verdicts: "1 open",
-            // "Closed", "None" all refer to city-format stores. Also
-            // explains the gray-bar treatment.
             p.noStroke();
             p.fill('#888');
             p.textStyle(p.NORMAL);
             p.textSize(10);
             p.textAlign(p.LEFT, p.TOP);
-            p.text('PTI = price-to-income ratio (Numbeo). Right column = city-format store count (active / closed since). Bar gray = no city-format store; coloured = at least one currently open.',
+            p.text('PTI = price-to-income ratio (Numbeo). Right column: city-format stores active / closed since, plus suburban big-box count. Bar gray = no city-format store; coloured = at least one currently open.',
                 0, innerT + maxRows * rowH + 4);
 
             p.pop();
