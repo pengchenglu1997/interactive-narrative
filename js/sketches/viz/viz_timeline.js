@@ -4,7 +4,9 @@
 //
 // Filter passed via manager.state.vizConfig.regime ("east_asia" | "western" | null).
 (function () {
-    // Lanes grouped narratively, with a dashed divider between groups.
+    // Lanes grouped narratively, with a dashed divider between groups
+    // and a group-name label rendered in the left margin so the reader
+    // can see WHAT the three groups are without consulting prose.
     // `groupAfter: true` means "draw the dashed divider line below this
     // lane" (so it sits between the last lane of group N and the first
     // lane of group N+1).
@@ -29,6 +31,9 @@
         { key: 'price_cut',          label: 'Price cut',            groupAfter: false },
         { key: 'strategy_pivot',     label: 'Strategy pivot',       groupAfter: false },
     ];
+    // One label per 2-lane group, rendered in the left margin
+    // vertically centered between the two lanes it covers.
+    var groupLabels = ['PHYSICAL', 'SERVICE', 'PRICING'];
 
     // event.response_type → lane.key. Most are identity; only the
     // merged lane needs aliasing.
@@ -41,13 +46,15 @@
     // pre-2016 events were big-box openings that aren't in this chart.
     var Y_MIN = 2016, Y_MAX = 2026;
 
-    function regimeFill(ev, dimmed) {
-        var base;
-        if (ev.regime_type === 'east_asia') base = '#FBD914';      // IKEA yellow
-        else if (ev.regime_type === 'western') base = '#0058AB';   // IKEA blue
-        else if (ev.regime_type === 'both') base = '#888';         // neutral gray (was black; black read as a heavier third regime)
-        else base = '#bbb';
-        return dimmed ? base + '40' : base;
+    // No more dimming — both regimes always at full opacity. The
+    // prose in each section directs the reader to look at the
+    // yellow tiles vs the blue tiles. Faded tiles previously read
+    // as bugs / colour bleed and broke the comparison.
+    function regimeFill(ev) {
+        if (ev.regime_type === 'east_asia') return '#FBD914';      // IKEA yellow
+        if (ev.regime_type === 'western')   return '#0058AB';      // IKEA blue
+        if (ev.regime_type === 'both')      return '#888';         // global / neutral
+        return '#bbb';
     }
 
     // Tile label: dark ink on yellow + gray (light fills), white on blue.
@@ -57,48 +64,53 @@
         return '#fff';
     }
 
-    // Tile labels target 7-10 characters because the year columns
-    // are only ~60-70 px wide at typical viewport, fitting roughly
-    // 10 chars at 11pt. Earlier 12-18 char outputs were still
-    // truncating to '…' on screen.
+    // Tile labels — target 10–16 characters. Was 7–10 with cryptic
+    // codes like 'HRJ+SHJ', 'TaskRabbt', 'Place AR', 'Future IK' that
+    // a first-time reader couldn't decode without tooltip-hovering.
+    // With tileW bumped to 140 (was 110) and font to 13pt (was 11),
+    // there's room for human-readable forms.
     function shortLabel(name) {
         if (!name) return '';
         return name
-            // Per-event explicit short forms (target 7-10 chars).
-            .replace(/^IKEA Harajuku and Shinjuku close$/i, 'HRJ+SHJ')
+            // Closures
+            .replace(/^IKEA Harajuku and Shinjuku close$/i, 'Tokyo closures')
+            .replace(/^IKEA Shanghai Yangpu closes$/i, 'Shanghai Yangpu')
+            .replace(/^IKEA Guiyang closes$/i, 'Guiyang')
+            .replace(/^Shanghai Jing'an closure announced$/i, "Jing'an close")
+            // Urban-format openings
             .replace(/^Tottenham Court Road.*$/i, 'Tottenham')
-            .replace(/^San Francisco Market Street.*$/i, 'SF Market')
+            .replace(/^San Francisco Market Street.*$/i, 'SF Market St')
             .replace(/^Oxford Street London flagship opens$/i, 'Oxford St')
             .replace(/^Greenwich sustainability flagship opens$/i, 'Greenwich')
             .replace(/^Vienna Westbahnhof.*$/i, 'Vienna')
             .replace(/^Manhattan Planning Studio opens$/i, 'Manhattan')
-            .replace(/^Hammersmith London opens$/i, 'Hammersm.')
-            .replace(/^Taipei Neihu.*$/i, 'Taipei')
-            .replace(/^Singapore Jurong opens$/i, 'Jurong')
-            .replace(/^Gangdong Seoul opens$/i, 'Gangdong')
+            .replace(/^Hammersmith London opens$/i, 'Hammersmith')
+            .replace(/^Taipei Neihu.*$/i, 'Taipei Neihu')
+            .replace(/^Singapore Jurong opens$/i, 'Singapore Jurong')
+            .replace(/^Gangdong Seoul opens$/i, 'Seoul Gangdong')
             .replace(/^Paris La Madeleine opens$/i, 'Paris')
-            .replace(/^Tokyo business optimization announcement$/i, 'Tokyo opt')
-            .replace(/^IKEA Shibuya renewal reopens$/i, 'Shibuya re')
+            .replace(/^IKEA Shibuya renewal reopens$/i, 'Shibuya renewal')
             .replace(/^IKEA Shibuya opens$/i, 'Shibuya')
             .replace(/^IKEA Harajuku opens$/i, 'Harajuku')
             .replace(/^IKEA Shinjuku opens$/i, 'Shinjuku')
-            .replace(/^Shanghai Jing'an city store opens$/i, "Jing'an")
-            .replace(/^Shanghai Jing'an closure announced$/i, "Jing'an x")
-            .replace(/^IKEA Shanghai Yangpu closes$/i, 'Yangpu')
-            .replace(/^IKEA Guiyang closes$/i, 'Guiyang')
-            .replace(/^IKEA global price cuts EUR 2\.1B$/i, 'EUR 2.1B')
-            .replace(/^China major price cuts March$/i, 'Price cut')
-            .replace(/^IKEA China RMB 6\.3B reinvestment$/i, 'RMB 6.3B')
-            .replace(/^IKEA China revenue trough$/i, 'Rev −30%')
-            .replace(/^Lifeweek price strategy coverage$/i, 'Lifeweek')
-            .replace(/^Future of IKEA announcement$/i, 'Future IK')
-            .replace(/^CEO urban strategy announcement$/i, 'CEO urban')
-            .replace(/^Buyback and Resell launched$/i, 'Buyback')
-            .replace(/^TaskRabbit acquisition$/i, 'TaskRabbt')
-            .replace(/^IKEA Place AR app launches$/i, 'Place AR')
-            .replace(/^IKEA Japan online shop launches$/i, 'Japan onl')
-            .replace(/^IKEA Korea e-commerce launches$/i, 'Korea EC')
-            .replace(/^IKEA China web shop launches$/i, 'CN web')
+            .replace(/^Shanghai Jing'an city store opens$/i, "Shanghai Jing'an")
+            // Strategy / pricing
+            .replace(/^Tokyo business optimization announcement$/i, 'Tokyo reset')
+            .replace(/^IKEA global price cuts EUR 2\.1B$/i, '€2.1B cuts')
+            .replace(/^China major price cuts March$/i, 'China price cuts')
+            .replace(/^IKEA China RMB 6\.3B reinvestment$/i, '¥6.3B reinvest')
+            .replace(/^IKEA China revenue trough$/i, 'Revenue dip')
+            .replace(/^Lifeweek price strategy coverage$/i, 'Price strategy')
+            .replace(/^Future of IKEA announcement$/i, 'Future IKEA')
+            .replace(/^CEO urban strategy announcement$/i, 'Urban strategy')
+            // Service & circular
+            .replace(/^Buyback and Resell launched$/i, 'Buyback & Resell')
+            .replace(/^TaskRabbit acquisition$/i, 'TaskRabbit')
+            // Channel
+            .replace(/^IKEA Place AR app launches$/i, 'Place AR app')
+            .replace(/^IKEA Japan online shop launches$/i, 'Japan online')
+            .replace(/^IKEA Korea e-commerce launches$/i, 'Korea online')
+            .replace(/^IKEA China web shop launches$/i, 'China online')
             .replace(/^IKEA China Tmall flagship launches$/i, 'Tmall')
             .replace(/^IKEA China JD\.com flagship launches$/i, 'JD.com')
             // Generic safety net for anything else
@@ -157,7 +169,10 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerL = 130, innerR = 30, innerT = 50, innerB = 50;
+            // Layout — innerL widened 130→170 to fit a group-label
+            // column to the left of the lane labels. innerT pushed
+            // 50→80 so title + subtitle both fit above the chart.
+            var innerL = 170, innerR = 30, innerT = 80, innerB = 50;
             var laneH = (H - innerT - innerB) / lanes.length;
             // Pad both ends of the year range by 0.5 so 2014/2026 tiles don't clip
             function xYear(y) { return p.map(y, Y_MIN - 0.5, Y_MAX + 0.5, innerL + 10, W - innerR - 10); }
@@ -180,16 +195,43 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
-            p.text(title, innerL, innerT - 28);
+            p.text(title, innerL - 100, innerT - 52);
 
-            // Lane backgrounds + labels
+            // Subtitle — short punchline so a fresh reader sees what
+            // the chart says before reading any tile labels.
+            p.fill('#444'); p.textStyle(p.NORMAL); p.textSize(14);
+            var subtitle = regimeFilter === 'east_asia'
+                ? 'Platform launches alongside price cuts and city-store closures.'
+                : regimeFilter === 'western'
+                    ? 'Format additions: urban stores, services, AR — no closures.'
+                    : 'Strategic responses, 2016–2026, across both regions.';
+            p.text(subtitle, innerL - 100, innerT - 28);
+
+            // Lane backgrounds + labels — lane label font bumped 11→13
+            // for legibility.
             lanes.forEach(function (lane, i) {
                 p.noStroke();
                 p.fill(i % 2 === 0 ? '#fafafa' : 'white');
                 p.rect(innerL, innerT + i * laneH, W - innerL - innerR, laneH);
-                p.fill('#1a1a1a'); p.textSize(11); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
                 p.text(lane.label, innerL - 8, innerT + i * laneH + laneH / 2);
+                p.textStyle(p.NORMAL);
+            });
+
+            // Group labels — PHYSICAL / SERVICE / PRICING in the left
+            // margin, vertically centered in each 2-lane group. Lets
+            // the reader see the three narrative buckets at a glance
+            // without consulting prose.
+            groupLabels.forEach(function (label, gi) {
+                var midY = innerT + (gi * 2 + 1) * laneH;
+                p.fill('#888'); p.textSize(10); p.textStyle(p.BOLD);
+                p.textAlign(p.RIGHT, p.CENTER);
+                // Right-aligned at innerL - 100 so it sits well left of
+                // the lane labels (innerL - 8). Letter-spacing via
+                // p.text() isn't supported in p5, so the all-caps
+                // glyphs do the visual heavy lifting.
+                p.text(label, innerL - 100, midY);
                 p.textStyle(p.NORMAL);
             });
 
@@ -214,20 +256,31 @@
             });
             p.noStroke();
 
-            // Year axis ticks
-            p.fill('#888'); p.textSize(10); p.textAlign(p.CENTER, p.BOTTOM);
+            // Year axis ticks — every year now labelled. Even years
+            // bold and slightly larger to give the eye anchor points;
+            // odd years lighter so they recede. Was: only even years
+            // visible at 10pt, all the same weight.
+            p.textAlign(p.CENTER, p.BOTTOM);
             for (var y = Y_MIN; y <= Y_MAX; y++) {
                 var x = xYear(y);
                 p.stroke('#eee'); p.line(x, innerT, x, H - innerB);
                 p.noStroke();
-                if (y % 2 === 0 || y === Y_MIN) { p.fill('#888'); p.text(y, x, innerT - 6); }
+                if (y % 2 === 0) {
+                    p.textStyle(p.BOLD); p.textSize(12); p.fill('#444');
+                } else {
+                    p.textStyle(p.NORMAL); p.textSize(11); p.fill('#999');
+                }
+                p.text(y, x, innerT - 6);
             }
+            p.textStyle(p.NORMAL);
 
             // Convert canvas mouse → translated sketch coords
             var mx = p.mouseX - padL;
             var my = p.mouseY - padT;
 
-            // Tiles + hover detection
+            // Tiles + hover detection — all tiles full opacity now,
+            // no East/West fade. tileW cap raised 110→140 and font cap
+            // raised 11→13 to fit the longer, more readable labels.
             var hoverEv = null;
             lanes.forEach(function (lane, li) {
                 var ly = innerT + li * laneH;
@@ -235,28 +288,21 @@
                     var k = lane.key + '|' + yr;
                     var evs = grouped[k];
                     if (!evs) continue;
-                    // Tile width: capped at 110 (was 78) — gives event text
-                    // ~40% more room. Font cap raised to 11 (was 9). Both
-                    // changes assume the new 6-lane / merged-resale layout
-                    // gives laneH more room vertically too.
-                    var tileW = Math.min(yearW - 3, 110);
+                    var tileW = Math.min(yearW - 3, 140);
                     var tileH = (laneH - 6) / evs.length;
                     evs.forEach(function (ev, ei) {
                         var tx = xYear(yr) - tileW / 2;
                         var ty = ly + 3 + ei * tileH;
-                        var hi = isHighlighted(ev, regimeFilter);
                         p.noStroke();
-                        p.fill(regimeFill(ev, !hi));
+                        p.fill(regimeFill(ev));
                         p.rect(tx, ty, tileW, tileH - 1.5, 2);
-                        if (hi) {
-                            p.fill(tileTextColor(ev));
-                            p.textSize(Math.max(8, Math.min(11, tileH - 4)));
-                            p.textAlign(p.LEFT, p.CENTER);
-                            var label = shortLabel(ev.event_name || '');
-                            var maxChars = Math.max(10, Math.floor(tileW / 5.5));
-                            var shown = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
-                            p.text(shown, tx + 4, ty + (tileH - 1.5) / 2);
-                        }
+                        p.fill(tileTextColor(ev));
+                        p.textSize(Math.max(9, Math.min(13, tileH - 4)));
+                        p.textAlign(p.LEFT, p.CENTER);
+                        var label = shortLabel(ev.event_name || '');
+                        var maxChars = Math.max(12, Math.floor(tileW / 5.5));
+                        var shown = label.length > maxChars ? label.slice(0, maxChars - 1) + '…' : label;
+                        p.text(shown, tx + 5, ty + (tileH - 1.5) / 2);
                         // hover check (in translated sketch space)
                         if (mx >= tx && mx <= tx + tileW &&
                             my >= ty && my <= ty + tileH) {
@@ -266,43 +312,22 @@
                 }
             });
 
-            // Legend (bottom — placed in the dedicated bottom-margin band)
+            // Legend — same 3 swatches in both sections now that fade
+            // is gone. Prose tells the reader which colour to focus on.
             p.noStroke(); p.textSize(12); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
             var legY = H - innerB + 18;
             var lx = innerL;
-            // Show one swatch per color the reader actually sees on screen.
-            // When a regime is highlighted, tiles from the OTHER regime are
-            // drawn with +'40' alpha — so the faded swatch must use the SAME
-            // base color, not a generic gray.
-            var legendItems = regimeFilter === 'east_asia'
-                ? [
-                    { c: '#FBD914',   label: 'East Asian (focus)' },
-                    { c: '#888',      label: 'Global / both' },
-                    { c: '#0058AB40', label: 'Western (faded)' },
-                ]
-                : regimeFilter === 'western'
-                ? [
-                    { c: '#0058AB',   label: 'Western (focus)' },
-                    { c: '#888',      label: 'Global / both' },
-                    { c: '#FBD91440', label: 'East Asian (faded)' },
-                ]
-                : [
-                    { c: '#0058AB', label: 'Western' },
-                    { c: '#FBD914', label: 'East Asian' },
-                    { c: '#1a1a1a', label: 'Global / both' },
-                ];
+            var legendItems = [
+                { c: '#FBD914', label: 'East Asian' },
+                { c: '#0058AB', label: 'Western' },
+                { c: '#888',    label: 'Global / both' },
+            ];
             legendItems.forEach(function (it) {
-                // Faded swatches at 25% alpha are nearly invisible on the white
-                // toolbar strip — add a thin neutral border so the reader can
-                // still locate them.
-                var isFaded = /\(faded\)/.test(it.label);
-                if (isFaded) { p.stroke('#bbb'); p.strokeWeight(0.6); }
-                else         { p.noStroke(); }
-                p.fill(it.c);
-                p.rect(lx, legY + 4, 9, 9);
                 p.noStroke();
-                p.fill('#333'); p.text(it.label, lx + 13, legY + 2);
-                lx += p.textWidth(it.label) + 35;
+                p.fill(it.c);
+                p.rect(lx, legY + 4, 11, 11);
+                p.fill('#333'); p.text(it.label, lx + 15, legY + 2);
+                lx += p.textWidth(it.label) + 38;
             });
 
             p.pop();
