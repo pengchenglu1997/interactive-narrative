@@ -109,9 +109,10 @@
             var R = colLayout(rightX);
 
             var maxRows = Math.max(east.length, west.length);
-            // rowH bumped 28→36 so each row can stack verdict + closure
-            // subtitle + big-box subtitle vertically without crowding.
-            var rowH = Math.max(36, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
+            // rowH bumped 36 → 42 so verdict (now 13pt) + closure
+            // subtitle + big-box subtitle stack with comfortable
+            // leading at the new font sizes.
+            var rowH = Math.max(42, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
 
             // === Title (centered, spans both columns) ===
             p.noStroke();
@@ -120,13 +121,14 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text('CITY-FORMAT RESPONSE UNDER HOUSING PRESSURE', contentW / 2, innerT - 56);
 
-            // === Subtitle ===
+            // === Subtitle (14pt; '· shared PTI scale' dropped so the
+            // line doesn't wrap on narrower viewports) ===
             p.fill('#666');
-            p.textStyle(p.NORMAL); p.textSize(12);
-            p.text('Selected cities, ranked by PTI within region · shared PTI scale', contentW / 2, innerT - 38);
+            p.textStyle(p.NORMAL); p.textSize(14);
+            p.text('Selected cities, ranked by PTI within region.', contentW / 2, innerT - 36);
 
             // === Column headers ===
-            p.textStyle(p.BOLD); p.textSize(13);
+            p.textStyle(p.BOLD); p.textSize(14);
             p.fill('#C9A800');                                    // amber — readable East
             p.textAlign(p.CENTER, p.BOTTOM);
             p.text('EAST ASIAN CITIES', leftX  + colW / 2, innerT - 12);
@@ -151,7 +153,7 @@
                 // City label (right-aligned to bar start)
                 p.noStroke();
                 p.fill('#1a1a1a');
-                p.textSize(12); p.textStyle(p.BOLD);
+                p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
                 p.text(c.city, layout.labelX, yPos);
                 p.textStyle(p.NORMAL);
@@ -170,7 +172,7 @@
                 // PTI value at the bar's end
                 p.fill('#1a1a1a');
                 p.textAlign(p.LEFT, p.CENTER);
-                p.textSize(11);
+                p.textSize(12);
                 p.text(c.price_to_income_ratio.toFixed(1), layout.barX + bw + 4, yPos);
 
                 // Verdict (4 cases) — compressed wording. The footer
@@ -204,30 +206,29 @@
 
                 p.noStroke();
                 p.fill(vcolor);
-                p.textSize(12); p.textStyle(p.BOLD);
+                p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
-                // Vertical stacking — three possible row layouts:
-                //   verdict only            → centered
-                //   verdict + 1 subtitle    → verdict above, subtitle below
-                //   verdict + 2 subtitles   → verdict on top, two below
+                // Vertical stacking — three possible row layouts.
+                // Offsets retuned for the new font sizes (verdict 13,
+                // subtitle 11): wider stack so lines breathe.
                 var lineCount = 1 + (subtitle ? 1 : 0) + (bigBox ? 1 : 0);
                 var topOffset = lineCount === 1 ?  0
-                              : lineCount === 2 ? -7
-                              :                  -11;
+                              : lineCount === 2 ? -8
+                              :                  -13;
                 p.text(verdict, layout.verdictX, yPos + topOffset);
 
-                var subY = yPos + topOffset + 11;
+                var subY = yPos + topOffset + 13;
                 if (subtitle) {
                     p.fill('#888');
                     p.textStyle(p.NORMAL);
-                    p.textSize(10);
+                    p.textSize(11);
                     p.text(subtitle, layout.verdictX, subY);
-                    subY += 10;
+                    subY += 12;
                 }
                 if (bigBox) {
                     p.fill('#aaa');                          // lighter — secondary detail
                     p.textStyle(p.NORMAL);
-                    p.textSize(10);
+                    p.textSize(11);
                     p.text(bigBox, layout.verdictX, subY);
                 }
                 p.textStyle(p.NORMAL);
@@ -241,7 +242,7 @@
             p.noStroke();
             p.fill('#888');
             p.textStyle(p.NORMAL);
-            p.textSize(10);
+            p.textSize(11);
             p.textAlign(p.LEFT, p.TOP);
             p.text('PTI = price-to-income ratio (Numbeo). Right column: city-format stores active / closed since, plus suburban big-box count. Bar gray = no city-format store; coloured = at least one currently open.',
                 0, innerT + maxRows * rowH + 4);

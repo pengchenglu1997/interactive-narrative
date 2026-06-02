@@ -53,7 +53,7 @@
             p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 60);
 
             // Subtitle
-            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(13);
             p.text('Each strategy appears in both regions. Steeper lines show larger ranking shifts.', 20, innerT - 38);
 
             // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
@@ -63,7 +63,7 @@
             p.fill(REGIME_EAST_TEXT); p.textAlign(p.LEFT, p.BOTTOM);
             p.text('EAST ASIAN IKEA', rightX + 18, innerT - 16);
 
-            p.textStyle(p.NORMAL); p.fill('#888'); p.textSize(10);
+            p.textStyle(p.NORMAL); p.fill('#888'); p.textSize(11);
             p.textAlign(p.RIGHT, p.TOP);
             p.text('top = highest priority', leftX - 18, innerT - 12);
             p.textAlign(p.LEFT, p.TOP);
@@ -120,10 +120,10 @@
                 p.noStroke(); p.fill(REGIME_WEST);
                 var rL = radius(it.west_intensity);
                 p.ellipse(leftX, yL, rL, rL);
-                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
                 p.text(it.priority_label, leftX - rL - 6, yL);
-                p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
+                p.fill('#888'); p.textSize(11); p.textStyle(p.NORMAL);
                 p.text('intensity ' + it.west_intensity + '/5', leftX - rL - 6, yL + 12);
 
                 // East node — yellow fill needs an IKEA-blue ring for legibility on white
@@ -132,10 +132,10 @@
                 var rR = radius(it.east_intensity);
                 p.ellipse(rightX, yR, rR, rR);
                 p.noStroke();
-                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(it.priority_label, rightX + rR + 6, yR);
-                p.fill('#888'); p.textSize(9); p.textStyle(p.NORMAL);
+                p.fill('#888'); p.textSize(11); p.textStyle(p.NORMAL);
                 p.text('intensity ' + it.east_intensity + '/5', rightX + rR + 6, yR + 12);
 
                 // Hover check (either column's node — use a generous hit area
@@ -152,11 +152,11 @@
             });
 
             // Legend + algorithm note (bottom)
-            p.noStroke(); p.textSize(12); p.fill('#666');
+            p.noStroke(); p.textSize(13); p.fill('#666');
             p.textAlign(p.CENTER, p.TOP);
             p.text('Line color: blue = higher Western priority · gold = higher East Asian priority · gray = similar priority · dot size = intensity',
-                W / 2, H - 32);
-            p.fill('#999'); p.textSize(10);
+                W / 2, H - 34);
+            p.fill('#999'); p.textSize(11);
             p.text('Intensities synthesized from documented strategic events using time decay and within-region normalization. See colophon for the full methodology.',
                 W / 2, H - 14);
 

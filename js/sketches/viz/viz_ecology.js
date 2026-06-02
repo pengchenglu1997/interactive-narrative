@@ -141,7 +141,7 @@
             // Group caption row — three dims:
             //   index 0 = density (QUANTITATIVE, single col)
             //   index 1-2 = service / competition (OBSERVATIONAL, two cols)
-            p.fill('#888'); p.textSize(11); p.textStyle(p.BOLD);
+            p.fill('#888'); p.textSize(12); p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             var quantX = innerL + 0.5 * cellW;                      // center of dim 0
             var obsX   = innerL + 2   * cellW;                      // center of dims 1+2
@@ -167,7 +167,7 @@
                 p.text(d.label, x, innerT - 8);
             });
             p.fill('#1a1a1a');
-            p.textSize(12);
+            p.textSize(13);
             p.text('CHALLENGE / 12', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
             p.textStyle(p.NORMAL);
 
@@ -234,7 +234,7 @@
                 var lowShade = row.region_type === 'east_asia' ? '#FFD647' : '#3F84BC';
                 p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
-                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(total + '/12', barX + barW + 6, barY + barH / 2);
                 p.textStyle(p.NORMAL);
@@ -274,7 +274,7 @@
             p.noStroke();
             p.fill('#888');
             p.textStyle(p.ITALIC);
-            p.textSize(10.5);
+            p.textSize(11.5);
             p.textAlign(p.LEFT, p.TOP);
             p.text('Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Per-cell sources documented in the colophon.',
                 innerL, legY + 22, W - innerL - 20, 60);

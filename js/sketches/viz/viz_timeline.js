@@ -227,7 +227,7 @@
             // without consulting prose.
             groupLabels.forEach(function (label, gi) {
                 var midY = innerT + (gi * 2 + 1) * laneH;
-                p.fill('#888'); p.textSize(10); p.textStyle(p.BOLD);
+                p.fill('#888'); p.textSize(11.5); p.textStyle(p.BOLD);
                 p.textAlign(p.RIGHT, p.CENTER);
                 // Right-aligned at innerL - 80; lane labels at innerL - 8.
                 p.text(label, innerL - 80, midY);
@@ -265,9 +265,9 @@
                 p.stroke('#eee'); p.line(x, innerT, x, H - innerB);
                 p.noStroke();
                 if (y % 2 === 0) {
-                    p.textStyle(p.BOLD); p.textSize(12); p.fill('#444');
+                    p.textStyle(p.BOLD); p.textSize(13); p.fill('#444');
                 } else {
-                    p.textStyle(p.NORMAL); p.textSize(11); p.fill('#999');
+                    p.textStyle(p.NORMAL); p.textSize(12); p.fill('#999');
                 }
                 p.text(y, x, innerT - 6);
             }
@@ -326,7 +326,7 @@
 
             // Legend — same 3 swatches in both sections now that fade
             // is gone. Prose tells the reader which colour to focus on.
-            p.noStroke(); p.textSize(12); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
+            p.noStroke(); p.textSize(13); p.textAlign(p.LEFT, p.TOP); p.fill('#333');
             var legY = H - innerB + 18;
             var lx = innerL;
             var legendItems = [
@@ -337,9 +337,9 @@
             legendItems.forEach(function (it) {
                 p.noStroke();
                 p.fill(it.c);
-                p.rect(lx, legY + 4, 11, 11);
-                p.fill('#333'); p.text(it.label, lx + 15, legY + 2);
-                lx += p.textWidth(it.label) + 38;
+                p.rect(lx, legY + 3, 13, 13);
+                p.fill('#333'); p.text(it.label, lx + 18, legY + 2);
+                lx += p.textWidth(it.label) + 42;
             });
 
             p.pop();
