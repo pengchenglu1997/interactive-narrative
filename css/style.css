@@ -258,6 +258,41 @@
    buffer at the page end. */
 #extra-space { height: 80px; }
 
+/* ============ Map interaction hint + How-to-read note ============ */
+
+#sections .map-hint,
+#sections .how-to-read {
+  font-family: var(--font-sans);
+  font-size: 12.5px;
+  color: var(--muted);
+  background: #fafafa;
+  border-left: 3px solid #cfcfcf;
+  padding: 8px 10px 8px 12px;
+  margin: 12px 0;
+  border-radius: 2px;
+  line-height: 1.5;
+}
+#sections .map-hint strong,
+#sections .how-to-read strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+/* ============ Act divider — hairline above each Act's first
+   section so a fast scroller doesn't blur the four acts together. */
+#sections section.step.act-divider-top {
+  position: relative;
+}
+#sections section.step.act-divider-top::before {
+  content: "";
+  display: block;
+  width: 80px;
+  height: 2px;
+  background: var(--ink);
+  margin: 0 0 28px;
+  opacity: 0.55;
+}
+
 /* ============ Takeaway callout ============ */
 
 #sections .takeaway {

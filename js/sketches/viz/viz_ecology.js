@@ -148,11 +148,14 @@
             // QUANTITATIVE accent matches the panel's regime: amber
             // on East, IKEA blue on West. The blue-on-yellow panel
             // looked like cross-regime contamination.
+            // Inline " (stats)" / " (coded)" parens added so a casual
+            // reader sees the source-confidence distinction without
+            // having to read the method note below the legend.
             var quantAccent = regimeFilter === 'east_asia' ? '#C9A800' : '#0058AB';
             p.fill(quantAccent);
-            p.text('QUANTITATIVE',  quantX, innerT - 36);
+            p.text('QUANTITATIVE (stats)',  quantX, innerT - 36);
             p.fill('#888');
-            p.text('OBSERVATIONAL', obsX,   innerT - 36);
+            p.text('OBSERVATIONAL (coded)', obsX,   innerT - 36);
 
             // Thin underline under each group caption
             p.stroke('#ddd'); p.strokeWeight(0.8);
