@@ -150,16 +150,14 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             var quantX = innerL + 0.5 * cellW;                      // center of dim 0
             var obsX   = innerL + 2   * cellW;                      // center of dims 1+2
-            // QUANTITATIVE accent matches the panel's regime: amber
-            // on East, IKEA blue on West. The blue-on-yellow panel
-            // looked like cross-regime contamination.
-            // Inline " (stats)" / " (coded)" parens added so a casual
-            // reader sees the source-confidence distinction without
-            // having to read the method note below the legend.
-            var quantAccent = regimeFilter === 'east_asia' ? '#A88000' : '#0058AB';
-            p.fill(quantAccent);
+            // Both group captions in the same neutral gray. The
+            // earlier 'QUANT in regime colour, OBS in gray' read as
+            // 'why is one a brand colour and one not?' for casual
+            // readers — the (stats) / (coded) parens already carry
+            // the source-confidence distinction without needing a
+            // colour signal.
+            p.fill('#666');
             p.text('QUANTITATIVE (stats)',  quantX, innerT - 36);
-            p.fill('#888');
             p.text('OBSERVATIONAL (coded)', obsX,   innerT - 36);
 
             // Thin underline under each group caption
@@ -174,9 +172,9 @@
             p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
-                // Quantitative dim header inherits the panel's regime
-                // accent so East-yellow never carries an IKEA-blue label.
-                p.fill(d.group === 'quantitative' ? quantAccent : '#1a1a1a');
+                // All dim headers in neutral dark — same rationale
+                // as the QUANT/OBS captions above (consistency).
+                p.fill('#1a1a1a');
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
