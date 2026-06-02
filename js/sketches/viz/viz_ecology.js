@@ -261,12 +261,19 @@
             });
 
             // Legend — cell scale only. Per-regime single-hue means one
-            // legend row is enough.
+            // legend row is enough. Long 'Cell — challenge to IKEA's...'
+            // prefix dropped (was eating ~250px and pushing the
+            // 'Very high / Very strong' swatch off the right edge); the
+            // subtitle + method note already establish what the colour
+            // encodes. A shorter 'Challenge:' label keeps semantic
+            // context for the row.
             p.noStroke(); p.textSize(13); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
             var legY = H - innerB + 18;
-            p.text("Cell — challenge to IKEA's original model:", innerL, legY);
-            var lx = innerL + 252;
+            p.textStyle(p.BOLD);
+            p.text('Challenge:', innerL, legY);
+            p.textStyle(p.NORMAL);
+            var lx = innerL + 92;
             // 4-stop gradient legend. Labels bridge BOTH cell-value
             // vocabularies: density uses low / moderate / high / very
             // high, while service expectation and local competition
