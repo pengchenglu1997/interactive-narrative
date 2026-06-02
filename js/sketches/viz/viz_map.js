@@ -54,8 +54,12 @@
                 'color:#fff;font:bold ' + (sz - 4) + 'px/1 -apple-system,Helvetica,Arial,sans-serif;' +
                 '">✗</div>';
         }
-        // Active markers — yellow needs a dark blue border, others use a white border.
-        var bord = (color === '#FBD914') ? '1.5px solid #0058AB' : '1.5px solid #fff';
+        // Active markers — both regimes use a thin white border now
+        // (per user feedback: drop the colored border that previously
+        // outlined yellow markers in IKEA blue). White still gives a
+        // clean separation from the gray basemap; the fill colour
+        // alone carries the regime signal.
+        var bord = '1px solid #fff';
         var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:0.95;' +
             'background:' + color + ';border:' + bord + ';box-shadow:0 0 1px rgba(0,0,0,0.4)';
         switch (format) {
@@ -176,7 +180,10 @@
             var isEast    = (r.id === 'ea');
             var openFill  = isEast ? '#FBD914' : '#0058AB';
             var openText  = isEast ? '#0058AB' : '#FBD914';
-            var openRing  = isEast ? '#0058AB' : '#FBD914';
+            // No colored ring on cluster bubbles (per user feedback) —
+            // white outer border is enough for separation against the
+            // basemap. The fill colour alone communicates the regime.
+            var openRing  = '#ffffff';
             function clusterIcon(cluster) {
                 var children = cluster.getAllChildMarkers();
                 var openN = 0, closedN = 0;

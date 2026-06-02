@@ -472,7 +472,9 @@
 }
 
 .leaflet-toolbar #map-stats .open-n { color: var(--ink-soft); font-weight: 600; }
-.leaflet-toolbar #map-stats .closed-n { color: var(--regime-east); font-weight: 600; }
+/* Closed-count stat — neutral gray (was yellow). Closed status
+   should read as 'muted / inactive', not as the East-regime hue. */
+.leaflet-toolbar #map-stats .closed-n { color: var(--muted); font-weight: 600; }
 .leaflet-toolbar #map-stats .west-n { color: var(--ikea-blue-soft); font-weight: 600; }
 .leaflet-toolbar #map-stats .east-n { color: var(--regime-east); font-weight: 600; }
 
