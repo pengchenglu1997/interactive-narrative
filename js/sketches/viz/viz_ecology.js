@@ -39,23 +39,22 @@
         domestic_competition: { weak: 1, moderate: 2, strong: 3, very_strong: 4 },
     };
 
-    // Per-regime single-hue heatmap. Every level is shaded in the
-    // regime hue from very pale → saturated. No gray steps — the
-    // East panel reads as "all yellow" and the West panel reads
-    // as "all blue" at a glance, with depth = challenge level.
+    // Per-regime single-hue heatmap. Every level is clearly tinted
+    // in the regime hue — no near-white steps — so East panel reads
+    // as "all yellow" and West as "all blue" even at "Low".
+    // Brand colour (IKEA yellow / IKEA blue) sits at L3 (High); L4
+    // (Very high) goes DEEPER to communicate maximum challenge.
     function challengeColor(level, regime) {
         if (regime === 'east_asia') {
-            // Yellow gradient (pale → IKEA yellow)
-            if (level <= 1) return '#fff9d6';                      // very pale yellow
-            if (level <= 2) return '#fff0a8';                      // pale yellow
-            if (level <= 3) return '#ffe35c';                      // medium yellow
-            return '#FBD914';                                       // IKEA yellow
+            if (level <= 1) return '#FFEC8A';                       // recognizable yellow (not cream)
+            if (level <= 2) return '#FFD647';                       // warm yellow
+            if (level <= 3) return '#FBD914';                       // IKEA yellow
+            return '#B58700';                                        // dark amber — depth
         }
-        // western (and combined view) — single blue gradient
-        if (level <= 1) return '#e6effa';                          // very pale blue
-        if (level <= 2) return '#b9d0e6';                          // pale blue
-        if (level <= 3) return '#6699cc';                          // medium blue
-        return '#0058AB';                                           // IKEA blue
+        if (level <= 1) return '#8EBADD';                           // clear sky blue
+        if (level <= 2) return '#3F84BC';                           // mid blue
+        if (level <= 3) return '#0058AB';                           // IKEA blue
+        return '#00375A';                                            // navy — depth
     }
 
     function regimeColor(rt) {
@@ -127,7 +126,7 @@
             p.text(title, innerL, innerT - 78);
 
             // Subtitle — explicit about which dims are quantitative vs observation.
-            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(11);
+            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(12.5);
             var hueLabel = regimeFilter === 'east_asia'
                 ? 'Cells shaded in a single yellow gradient — pale = low challenge, saturated = very high.'
                 : regimeFilter === 'western'
@@ -141,7 +140,7 @@
             // Group caption row — three dims:
             //   index 0 = density (QUANTITATIVE, single col)
             //   index 1-2 = service / competition (OBSERVATIONAL, two cols)
-            p.fill('#888'); p.textSize(9.5); p.textStyle(p.BOLD);
+            p.fill('#888'); p.textSize(11); p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             var quantX = innerL + 0.5 * cellW;                      // center of dim 0
             var obsX   = innerL + 2   * cellW;                      // center of dims 1+2
@@ -158,7 +157,7 @@
 
             // Dimension headers — quantitative dim styled darker/bold,
             // observational dims slightly faded.
-            p.textSize(10.5);
+            p.textSize(12.5);
             p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
@@ -167,6 +166,7 @@
                 p.text(d.label, x, innerT - 8);
             });
             p.fill('#1a1a1a');
+            p.textSize(12);
             p.text('CHALLENGE / 12', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
             p.textStyle(p.NORMAL);
 
@@ -189,7 +189,7 @@
                 // Regime stripe + market label
                 p.noStroke(); p.fill(regimeColor(row.region_type));
                 p.rect(2, y - 8, 4, 16);
-                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(13.5); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(row.market, 12, y);
                 p.textStyle(p.NORMAL);
@@ -207,7 +207,7 @@
                     // Dark ink always — readable on every shade in the
                     // per-regime palette (gray / pale color / saturated).
                     p.fill('#1a1a1a');
-                    p.textSize(10);
+                    p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
 
@@ -225,42 +225,42 @@
                 var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
                 p.noStroke(); p.fill('#eee');
                 p.rect(barX, barY, barW, barH, 2);
-                // Bar fill — single-hue per regime, three depths,
-                // no gray. Matches the cell palette: 8+ = saturated
-                // regime hue, 5+ = medium, below = palest shade.
-                var topShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
-                var midShade = row.region_type === 'east_asia' ? '#ffe35c' : '#6699cc';
-                var lowShade = row.region_type === 'east_asia' ? '#fff9d6' : '#e6effa';
+                // Bar fill — same gradient as the cells. Top tier picks
+                // the depth shade (max challenge), mid = brand hue,
+                // low = the recognizable-but-light tier.
+                var topShade = row.region_type === 'east_asia' ? '#B58700' : '#00375A';
+                var midShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
+                var lowShade = row.region_type === 'east_asia' ? '#FFD647' : '#3F84BC';
                 p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
-                p.fill('#1a1a1a'); p.textSize(10); p.textStyle(p.BOLD);
+                p.fill('#1a1a1a'); p.textSize(12); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(total + '/12', barX + barW + 6, barY + barH / 2);
                 p.textStyle(p.NORMAL);
             });
 
-            // Legend — cell scale only. Per-regime monochrome means one
+            // Legend — cell scale only. Per-regime single-hue means one
             // legend row is enough.
-            p.noStroke(); p.textSize(12); p.fill('#666');
+            p.noStroke(); p.textSize(13); p.fill('#666');
             p.textAlign(p.LEFT, p.TOP);
             var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
-            var lx = innerL + 226;
-            // Single-hue gradient legend, 4 stops — matches the
-            // challengeColor() ladder (pale → IKEA hue), no gray.
-            var topHi  = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
-            var medHi  = regimeFilter === 'east_asia' ? '#ffe35c' : '#6699cc';
-            var palHi  = regimeFilter === 'east_asia' ? '#fff0a8' : '#b9d0e6';
-            var palest = regimeFilter === 'east_asia' ? '#fff9d6' : '#e6effa';
+            var lx = innerL + 252;
+            // 4-stop gradient legend, matches challengeColor():
+            //   L1 light tinted → L2 warm → L3 IKEA brand → L4 depth.
+            var l1 = regimeFilter === 'east_asia' ? '#FFEC8A' : '#8EBADD';
+            var l2 = regimeFilter === 'east_asia' ? '#FFD647' : '#3F84BC';
+            var l3 = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
+            var l4 = regimeFilter === 'east_asia' ? '#B58700' : '#00375A';
             [
-                { c: palest, label: 'Low' },
-                { c: palHi,  label: 'Moderate' },
-                { c: medHi,  label: 'High' },
-                { c: topHi,  label: 'Very high' },
+                { c: l1, label: 'Low' },
+                { c: l2, label: 'Moderate' },
+                { c: l3, label: 'High' },
+                { c: l4, label: 'Very high' },
             ].forEach(function (it) {
-                p.fill(it.c); p.rect(lx, legY - 2, 10, 10);
-                p.fill('#333'); p.text(it.label, lx + 14, legY);
-                lx += p.textWidth(it.label) + 26;
+                p.fill(it.c); p.rect(lx, legY - 2, 14, 14);
+                p.fill('#333'); p.text(it.label, lx + 18, legY);
+                lx += p.textWidth(it.label) + 30;
             });
 
             p.pop();
