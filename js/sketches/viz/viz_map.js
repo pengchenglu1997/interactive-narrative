@@ -176,16 +176,9 @@
             // single visual element, never overlapping.
             var isEast    = (r.id === 'ea');
             var openFill  = isEast ? '#FBD914' : '#0058AB';
-            // Digit colour goes NEUTRAL — was yellow on blue / blue on
-            // yellow (IKEA brand inversion), but that put a bold
-            // regime-coloured glyph in the middle of every bubble, which
-            // perceptually read as "yellow bubble with blue border" on
-            // the East side. Now: dark digits on yellow, white digits on
-            // blue. Fill is the only regime signal.
+            // Digit colour goes NEUTRAL — dark digits on yellow, white
+            // digits on blue. Fill is the only regime signal.
             var openText  = isEast ? '#1a1a1a' : '#ffffff';
-            // No colored ring on cluster bubbles either — white border
-            // for clean separation against the gray basemap.
-            var openRing  = '#ffffff';
             function clusterIcon(cluster) {
                 var children = cluster.getAllChildMarkers();
                 var openN = 0, closedN = 0;
@@ -195,14 +188,19 @@
                 }
                 var total = openN + closedN;
                 var h = total < 10 ? 28 : total < 30 ? 34 : 40;
+                // No border anywhere on cluster bubbles (per user
+                // feedback). Separation against the basemap is handled
+                // entirely by the .ikea-cluster-bubble / .ikea-cluster-
+                // pill box-shadow defined in CSS.
                 // ALL-OPEN → round regime bubble
                 if (closedN === 0) {
                     return L.divIcon({
                         html:
                             '<div class="ikea-cluster-bubble" style="' +
                                 'width:' + h + 'px;height:' + h + 'px;' +
-                                'background:' + openFill + ';color:' + openText + ';' +
-                                'border:2px solid ' + openRing + ';">' + openN + '</div>',
+                                'background:' + openFill + ';color:' + openText + ';">' +
+                                openN +
+                            '</div>',
                         className: 'ikea-cluster',
                         iconSize: L.point(h, h),
                     });
@@ -213,8 +211,9 @@
                         html:
                             '<div class="ikea-cluster-bubble" style="' +
                                 'width:' + h + 'px;height:' + h + 'px;' +
-                                'background:#1a1a1a;color:#ffffff;' +
-                                'border:2px solid #ffffff;">✗' + closedN + '</div>',
+                                'background:#1a1a1a;color:#ffffff;">' +
+                                '✗' + closedN +
+                            '</div>',
                         className: 'ikea-cluster',
                         iconSize: L.point(h, h),
                     });
@@ -224,8 +223,7 @@
                 return L.divIcon({
                     html:
                         '<div class="ikea-cluster-pill" style="' +
-                            'width:' + w + 'px;height:' + h + 'px;' +
-                            'border:2px solid ' + openRing + ';">' +
+                            'width:' + w + 'px;height:' + h + 'px;">' +
                             '<div class="pill-half pill-open" style="' +
                                 'background:' + openFill + ';color:' + openText + ';">' +
                                 openN +

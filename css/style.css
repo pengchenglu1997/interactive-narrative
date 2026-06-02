@@ -647,6 +647,9 @@
 .marker-cluster-large div {
   background: transparent !important;
 }
+/* No border on cluster bubbles — separation against the basemap
+   uses a soft 1px dark halo via box-shadow, same treatment as the
+   individual store markers. */
 .ikea-cluster-bubble {
   border-radius: 50%;
   display: flex;
@@ -656,20 +659,18 @@
   font-weight: 700;
   font-size: 12px;
   line-height: 1;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.2);
 }
 
-/* Mixed-cluster pill — one bubble whose left half shows the open
-   count in the regime palette and right half shows the closed count
-   in black, with a single regime-coloured outer border so the whole
-   thing reads as one connected unit (instead of two overlapping
-   bubbles competing for the same metro). */
+/* Mixed-cluster pill — left half regime, right half black, NO outer
+   border. Same soft halo as the round bubbles. Divider between the
+   halves dropped — the colour break alone already separates them. */
 .ikea-cluster-pill {
   display: flex;
   align-items: stretch;
   border-radius: 999px;
   overflow: hidden;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.25), 0 1px 3px rgba(0,0,0,0.2);
   box-sizing: border-box;
   font-family: -apple-system, Helvetica, Arial, sans-serif;
   font-weight: 700;
@@ -685,7 +686,6 @@
 .ikea-cluster-pill .pill-closed {
   background: #1a1a1a;
   color: #ffffff;
-  border-left: 1px solid #ffffff;
 }
 
 /* ============ Stat cards (Act 4) ============ */
