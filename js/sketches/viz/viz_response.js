@@ -71,10 +71,12 @@
             p.translate(padL, padT);
 
             var innerT = 86, innerB = 20;
-            // Right pad reduced 20→10, colGap 36→24 — claims ~22px back
-            // per column for the bar (in addition to the layout
-            // compression below).
-            var contentW = W - padL - 10;
+            // BUG FIX: was 'W - padL - 10', which double-subtracted the
+            // canvas's built-in left margin (manager.margin.left is already
+            // accounted for in canvasWidth — translate just shifts the
+            // origin, it doesn't shrink the drawable area). Reclaiming up
+            // to 80px of right-side dead space on wide viewports.
+            var contentW = W;
             var colGap = 24;
             var colW = (contentW - colGap) / 2;
             var leftX  = 0;
