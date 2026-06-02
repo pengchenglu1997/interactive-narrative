@@ -52,9 +52,13 @@
             p.textAlign(p.LEFT, p.BOTTOM);
             p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 60);
 
-            // Subtitle
+            // Subtitle — describes the chart's CONTENT, not how to
+            // read it. The how-to-read note in the prose already
+            // covers 'steeper = larger shift' and 'colour = which
+            // side weighs it more', so repeating that here was just
+            // visual duplication.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(13);
-            p.text('Each strategy appears in both regions. Steeper lines show larger ranking shifts.', 20, innerT - 38);
+            p.text('Eight strategic priorities ranked within each region.', 20, innerT - 38);
 
             // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
             p.textStyle(p.BOLD); p.textSize(14);

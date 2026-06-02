@@ -846,6 +846,19 @@
 .scorecard .verdict.east-loss  { background: #fff4c4; color: #5c4400; border: 1px solid #d9ba3a; }
 .scorecard .verdict.both       { background: #f3f3f3; color: var(--muted); border: 1px solid #d6d6d6; }
 
+/* Small caption right under the scorecard, telling the reader
+   what the three Pattern-column colours mean. */
+.pattern-key {
+  font-family: var(--font-sans);
+  font-size: 12px;
+  color: var(--muted);
+  margin: 8px 0 0;
+  line-height: 1.5;
+}
+.pattern-key .pk-west { color: #154a8a; font-weight: 700; }
+.pattern-key .pk-east { color: #6e5400; font-weight: 700; }
+.pattern-key .pk-loss { color: #5c4400; font-weight: 700; }
+
 /* ============ Author section ============ */
 
 .author-section { align-items: center; }

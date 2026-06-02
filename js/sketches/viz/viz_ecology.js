@@ -117,8 +117,10 @@
             var chalColX = innerL + dims.length * cellW + 6;
 
             // Section title — amber for East (yellow text unreadable).
+            // Darkened to #A88000 (was #C9A800) so the East amber is
+            // visually heavier than the gray OBSERVATIONAL label below.
             p.noStroke();
-            p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
+            p.fill(regimeFilter === 'east_asia' ? '#A88000' : regimeFilter === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
@@ -154,7 +156,7 @@
             // Inline " (stats)" / " (coded)" parens added so a casual
             // reader sees the source-confidence distinction without
             // having to read the method note below the legend.
-            var quantAccent = regimeFilter === 'east_asia' ? '#C9A800' : '#0058AB';
+            var quantAccent = regimeFilter === 'east_asia' ? '#A88000' : '#0058AB';
             p.fill(quantAccent);
             p.text('QUANTITATIVE (stats)',  quantX, innerT - 36);
             p.fill('#888');
@@ -308,7 +310,7 @@
             p.textStyle(p.ITALIC);
             p.textSize(11.5);
             p.textAlign(p.LEFT, p.TOP);
-            p.text('Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Per-cell sources documented in the colophon.',
+            p.text('Per-cell data sources documented in the colophon.',
                 innerL, legY + 22, W - innerL - 20, 60);
             p.textStyle(p.NORMAL);
 
