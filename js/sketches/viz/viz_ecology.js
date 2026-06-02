@@ -108,7 +108,7 @@
             var CHAL_COL_W = 92;
             var innerL = 130;
             var innerR = 14 + CHAL_COL_W;
-            var innerT = 96, innerB = 76;        // innerT +18 for group caption row; innerB +24 for method-note footer
+            var innerT = 96, innerB = 92;        // innerT +18 for group caption; innerB now fits 2 wrapped lines of method note
             var cellW  = (W - innerL - innerR) / dims.length;
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
             var chalColX = innerL + dims.length * cellW + 6;
@@ -267,13 +267,17 @@
             // Method note — moved out of the subtitle into a small
             // footnote below the legend. Sourcing details that the
             // reader only needs once per region.
+            // Use the (x, y, w, h) form of text() so p5 wraps it to
+            // multiple lines when the viewport is narrow. Without the
+            // width arg, single-line text() runs off the right edge on
+            // sub-1200px viewports.
             p.noStroke();
             p.fill('#888');
             p.textStyle(p.ITALIC);
             p.textSize(10.5);
             p.textAlign(p.LEFT, p.TOP);
             p.text('Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Per-cell sources documented in the colophon.',
-                innerL, legY + 24);
+                innerL, legY + 22, W - innerL - 20, 60);
             p.textStyle(p.NORMAL);
 
             p.pop();
