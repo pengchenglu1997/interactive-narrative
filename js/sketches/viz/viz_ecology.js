@@ -51,7 +51,10 @@
             if (level <= 3) return '#FBD914';                       // IKEA yellow
             return '#B58700';                                        // dark amber — depth
         }
-        if (level <= 1) return '#8EBADD';                           // clear sky blue
+        // West L1 darkened #8EBADD → #6FA8D3 so white cell text stays
+        // legible at the lowest tier (matches the new 'all West cells
+        // are white text' rule below).
+        if (level <= 1) return '#6FA8D3';                           // mid-pale blue
         if (level <= 2) return '#3F84BC';                           // mid blue
         if (level <= 3) return '#0058AB';                           // IKEA blue
         return '#00375A';                                            // navy — depth
@@ -214,14 +217,16 @@
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    // Text colour adapts to the cell shade:
-                    //   - West L2 #3F84BC, L3 #0058AB, L4 #00375A —
-                    //     mid-to-saturated blue → white text. Earlier
-                    //     threshold (≥3) only caught L3+, leaving the
-                    //     mid blue cells with hard-to-read dark text.
+                    // Text colour:
+                    //   - West cells (all 4 levels) → WHITE text now.
+                    //     L1 was darkened to #6FA8D3 above to make
+                    //     white readable even on the lightest tier.
+                    //     Per user: 'low 还是黑色的' on the previous
+                    //     L2+ threshold — they expected uniform white
+                    //     across the blue panel.
                     //   - East yellow palette (all 4 shades) keeps
-                    //     dark ink — yellow needs contrast from dark.
-                    var darkBg = (row.region_type === 'western' && level >= 2);
+                    //     dark ink — yellow needs dark for contrast.
+                    var darkBg = (row.region_type === 'western');
                     p.fill(darkBg ? '#ffffff' : '#1a1a1a');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
@@ -246,7 +251,7 @@
                 // low = the recognizable-but-light tier.
                 var topShade = row.region_type === 'east_asia' ? '#B58700' : '#00375A';
                 var midShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
-                var lowShade = row.region_type === 'east_asia' ? '#FFD647' : '#3F84BC';
+                var lowShade = row.region_type === 'east_asia' ? '#FFD647' : '#3F84BC';      // bar tier still uses the medium blue, not the new pale
                 p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
@@ -262,21 +267,26 @@
             var legY = H - innerB + 18;
             p.text("Cell — challenge to IKEA's original model:", innerL, legY);
             var lx = innerL + 252;
-            // 4-stop gradient legend, matches challengeColor():
-            //   L1 light tinted → L2 warm → L3 IKEA brand → L4 depth.
-            var l1 = regimeFilter === 'east_asia' ? '#FFEC8A' : '#8EBADD';
+            // 4-stop gradient legend. Labels bridge BOTH cell-value
+            // vocabularies: density uses low / moderate / high / very
+            // high, while service expectation and local competition
+            // use weak / strong / very strong. Both map to the same
+            // 4-level challenge scale; the legend says so explicitly
+            // so a reader doesn't go hunting for 'weak' on a 4-step
+            // ladder that previously only spelled 'Low'.
+            var l1 = regimeFilter === 'east_asia' ? '#FFEC8A' : '#6FA8D3';
             var l2 = regimeFilter === 'east_asia' ? '#FFD647' : '#3F84BC';
             var l3 = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
             var l4 = regimeFilter === 'east_asia' ? '#B58700' : '#00375A';
             [
-                { c: l1, label: 'Low' },
+                { c: l1, label: 'Low / Weak' },
                 { c: l2, label: 'Moderate' },
-                { c: l3, label: 'High' },
-                { c: l4, label: 'Very high' },
+                { c: l3, label: 'High / Strong' },
+                { c: l4, label: 'Very high / Very strong' },
             ].forEach(function (it) {
                 p.fill(it.c); p.rect(lx, legY - 2, 14, 14);
                 p.fill('#333'); p.text(it.label, lx + 18, legY);
-                lx += p.textWidth(it.label) + 30;
+                lx += p.textWidth(it.label) + 26;
             });
 
             // Method note — moved out of the subtitle into a small
