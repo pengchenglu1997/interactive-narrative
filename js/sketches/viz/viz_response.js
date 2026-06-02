@@ -249,6 +249,39 @@
             east.forEach(function (c, i) { drawRow(c, i, L, '#FBD914', '#C9A800'); });
             west.forEach(function (c, i) { drawRow(c, i, R, '#0058AB', '#0058AB'); });
 
+            // === Inline colour legend, in the empty bottom of the East
+            // column (East has 10 rows, West has 14 — 4 rows of dead
+            // space at the bottom of the East column otherwise). Reads
+            // 'Bar colour:  yellow = East · blue = West · gray = no
+            // city-format'. ===
+            if (east.length < maxRows) {
+                var legY = innerT + (east.length + 1) * rowH;
+                var legX = leftX + 4;
+                p.noStroke();
+                p.textStyle(p.BOLD); p.textSize(11); p.fill('#888');
+                p.textAlign(p.LEFT, p.CENTER);
+                p.text('BAR COLOUR', legX, legY);
+
+                var rowGap = 22;
+                var swatchW = 22, swatchH = 12;
+                var items = [
+                    { c: '#FBD914', label: 'East Asian city (has city-format)' },
+                    { c: '#0058AB', label: 'Western city (has city-format)'    },
+                    { c: '#cfcfcf', label: 'No city-format store'              },
+                ];
+                items.forEach(function (it, idx) {
+                    var y = legY + rowGap + idx * 20;
+                    p.noStroke();
+                    p.fill(it.c);
+                    p.rect(legX, y - swatchH / 2, swatchW, swatchH, 2);
+                    p.fill('#444');
+                    p.textStyle(p.NORMAL); p.textSize(12);
+                    p.textAlign(p.LEFT, p.CENTER);
+                    p.text(it.label, legX + swatchW + 8, y);
+                });
+                p.textStyle(p.NORMAL);
+            }
+
             // === Footer note ===
             p.noStroke();
             p.fill('#888');

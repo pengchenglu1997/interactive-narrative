@@ -126,12 +126,14 @@
                 p.fill('#888'); p.textSize(11); p.textStyle(p.NORMAL);
                 p.text('intensity ' + it.west_intensity + '/5', leftX - rL - 6, yL + 12);
 
-                // East node — yellow fill needs an IKEA-blue ring for legibility on white
-                p.stroke(REGIME_WEST); p.strokeWeight(1.2);
+                // East node — solid yellow, no blue ring (per feedback:
+                // the cross-regime accent was perceived as visual
+                // contamination, same fix we applied on the Act 1 map
+                // cluster bubbles).
+                p.noStroke();
                 p.fill(REGIME_EAST);
                 var rR = radius(it.east_intensity);
                 p.ellipse(rightX, yR, rR, rR);
-                p.noStroke();
                 p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 p.text(it.priority_label, rightX + rR + 6, yR);

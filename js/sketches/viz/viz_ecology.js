@@ -205,9 +205,13 @@
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    // Dark ink always — readable on every shade in the
-                    // per-regime palette (gray / pale color / saturated).
-                    p.fill('#1a1a1a');
+                    // Text colour adapts to the cell shade:
+                    //   - West L3/L4 (#0058AB IKEA blue / #00375A navy)
+                    //     → white text for legibility
+                    //   - East yellow palette + West light blues
+                    //     → dark ink stays readable
+                    var darkBg = (row.region_type === 'western' && level >= 3);
+                    p.fill(darkBg ? '#ffffff' : '#1a1a1a');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
