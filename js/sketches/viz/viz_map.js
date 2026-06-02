@@ -274,6 +274,12 @@
         state.stores.forEach(function (s) {
             if (s.opening_year == null || s.opening_year > state.year) return;
             if (s.latitude == null || s.longitude == null) return;
+            // Skip stores outside the West vs East Asia comparison.
+            // Today this is one store (Pasay City, Philippines, 2021,
+            // region_type='other') — it was rendering as a stray gray
+            // dot with no narrative link.
+            var rt = (s.region_type || '').toLowerCase();
+            if (rt !== 'western' && rt !== 'east_asia' && rt !== 'origin') return;
             var region = regionFor(s.latitude, s.longitude);
             if (!region || !state.markerLayers[region]) return;
             var closed = s.closure_year != null && s.closure_year <= state.year;
