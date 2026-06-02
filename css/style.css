@@ -841,7 +841,7 @@
   font-size: 12px;
   color: var(--muted);
   max-width: 720px;
-  margin: 28px auto 0;
+  margin: 64px auto 0;          /* was 28 — too close to colophon */
   line-height: 1.6;
   text-align: center;
 }

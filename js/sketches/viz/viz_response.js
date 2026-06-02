@@ -70,7 +70,8 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerT = 86, innerB = 20;
+            var innerT = 102, innerB = 20;   // +16 to fit the second
+                                              // 'Right column = ...' subtitle
             // BUG FIX: was 'W - padL - 10', which double-subtracted the
             // canvas's built-in left margin (manager.margin.left is already
             // accounted for in canvasWidth — translate just shifts the
@@ -109,31 +110,41 @@
             var R = colLayout(rightX);
 
             var maxRows = Math.max(east.length, west.length);
-            // rowH bumped 36 → 42 so verdict (now 13pt) + closure
-            // subtitle + big-box subtitle stack with comfortable
-            // leading at the new font sizes.
-            var rowH = Math.max(42, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
+            // rowH 36 absorbs 3 tightly-stacked lines (verdict 13 +
+            // closure subtitle 11 + big-box subtitle 11). 42 looked
+            // great but 14 Western rows × 42 + chrome overflowed the
+            // canvas bottom on most viewports.
+            var rowH = Math.max(36, Math.floor((H - innerT - innerB) / Math.max(maxRows, 1)));
 
             // === Title (centered, spans both columns) ===
             p.noStroke();
             p.fill('#1a1a1a');
             p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.text('CITY-FORMAT RESPONSE UNDER HOUSING PRESSURE', contentW / 2, innerT - 56);
+            p.text('CITY-FORMAT RESPONSE UNDER HOUSING PRESSURE', contentW / 2, innerT - 72);
 
-            // === Subtitle (14pt; '· shared PTI scale' dropped so the
-            // line doesn't wrap on narrower viewports) ===
+            // === Subtitle line 1 (14pt) — what's plotted ===
             p.fill('#666');
             p.textStyle(p.NORMAL); p.textSize(14);
-            p.text('Selected cities, ranked by PTI within region.', contentW / 2, innerT - 36);
+            p.text('Selected cities, ranked by PTI within region.', contentW / 2, innerT - 52);
+
+            // === Subtitle line 2 (12pt) — what the RIGHT half means.
+            // The compressed verdicts ('None', 'Closed', '1 open',
+            // '2 open') need a noun context, and footer microcopy
+            // alone wasn't carrying it for new readers. ===
+            p.fill('#888');
+            p.textStyle(p.ITALIC); p.textSize(12);
+            p.text('Right column shows the count of city-format stores currently open (with closures and suburban big-box count below).',
+                contentW / 2, innerT - 32);
+            p.textStyle(p.NORMAL);
 
             // === Column headers ===
             p.textStyle(p.BOLD); p.textSize(14);
             p.fill('#C9A800');                                    // amber — readable East
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.text('EAST ASIAN CITIES', leftX  + colW / 2, innerT - 12);
+            p.text('EAST ASIAN CITIES', leftX  + colW / 2, innerT - 10);
             p.fill('#0058AB');                                    // IKEA blue — West
-            p.text('WESTERN CITIES',    rightX + colW / 2, innerT - 12);
+            p.text('WESTERN CITIES',    rightX + colW / 2, innerT - 10);
             p.textStyle(p.NORMAL);
 
             // Mouse → translated coords
@@ -209,21 +220,21 @@
                 p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
                 // Vertical stacking — three possible row layouts.
-                // Offsets retuned for the new font sizes (verdict 13,
-                // subtitle 11): wider stack so lines breathe.
+                // Offsets retuned for rowH 36 with tight leading so 3
+                // lines (13pt + 11pt + 11pt) fit a single row.
                 var lineCount = 1 + (subtitle ? 1 : 0) + (bigBox ? 1 : 0);
                 var topOffset = lineCount === 1 ?  0
-                              : lineCount === 2 ? -8
-                              :                  -13;
+                              : lineCount === 2 ? -7
+                              :                  -11;
                 p.text(verdict, layout.verdictX, yPos + topOffset);
 
-                var subY = yPos + topOffset + 13;
+                var subY = yPos + topOffset + 12;
                 if (subtitle) {
                     p.fill('#888');
                     p.textStyle(p.NORMAL);
                     p.textSize(11);
                     p.text(subtitle, layout.verdictX, subY);
-                    subY += 12;
+                    subY += 11;
                 }
                 if (bigBox) {
                     p.fill('#aaa');                          // lighter — secondary detail
