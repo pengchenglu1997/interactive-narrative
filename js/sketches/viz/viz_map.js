@@ -49,19 +49,16 @@
             return '<div style="' +
                 'display:flex;align-items:center;justify-content:center;' +
                 'width:' + sz + 'px;height:' + sz + 'px;' +
-                'background:#1a1a1a;border:1px solid #fff;border-radius:' + radius + ';' +
-                'box-shadow:0 0 1px rgba(0,0,0,0.4);' +
+                'background:#1a1a1a;border-radius:' + radius + ';' +
+                'box-shadow:0 0 0 1px rgba(0,0,0,0.25);' +
                 'color:#fff;font:bold ' + (sz - 4) + 'px/1 -apple-system,Helvetica,Arial,sans-serif;' +
                 '">✗</div>';
         }
-        // Active markers — both regimes use a thin white border now
-        // (per user feedback: drop the colored border that previously
-        // outlined yellow markers in IKEA blue). White still gives a
-        // clean separation from the gray basemap; the fill colour
-        // alone carries the regime signal.
-        var bord = '1px solid #fff';
+        // Active markers — no border at all (per user feedback). A soft
+        // 1px dark halo via box-shadow keeps the marker readable
+        // against the gray basemap without adding a visible edge.
         var base = 'display:inline-block;width:' + sz + 'px;height:' + sz + 'px;opacity:0.95;' +
-            'background:' + color + ';border:' + bord + ';box-shadow:0 0 1px rgba(0,0,0,0.4)';
+            'background:' + color + ';box-shadow:0 0 0 1px rgba(0,0,0,0.25)';
         switch (format) {
             case 'big-box':         return '<div style="' + base + '"></div>';
             case 'city_store':      return '<div style="' + base + ';border-radius:50%"></div>';
