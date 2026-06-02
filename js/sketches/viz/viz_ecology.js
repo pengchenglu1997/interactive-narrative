@@ -108,7 +108,7 @@
             var CHAL_COL_W = 92;
             var innerL = 130;
             var innerR = 14 + CHAL_COL_W;
-            var innerT = 96, innerB = 52;        // innerT +18 for group caption row
+            var innerT = 96, innerB = 76;        // innerT +18 for group caption row; innerB +24 for method-note footer
             var cellW  = (W - innerL - innerR) / dims.length;
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
             var chalColX = innerL + dims.length * cellW + 6;
@@ -123,19 +123,20 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN MARKETS — RETAIL ECOLOGY'
                     : 'RETAIL ECOLOGY MATRIX';
-            p.text(title, innerL, innerT - 78);
+            p.text(title, innerL, innerT - 80);
 
-            // Subtitle — explicit about which dims are quantitative vs observation.
-            p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(12.5);
-            var hueLabel = regimeFilter === 'east_asia'
-                ? 'Cells shaded in a single yellow gradient — pale = low challenge, saturated = very high.'
+            // Subtitle — short, bigger. One sentence that says what
+            // the chart is plotting. (The per-cell encoding details
+            // and the data-provenance microcopy used to live here too;
+            // both now sit in the footer note below the legend, so
+            // this line stays the punchline and reads at a glance.)
+            p.fill('#444'); p.textStyle(p.NORMAL); p.textSize(14.5);
+            var subtitle = regimeFilter === 'east_asia'
+                ? 'East Asian markets sorted by total challenge to the original IKEA model.'
                 : regimeFilter === 'western'
-                    ? 'Cells shaded in a single blue gradient — pale = low challenge, saturated = very high.'
-                    : '';
-            var subtitle = (regimeFilter === 'east_asia' || regimeFilter === 'western')
-                ? hueLabel + ' Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Sorted by total challenge. See data/SOURCING.md for per-cell sources.'
-                : 'Density is quantitative; service and competition are observation-based. Sorted by total challenge.';
-            p.text(subtitle, innerL, innerT - 58);
+                    ? 'Western markets sorted by total challenge to the original IKEA model.'
+                    : 'Markets sorted by total challenge to the original IKEA model.';
+            p.text(subtitle, innerL, innerT - 56);
 
             // Group caption row — three dims:
             //   index 0 = density (QUANTITATIVE, single col)
@@ -262,6 +263,18 @@
                 p.fill('#333'); p.text(it.label, lx + 18, legY);
                 lx += p.textWidth(it.label) + 30;
             });
+
+            // Method note — moved out of the subtitle into a small
+            // footnote below the legend. Sourcing details that the
+            // reader only needs once per region.
+            p.noStroke();
+            p.fill('#888');
+            p.textStyle(p.ITALIC);
+            p.textSize(10.5);
+            p.textAlign(p.LEFT, p.TOP);
+            p.text('Density is sourced from national statistics agencies; service expectation and local competition are observation-based. Per-cell sources documented in the colophon.',
+                innerL, legY + 24);
+            p.textStyle(p.NORMAL);
 
             p.pop();
 
