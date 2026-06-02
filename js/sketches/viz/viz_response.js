@@ -249,11 +249,12 @@
             east.forEach(function (c, i) { drawRow(c, i, L, '#FBD914', '#C9A800'); });
             west.forEach(function (c, i) { drawRow(c, i, R, '#0058AB', '#0058AB'); });
 
-            // === Inline colour legend, in the empty bottom of the East
-            // column (East has 10 rows, West has 14 — 4 rows of dead
-            // space at the bottom of the East column otherwise). Reads
-            // 'Bar colour:  yellow = East · blue = West · gray = no
-            // city-format'. ===
+            // === Inline colour legend + PTI footnote, in the empty
+            // bottom of the East column (East has 10 rows, West has 14
+            // — 4 rows of dead space at the bottom of the East column
+            // otherwise). This is also where the PTI definition note
+            // lives now; the prior position (below row 14) was getting
+            // visually cut off by the canvas bottom. ===
             if (east.length < maxRows) {
                 var legY = innerT + (east.length + 1) * rowH;
                 var legX = leftX + 4;
@@ -279,17 +280,20 @@
                     p.textAlign(p.LEFT, p.CENTER);
                     p.text(it.label, legX + swatchW + 8, y);
                 });
+
+                // PTI footnote — wrapped, sits below the swatches.
+                var ptiY = legY + rowGap + 3 * 20 + 14;
+                p.fill('#888');
+                p.textStyle(p.ITALIC); p.textSize(11);
+                p.textAlign(p.LEFT, p.TOP);
+                p.text('PTI = price-to-income ratio (Numbeo). The standard cross-city affordability proxy.',
+                    legX, ptiY, colW - 20, 60);
                 p.textStyle(p.NORMAL);
             }
 
-            // === Footer note ===
-            p.noStroke();
-            p.fill('#888');
-            p.textStyle(p.NORMAL);
-            p.textSize(11);
-            p.textAlign(p.LEFT, p.TOP);
-            p.text('PTI = price-to-income ratio (Numbeo). Right column: city-format stores active / closed since, plus suburban big-box count. Bar gray = no city-format store; coloured = at least one currently open.',
-                0, innerT + maxRows * rowH + 4);
+            // (PTI footnote moved into the East-column legend block
+            // above — the prior position below row 14 was getting cut
+            // off near the canvas bottom.)
 
             p.pop();
 

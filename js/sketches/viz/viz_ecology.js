@@ -145,7 +145,11 @@
             p.textAlign(p.CENTER, p.BOTTOM);
             var quantX = innerL + 0.5 * cellW;                      // center of dim 0
             var obsX   = innerL + 2   * cellW;                      // center of dims 1+2
-            p.fill('#0058AB');
+            // QUANTITATIVE accent matches the panel's regime: amber
+            // on East, IKEA blue on West. The blue-on-yellow panel
+            // looked like cross-regime contamination.
+            var quantAccent = regimeFilter === 'east_asia' ? '#C9A800' : '#0058AB';
+            p.fill(quantAccent);
             p.text('QUANTITATIVE',  quantX, innerT - 36);
             p.fill('#888');
             p.text('OBSERVATIONAL', obsX,   innerT - 36);
@@ -162,7 +166,9 @@
             p.textStyle(p.BOLD);
             p.textAlign(p.CENTER, p.BOTTOM);
             dims.forEach(function (d, j) {
-                p.fill(d.group === 'quantitative' ? '#0058AB' : '#1a1a1a');
+                // Quantitative dim header inherits the panel's regime
+                // accent so East-yellow never carries an IKEA-blue label.
+                p.fill(d.group === 'quantitative' ? quantAccent : '#1a1a1a');
                 var x = innerL + j * cellW + cellW / 2;
                 p.text(d.label, x, innerT - 8);
             });
@@ -206,11 +212,13 @@
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
                     // Text colour adapts to the cell shade:
-                    //   - West L3/L4 (#0058AB IKEA blue / #00375A navy)
-                    //     → white text for legibility
-                    //   - East yellow palette + West light blues
-                    //     → dark ink stays readable
-                    var darkBg = (row.region_type === 'western' && level >= 3);
+                    //   - West L2 #3F84BC, L3 #0058AB, L4 #00375A —
+                    //     mid-to-saturated blue → white text. Earlier
+                    //     threshold (≥3) only caught L3+, leaving the
+                    //     mid blue cells with hard-to-read dark text.
+                    //   - East yellow palette (all 4 shades) keeps
+                    //     dark ink — yellow needs contrast from dark.
+                    var darkBg = (row.region_type === 'western' && level >= 2);
                     p.fill(darkBg ? '#ffffff' : '#1a1a1a');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
