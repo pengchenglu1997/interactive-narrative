@@ -27,8 +27,9 @@
             p.push();
             p.translate(padL, padT);
 
-            // Layout
-            var innerT = 86, innerB = 30;
+            // Layout — innerT bumped 86 → 100 for breathing room
+            // between title block and first node row.
+            var innerT = 100, innerB = 30;
             var contentH = H - innerT - innerB;
             var rowH = contentH / items.length;
 
@@ -50,7 +51,7 @@
             p.noStroke();
             p.fill('#1a1a1a'); p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 60);
+            p.text('TWO REGIONAL PLAYBOOKS — PRIORITY RANKING COMPARISON', 20, innerT - 74);
 
             // Subtitle — describes the chart's CONTENT, not how to
             // read it. The how-to-read note in the prose already
@@ -58,20 +59,20 @@
             // side weighs it more', so repeating that here was just
             // visual duplication.
             p.fill('#666'); p.textStyle(p.NORMAL); p.textSize(13);
-            p.text('Eight strategic priorities ranked within each region.', 20, innerT - 38);
+            p.text('Eight strategic priorities ranked within each region.', 20, innerT - 52);
 
             // Column headers — match Act 4 stat-card style (uppercase, accent color, kicker tracking)
             p.textStyle(p.BOLD); p.textSize(14);
             p.fill(REGIME_WEST); p.textAlign(p.RIGHT, p.BOTTOM);
-            p.text('WESTERN IKEA', leftX - 18, innerT - 16);
+            p.text('WESTERN IKEA', leftX - 18, innerT - 30);
             p.fill(REGIME_EAST_TEXT); p.textAlign(p.LEFT, p.BOTTOM);
-            p.text('EAST ASIAN IKEA', rightX + 18, innerT - 16);
+            p.text('EAST ASIAN IKEA', rightX + 18, innerT - 30);
 
             p.textStyle(p.NORMAL); p.fill('#888'); p.textSize(11);
             p.textAlign(p.RIGHT, p.TOP);
-            p.text('top = highest priority', leftX - 18, innerT - 12);
+            p.text('top = highest priority', leftX - 18, innerT - 26);
             p.textAlign(p.LEFT, p.TOP);
-            p.text('top = highest priority', rightX + 18, innerT - 12);
+            p.text('top = highest priority', rightX + 18, innerT - 26);
 
             function yFor(idx) { return innerT + idx * rowH + rowH / 2; }
             function radius(v) { return 8 + v * 3; }

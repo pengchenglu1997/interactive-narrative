@@ -45,19 +45,20 @@
     // Brand colour (IKEA yellow / IKEA blue) sits at L3 (High); L4
     // (Very high) goes DEEPER to communicate maximum challenge.
     function challengeColor(level, regime) {
+        // 4-step gradients spaced for clearer contrast between
+        // weak/moderate/high tiers (the L1↔L2↔L3 jumps were too
+        // close in the previous palette — user feedback). Each
+        // step is now ~25% lighter/darker than the next.
         if (regime === 'east_asia') {
-            if (level <= 1) return '#FFEC8A';                       // recognizable yellow (not cream)
-            if (level <= 2) return '#FFD647';                       // warm yellow
-            if (level <= 3) return '#FBD914';                       // IKEA yellow
-            return '#B58700';                                        // dark amber — depth
+            if (level <= 1) return '#FFF5C0';                       // pale cream-yellow
+            if (level <= 2) return '#FFDB59';                       // sunshine yellow
+            if (level <= 3) return '#F0BD0E';                       // saturated golden
+            return '#7A5500';                                        // espresso amber — depth
         }
-        // West L1 darkened #8EBADD → #6FA8D3 so white cell text stays
-        // legible at the lowest tier (matches the new 'all West cells
-        // are white text' rule below).
-        if (level <= 1) return '#6FA8D3';                           // mid-pale blue
-        if (level <= 2) return '#3F84BC';                           // mid blue
+        if (level <= 1) return '#B7D2EA';                           // pale sky blue (dark text on it)
+        if (level <= 2) return '#4D8FC9';                           // medium blue
         if (level <= 3) return '#0058AB';                           // IKEA blue
-        return '#00375A';                                            // navy — depth
+        return '#002340';                                            // deep navy — depth
     }
 
     function regimeColor(rt) {
@@ -111,7 +112,7 @@
             var CHAL_COL_W = 92;
             var innerL = 130;
             var innerR = 14 + CHAL_COL_W;
-            var innerT = 96, innerB = 92;        // innerT +18 for group caption; innerB now fits 2 wrapped lines of method note
+            var innerT = 112, innerB = 92;       // +16 from 96 — more space between title block and first data row
             var cellW  = (W - innerL - innerR) / dims.length;
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
             var chalColX = innerL + dims.length * cellW + 6;
@@ -128,7 +129,7 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN MARKETS — RETAIL ECOLOGY'
                     : 'RETAIL ECOLOGY MATRIX';
-            p.text(title, innerL, innerT - 80);
+            p.text(title, innerL, innerT - 96);
 
             // Subtitle — short, bigger. One sentence that says what
             // the chart is plotting. (The per-cell encoding details
@@ -141,7 +142,7 @@
                 : regimeFilter === 'western'
                     ? 'Western markets sorted by total challenge to the original IKEA model.'
                     : 'Markets sorted by total challenge to the original IKEA model.';
-            p.text(subtitle, innerL, innerT - 56);
+            p.text(subtitle, innerL, innerT - 72);
 
             // Group caption row — three dims:
             //   index 0 = density (QUANTITATIVE, single col)
@@ -157,13 +158,13 @@
             // the source-confidence distinction without needing a
             // colour signal.
             p.fill('#666');
-            p.text('QUANTITATIVE (stats)',  quantX, innerT - 36);
-            p.text('OBSERVATIONAL (coded)', obsX,   innerT - 36);
+            p.text('QUANTITATIVE (stats)',  quantX, innerT - 52);
+            p.text('OBSERVATIONAL (coded)', obsX,   innerT - 52);
 
             // Thin underline under each group caption
             p.stroke('#ddd'); p.strokeWeight(0.8);
-            p.line(innerL + 6,             innerT - 30, innerL + cellW - 6,     innerT - 30);
-            p.line(innerL + cellW + 6,     innerT - 30, innerL + 3 * cellW - 6, innerT - 30);
+            p.line(innerL + 6,             innerT - 46, innerL + cellW - 6,     innerT - 46);
+            p.line(innerL + cellW + 6,     innerT - 46, innerL + 3 * cellW - 6, innerT - 46);
             p.noStroke();
 
             // Dimension headers — quantitative dim styled darker/bold,
@@ -176,18 +177,18 @@
                 // as the QUANT/OBS captions above (consistency).
                 p.fill('#1a1a1a');
                 var x = innerL + j * cellW + cellW / 2;
-                p.text(d.label, x, innerT - 8);
+                p.text(d.label, x, innerT - 20);
             });
             p.fill('#1a1a1a');
             p.textSize(13);
-            p.text('CHALLENGE / 12', chalColX + (CHAL_COL_W - 12) / 2, innerT - 8);
+            p.text('CHALLENGE / 12', chalColX + (CHAL_COL_W - 12) / 2, innerT - 20);
             p.textStyle(p.NORMAL);
 
             // Group divider — light vertical line between QUANTITATIVE (1 dim)
             // and OBSERVATIONAL (2 dims). Sits between dim 0 and dim 1.
             p.stroke('#e8e8e8'); p.strokeWeight(1);
             var groupX = innerL + 1 * cellW;
-            p.line(groupX, innerT - 4, groupX, innerT + rows.length * rowH + 4);
+            p.line(groupX, innerT - 16, groupX, innerT + rows.length * rowH + 4);
             p.noStroke();
 
             // Mouse coords (translated)
@@ -199,12 +200,14 @@
             rows.forEach(function (row, i) {
                 var y = innerT + i * rowH + rowH / 2;
 
-                // Regime stripe + market label
-                p.noStroke(); p.fill(regimeColor(row.region_type));
-                p.rect(2, y - 8, 4, 16);
+                // Market label — regime stripe dropped per user
+                // feedback ('国家左边颜色的 label 删掉，没什么用').
+                // Panel-level title already encodes which regime
+                // we're looking at; the per-row stripe was redundant.
+                p.noStroke();
                 p.fill('#1a1a1a'); p.textSize(13.5); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
-                p.text(row.market, 12, y);
+                p.text(row.market, 4, y);
                 p.textStyle(p.NORMAL);
 
                 // Cells
@@ -218,16 +221,14 @@
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
                     // Text colour:
-                    //   - West cells (all 4 levels) → WHITE text now.
-                    //     L1 was darkened to #6FA8D3 above to make
-                    //     white readable even on the lightest tier.
-                    //     Per user: 'low 还是黑色的' on the previous
-                    //     L2+ threshold — they expected uniform white
-                    //     across the blue panel.
-                    //   - East yellow palette (all 4 shades) keeps
-                    //     dark ink — yellow needs dark for contrast.
-                    var darkBg = (row.region_type === 'western');
-                    p.fill(darkBg ? '#ffffff' : '#1a1a1a');
+                    //   - West L1 (#B7D2EA pale sky) → DARK text.
+                    //     Per-tier contrast widened; L1 is too light
+                    //     for white to read. L2/L3/L4 stay white.
+                    //   - East yellow palette (all 4 shades) → dark
+                    //     text throughout (yellow needs dark for
+                    //     contrast at every level).
+                    var whiteText = (row.region_type === 'western' && level >= 2);
+                    p.fill(whiteText ? '#ffffff' : '#1a1a1a');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
@@ -249,9 +250,9 @@
                 // Bar fill — same gradient as the cells. Top tier picks
                 // the depth shade (max challenge), mid = brand hue,
                 // low = the recognizable-but-light tier.
-                var topShade = row.region_type === 'east_asia' ? '#B58700' : '#00375A';
-                var midShade = row.region_type === 'east_asia' ? '#FBD914' : '#0058AB';
-                var lowShade = row.region_type === 'east_asia' ? '#FFD647' : '#3F84BC';      // bar tier still uses the medium blue, not the new pale
+                var topShade = row.region_type === 'east_asia' ? '#7A5500' : '#002340';
+                var midShade = row.region_type === 'east_asia' ? '#F0BD0E' : '#0058AB';
+                var lowShade = row.region_type === 'east_asia' ? '#FFDB59' : '#4D8FC9';
                 p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
@@ -281,10 +282,10 @@
             // 4-level challenge scale; the legend says so explicitly
             // so a reader doesn't go hunting for 'weak' on a 4-step
             // ladder that previously only spelled 'Low'.
-            var l1 = regimeFilter === 'east_asia' ? '#FFEC8A' : '#6FA8D3';
-            var l2 = regimeFilter === 'east_asia' ? '#FFD647' : '#3F84BC';
-            var l3 = regimeFilter === 'east_asia' ? '#FBD914' : '#0058AB';
-            var l4 = regimeFilter === 'east_asia' ? '#B58700' : '#00375A';
+            var l1 = regimeFilter === 'east_asia' ? '#FFF5C0' : '#B7D2EA';
+            var l2 = regimeFilter === 'east_asia' ? '#FFDB59' : '#4D8FC9';
+            var l3 = regimeFilter === 'east_asia' ? '#F0BD0E' : '#0058AB';
+            var l4 = regimeFilter === 'east_asia' ? '#7A5500' : '#002340';
             [
                 { c: l1, label: 'Low / Weak' },
                 { c: l2, label: 'Moderate' },

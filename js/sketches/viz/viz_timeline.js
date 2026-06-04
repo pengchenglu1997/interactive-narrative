@@ -171,10 +171,9 @@
 
             // Layout — innerL 150 leaves room for the group-label
             // column (PHYSICAL/SERVICE/PRICING at innerL-80) without
-            // eating into the chart body. innerT 80 fits title +
-            // subtitle. Earlier 170 made every year column ~20px
-            // narrower than necessary.
-            var innerL = 150, innerR = 30, innerT = 80, innerB = 50;
+            // eating into the chart body. innerT 96 (was 80) adds
+            // breathing room between title block and first lane row.
+            var innerL = 150, innerR = 30, innerT = 96, innerB = 50;
             var laneH = (H - innerT - innerB) / lanes.length;
             // Pad both ends of the year range by 0.5 so 2014/2026 tiles don't clip
             function xYear(y) { return p.map(y, Y_MIN - 0.5, Y_MAX + 0.5, innerL + 10, W - innerR - 10); }
@@ -197,7 +196,7 @@
                 : regimeFilter === 'western'
                     ? 'WESTERN STRATEGIC RESPONSE (' + Y_MIN + '–' + Y_MAX + ')'
                     : 'STRATEGIC RESPONSE TIMELINE';
-            p.text(title, innerL - 80, innerT - 52);
+            p.text(title, innerL - 80, innerT - 68);
 
             // Subtitle — short punchline so a fresh reader sees what
             // the chart says before reading any tile labels.
@@ -207,7 +206,7 @@
                 : regimeFilter === 'western'
                     ? 'Format additions: urban stores, services, AR — no closures.'
                     : 'Strategic responses, 2016–2026, across both regions.';
-            p.text(subtitle, innerL - 80, innerT - 28);
+            p.text(subtitle, innerL - 80, innerT - 44);
 
             // Lane backgrounds + labels — lane label font bumped 11→13
             // for legibility.

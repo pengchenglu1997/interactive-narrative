@@ -70,8 +70,9 @@
             p.push();
             p.translate(padL, padT);
 
-            var innerT = 102, innerB = 20;   // +16 to fit the second
-                                              // 'Right column = ...' subtitle
+            var innerT = 116, innerB = 20;   // +14 from 102 — adds breathing
+                                              // room between the title block
+                                              // and the first city row
             // BUG FIX: was 'W - padL - 10', which double-subtracted the
             // canvas's built-in left margin (manager.margin.left is already
             // accounted for in canvasWidth — translate just shifts the
@@ -121,30 +122,27 @@
             p.fill('#1a1a1a');
             p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.text('CITY-FORMAT RESPONSE UNDER HOUSING PRESSURE', contentW / 2, innerT - 72);
+            p.text('CITY-FORMAT RESPONSE UNDER HOUSING PRESSURE', contentW / 2, innerT - 86);
 
             // === Subtitle line 1 (14pt) — what's plotted ===
             p.fill('#666');
             p.textStyle(p.NORMAL); p.textSize(14);
-            p.text('Selected cities, ranked by PTI within region.', contentW / 2, innerT - 52);
+            p.text('Selected cities, ranked by PTI within region.', contentW / 2, innerT - 66);
 
-            // === Subtitle line 2 (12pt) — what the RIGHT half means.
-            // The compressed verdicts ('None', 'Closed', '1 open',
-            // '2 open') need a noun context, and footer microcopy
-            // alone wasn't carrying it for new readers. ===
+            // === Subtitle line 2 (12pt) — what the RIGHT half means. ===
             p.fill('#888');
             p.textStyle(p.ITALIC); p.textSize(12);
             p.text('Right column shows the count of city-format stores currently open (with closures and suburban big-box count below).',
-                contentW / 2, innerT - 32);
+                contentW / 2, innerT - 46);
             p.textStyle(p.NORMAL);
 
             // === Column headers ===
             p.textStyle(p.BOLD); p.textSize(14);
             p.fill('#C9A800');                                    // amber — readable East
             p.textAlign(p.CENTER, p.BOTTOM);
-            p.text('EAST ASIAN CITIES', leftX  + colW / 2, innerT - 10);
+            p.text('EAST ASIAN CITIES', leftX  + colW / 2, innerT - 22);
             p.fill('#0058AB');                                    // IKEA blue — West
-            p.text('WESTERN CITIES',    rightX + colW / 2, innerT - 10);
+            p.text('WESTERN CITIES',    rightX + colW / 2, innerT - 22);
             p.textStyle(p.NORMAL);
 
             // Mouse → translated coords
