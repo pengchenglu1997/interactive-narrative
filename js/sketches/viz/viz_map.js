@@ -81,7 +81,10 @@
 
     function buildPopupHTML(s, closed) {
         var lines = [];
-        lines.push('<div class="popup-name">' + (s.store_name || s.city) + '</div>');
+        var nameClass = s.region_type === 'east_asia' ? 'tt-east'
+                      : s.region_type === 'western'   ? 'tt-west'
+                      : 'tt-both';
+        lines.push('<div class="popup-name ' + nameClass + '">' + (s.store_name || s.city) + '</div>');
         lines.push('<div class="popup-where">' + (s.city || '') + (s.country ? ', ' + s.country : '') + '</div>');
         lines.push('<div class="popup-meta">');
         lines.push('  <span>Opened ' + (s.opening_year || '?') + '</span>');

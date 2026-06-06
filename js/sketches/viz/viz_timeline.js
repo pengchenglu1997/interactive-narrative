@@ -254,23 +254,18 @@
             });
             p.noStroke();
 
-            // Year axis ticks — every year now labelled. Even years
-            // bold and slightly larger to give the eye anchor points;
-            // odd years lighter so they recede. Was: only even years
-            // visible at 10pt, all the same weight.
+            // Year axis ticks — every year labelled with uniform
+            // weight + colour (alternating dark/light read as 'something
+            // is wrong with the chart' even though it was meant as
+            // anchor-vs-fill emphasis).
             p.textAlign(p.CENTER, p.BOTTOM);
+            p.textStyle(p.NORMAL); p.textSize(12); p.fill('#666');
             for (var y = Y_MIN; y <= Y_MAX; y++) {
                 var x = xYear(y);
                 p.stroke('#eee'); p.line(x, innerT, x, H - innerB);
                 p.noStroke();
-                if (y % 2 === 0) {
-                    p.textStyle(p.BOLD); p.textSize(13); p.fill('#444');
-                } else {
-                    p.textStyle(p.NORMAL); p.textSize(12); p.fill('#999');
-                }
                 p.text(y, x, innerT - 6);
             }
-            p.textStyle(p.NORMAL);
 
             // Convert canvas mouse → translated sketch coords
             var mx = p.mouseX - padL;
@@ -349,8 +344,11 @@
                 var regimeLabel = ev.regime_type === 'east_asia' ? 'East Asia'
                                 : ev.regime_type === 'western'   ? 'West'
                                 : ev.regime_type === 'both'      ? 'Global / both' : 'Other';
+                var ttClass = ev.regime_type === 'east_asia' ? 'tt-east'
+                            : ev.regime_type === 'western'   ? 'tt-west'
+                            : 'tt-both';
                 var html =
-                    '<div class="tt-name">' + ev.event_year + ' · ' + ev.event_name + '</div>' +
+                    '<div class="tt-name ' + ttClass + '">' + ev.event_year + ' · ' + ev.event_name + '</div>' +
                     '<div class="tt-row"><b>Type</b> ' + (ev.response_type || '').replace(/_/g, ' ') + '</div>' +
                     '<div class="tt-row"><b>Market</b> ' + (ev.market || '') + (ev.country_or_region ? ' (' + ev.country_or_region + ')' : '') + ' · ' + regimeLabel + '</div>' +
                     (ev.short_description ? '<div class="tt-note">' + ev.short_description + '</div>' : '') +

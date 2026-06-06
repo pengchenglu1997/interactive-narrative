@@ -255,7 +255,9 @@
   line-height: 1.6;
 }
 /* Quick glossary block — sits under the body so the reader can
-   tell big-box from city-format the first time the terms appear. */
+   tell big-box from city-format the first time the terms appear.
+   Each span becomes its own line so the two definitions read as a
+   stacked mini-list, not a paragraph. */
 #sections .definitions {
   font-family: var(--font-sans);
   font-size: 12.5px;
@@ -264,6 +266,10 @@
   border-left: 3px solid var(--rule);
   padding: 8px 12px;
   margin: 8px 0 16px;
+}
+#sections .definitions span {
+  display: block;
+  margin: 2px 0;
   border-radius: 2px;
   line-height: 1.55;
 }
@@ -949,7 +955,10 @@
    prose because this is back-matter, not narrative. */
 .colophon {
   max-width: 880px;
-  margin: 40px auto 0;
+  /* Now sits ABOVE the author cards instead of below. Smaller top
+     margin (the section title's bottom margin provides the gap),
+     and a real bottom margin to separate from the authors block. */
+  margin: 20px auto 40px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;
@@ -1004,9 +1013,12 @@ code {
 #viz-tooltip .tt-name {
   font-weight: 700;
   font-size: 14px;
-  color: var(--ikea-yellow);
+  color: #f5f5f5;
   margin-bottom: 5px;
 }
+#viz-tooltip .tt-name.tt-east { color: var(--ikea-yellow); }
+#viz-tooltip .tt-name.tt-west { color: #9ecfff; }     /* light blue, readable on dark tooltip */
+#viz-tooltip .tt-name.tt-both { color: #cccccc; }     /* gray for global / both regimes */
 
 #viz-tooltip .tt-row { margin: 2px 0; }
 #viz-tooltip .tt-row b { color: #ffffff; font-weight: 600; margin-right: 4px; }

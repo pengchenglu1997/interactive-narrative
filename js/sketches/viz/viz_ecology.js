@@ -50,10 +50,13 @@
         // close in the previous palette — user feedback). Each
         // step is now ~25% lighter/darker than the next.
         if (regime === 'east_asia') {
-            if (level <= 1) return '#FFF5C0';                       // pale cream-yellow
-            if (level <= 2) return '#FFDB59';                       // sunshine yellow
-            if (level <= 3) return '#F0BD0E';                       // saturated golden
-            return '#7A5500';                                        // espresso amber — depth
+            // Wider luminance spread between weak / moderate / strong
+            // so the L1↔L2↔L3 differences are unambiguous. Pushed L1
+            // lighter and L3 oranger.
+            if (level <= 1) return '#FFF8D2';                       // near-cream
+            if (level <= 2) return '#FFCB42';                       // warm bright yellow
+            if (level <= 3) return '#D49600';                       // amber
+            return '#6B4500';                                        // dark espresso amber
         }
         if (level <= 1) return '#B7D2EA';                           // pale sky blue (dark text on it)
         if (level <= 2) return '#4D8FC9';                           // medium blue
@@ -250,9 +253,9 @@
                 // Bar fill — same gradient as the cells. Top tier picks
                 // the depth shade (max challenge), mid = brand hue,
                 // low = the recognizable-but-light tier.
-                var topShade = row.region_type === 'east_asia' ? '#7A5500' : '#002340';
-                var midShade = row.region_type === 'east_asia' ? '#F0BD0E' : '#0058AB';
-                var lowShade = row.region_type === 'east_asia' ? '#FFDB59' : '#4D8FC9';
+                var topShade = row.region_type === 'east_asia' ? '#6B4500' : '#002340';
+                var midShade = row.region_type === 'east_asia' ? '#D49600' : '#0058AB';
+                var lowShade = row.region_type === 'east_asia' ? '#FFCB42' : '#4D8FC9';
                 p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
@@ -282,10 +285,10 @@
             // 4-level challenge scale; the legend says so explicitly
             // so a reader doesn't go hunting for 'weak' on a 4-step
             // ladder that previously only spelled 'Low'.
-            var l1 = regimeFilter === 'east_asia' ? '#FFF5C0' : '#B7D2EA';
-            var l2 = regimeFilter === 'east_asia' ? '#FFDB59' : '#4D8FC9';
-            var l3 = regimeFilter === 'east_asia' ? '#F0BD0E' : '#0058AB';
-            var l4 = regimeFilter === 'east_asia' ? '#7A5500' : '#002340';
+            var l1 = regimeFilter === 'east_asia' ? '#FFF8D2' : '#B7D2EA';
+            var l2 = regimeFilter === 'east_asia' ? '#FFCB42' : '#4D8FC9';
+            var l3 = regimeFilter === 'east_asia' ? '#D49600' : '#0058AB';
+            var l4 = regimeFilter === 'east_asia' ? '#6B4500' : '#002340';
             [
                 { c: l1, label: 'Low / Weak' },
                 { c: l2, label: 'Moderate' },
@@ -330,8 +333,9 @@
                 var groupLabel = h.dim.group === 'quantitative'
                     ? 'Quantitative — sourced from a national statistics agency'
                     : 'Observational — observation-based, see source for details';
+                var ttClass = h.row.region_type === 'east_asia' ? 'tt-east' : 'tt-west';
                 var html =
-                    '<div class="tt-name">' + h.row.market + ' · ' + h.dim.label + '</div>' +
+                    '<div class="tt-name ' + ttClass + '">' + h.row.market + ' · ' + h.dim.label + '</div>' +
                     '<div class="tt-row"><b>Value</b> ' + (h.val || '').replace(/_/g, ' ') + '</div>' +
                     '<div class="tt-row"><b>Challenge to IKEA</b> ' + challengeLabel + '</div>' +
                     '<div class="tt-row" style="opacity:0.8"><i>' + groupLabel + '</i></div>' +

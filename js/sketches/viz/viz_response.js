@@ -299,8 +299,9 @@
             if (hoverRow && window.VizTooltip) {
                 var city = hoverRow;
                 var s = summarize(stores, city.city);
+                var ttClass = city.region_type === 'east_asia' ? 'tt-east' : 'tt-west';
                 var html =
-                    '<div class="tt-name">' + city.city + ', ' + (city.country || '') + '</div>' +
+                    '<div class="tt-name ' + ttClass + '">' + city.city + ', ' + (city.country || '') + '</div>' +
                     '<div class="tt-row"><b>PTI</b> ' + city.price_to_income_ratio.toFixed(2) + '</div>' +
                     (city.mortgage_pct_of_income ? '<div class="tt-row"><b>Mortgage % income</b> ' + city.mortgage_pct_of_income + '%</div>' : '') +
                     (city.renter_share ? '<div class="tt-row"><b>Renter share</b> ' + city.renter_share + '%</div>' : '') +
