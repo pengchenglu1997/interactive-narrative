@@ -45,21 +45,19 @@
     // Brand colour (IKEA yellow / IKEA blue) sits at L3 (High); L4
     // (Very high) goes DEEPER to communicate maximum challenge.
     function challengeColor(level, regime) {
-        // 4-step gradients spaced for clearer contrast between
-        // weak/moderate/high tiers (the L1↔L2↔L3 jumps were too
-        // close in the previous palette — user feedback). Each
-        // step is now ~25% lighter/darker than the next.
+        // 4-step gradients chosen so white cell text stays readable
+        // at every tier (per user: 'put all the table text in white').
+        // Lightest tier is dark enough for white to read; deepest tier
+        // brought up from the previous near-black so very-high no
+        // longer looks black-deep.
         if (regime === 'east_asia') {
-            // Wider luminance spread between weak / moderate / strong
-            // so the L1↔L2↔L3 differences are unambiguous. Pushed L1
-            // lighter and L3 oranger.
-            if (level <= 1) return '#FFF8D2';                       // near-cream
-            if (level <= 2) return '#FFCB42';                       // warm bright yellow
-            if (level <= 3) return '#D49600';                       // amber
-            return '#6B4500';                                        // dark espresso amber
+            if (level <= 1) return '#E0BC1A';                       // warm gold
+            if (level <= 2) return '#B58700';                       // amber
+            if (level <= 3) return '#876300';                       // deep amber
+            return '#5C4200';                                        // rich brown — depth
         }
-        if (level <= 1) return '#B7D2EA';                           // pale sky blue (dark text on it)
-        if (level <= 2) return '#4D8FC9';                           // medium blue
+        if (level <= 1) return '#5B9CD2';                           // medium-light blue
+        if (level <= 2) return '#2870B5';                           // mid blue
         if (level <= 3) return '#0058AB';                           // IKEA blue
         return '#002340';                                            // deep navy — depth
     }
@@ -120,11 +118,12 @@
             var rowH   = Math.min(64, (H - innerT - innerB) / Math.max(rows.length, 1));
             var chalColX = innerL + dims.length * cellW + 6;
 
-            // Section title — amber for East (yellow text unreadable).
-            // Darkened to #A88000 (was #C9A800) so the East amber is
-            // visually heavier than the gray OBSERVATIONAL label below.
+            // Section title — amber for East matches the East amber
+            // used in Act 2/3 section titles (#C9A800), so the four
+            // 'East panel' headings across the article all carry the
+            // same accent.
             p.noStroke();
-            p.fill(regimeFilter === 'east_asia' ? '#A88000' : regimeFilter === 'western' ? '#0058AB' : '#333');
+            p.fill(regimeFilter === 'east_asia' ? '#C9A800' : regimeFilter === 'western' ? '#0058AB' : '#333');
             p.textStyle(p.BOLD); p.textSize(16);
             p.textAlign(p.LEFT, p.BOTTOM);
             var title = regimeFilter === 'east_asia'
@@ -223,15 +222,12 @@
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    // Text colour:
-                    //   - West L1 (#B7D2EA pale sky) → DARK text.
-                    //     Per-tier contrast widened; L1 is too light
-                    //     for white to read. L2/L3/L4 stay white.
-                    //   - East yellow palette (all 4 shades) → dark
-                    //     text throughout (yellow needs dark for
-                    //     contrast at every level).
-                    var whiteText = (row.region_type === 'western' && level >= 2);
-                    p.fill(whiteText ? '#ffffff' : '#1a1a1a');
+                    // All cell text → WHITE. The new 4-step palette
+                    // (East gold→brown / West medium-blue→navy) is
+                    // dark enough at every tier for white text to
+                    // pass contrast. Per user: 'put all the table
+                    // text in white'.
+                    p.fill('#ffffff');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
@@ -250,13 +246,16 @@
                 var barY  = innerT + i * rowH + rowH / 2 - barH / 2;
                 p.noStroke(); p.fill('#eee');
                 p.rect(barX, barY, barW, barH, 2);
-                // Bar fill — same gradient as the cells. Top tier picks
-                // the depth shade (max challenge), mid = brand hue,
-                // low = the recognizable-but-light tier.
-                var topShade = row.region_type === 'east_asia' ? '#6B4500' : '#002340';
-                var midShade = row.region_type === 'east_asia' ? '#D49600' : '#0058AB';
-                var lowShade = row.region_type === 'east_asia' ? '#FFCB42' : '#4D8FC9';
-                p.fill(total >= 8 ? topShade : total >= 5 ? midShade : lowShade);
+                // Bar fill — map the total onto the same 4-step gradient
+                // the cells use. East totals cluster at 9-11 and were
+                // hitting only the top tier under the previous flat 8+
+                // threshold, so the East bars looked uniformly dark.
+                // Now barLevel = round(total/3) puts Japan at L4, the
+                // other East markets at L3, France at L2, US/Canada at
+                // L1, etc. — every market in every region picks up
+                // visible depth.
+                var barLevel = Math.max(1, Math.min(4, Math.round(total / 3)));
+                p.fill(challengeColor(barLevel, row.region_type));
                 p.rect(barX, barY, barW * (total / MAX_CHALLENGE), barH, 2);
                 p.fill('#1a1a1a'); p.textSize(13); p.textStyle(p.BOLD);
                 p.textAlign(p.LEFT, p.CENTER);
@@ -285,10 +284,10 @@
             // 4-level challenge scale; the legend says so explicitly
             // so a reader doesn't go hunting for 'weak' on a 4-step
             // ladder that previously only spelled 'Low'.
-            var l1 = regimeFilter === 'east_asia' ? '#FFF8D2' : '#B7D2EA';
-            var l2 = regimeFilter === 'east_asia' ? '#FFCB42' : '#4D8FC9';
-            var l3 = regimeFilter === 'east_asia' ? '#D49600' : '#0058AB';
-            var l4 = regimeFilter === 'east_asia' ? '#6B4500' : '#002340';
+            var l1 = regimeFilter === 'east_asia' ? '#E0BC1A' : '#5B9CD2';
+            var l2 = regimeFilter === 'east_asia' ? '#B58700' : '#2870B5';
+            var l3 = regimeFilter === 'east_asia' ? '#876300' : '#0058AB';
+            var l4 = regimeFilter === 'east_asia' ? '#5C4200' : '#002340';
             [
                 { c: l1, label: 'Low / Weak' },
                 { c: l2, label: 'Moderate' },
