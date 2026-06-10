@@ -15,7 +15,8 @@
 //   8      Act 4: West ecology       → VizEcology  {regime: western}
 //   9      Coda · Scorecard          — no viz (full-text scorecard table)
 //   10     Coda · Playbook           → VizPlaybook
-//   11     About authors             — no viz
+//   11     Methodology & Limitations — no viz
+//   12     About authors             — no viz
 
 (function () {
     var ROUTING = {

@@ -953,12 +953,29 @@
    cards and the paper-footer-note. Two-column block on wide
    screens, stacked on narrow. Quieter typography than the body
    prose because this is back-matter, not narrative. */
+/* Pipeline-summary intro on the Methodology & Limitations page —
+   sits above the two-column colophon and reads as a single
+   walkthrough of the data flow (sources → CSV → load → render). */
+#sections .pipeline-summary {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--ink-soft);
+  max-width: 880px;
+  margin: 8px auto 32px;
+  line-height: 1.65;
+}
+#sections .pipeline-summary code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, monospace;
+  font-size: 13px;
+  background: #f4f1ec;
+  padding: 1px 5px;
+  border-radius: 3px;
+  color: var(--ink);
+}
+
 .colophon {
   max-width: 880px;
-  /* Now sits ABOVE the author cards instead of below. Smaller top
-     margin (the section title's bottom margin provides the gap),
-     and a real bottom margin to separate from the authors block. */
-  margin: 20px auto 40px;
+  margin: 8px auto 0;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 32px;

@@ -36,7 +36,7 @@
           <div class="kicker">IMT 561 Final Project · Spring 2026</div>
           <div class="title hero-title">One IKEA Model,<br>Two Regional Playbooks</div>
           <p class="byline">Pengcheng Lu &amp; Samantha Wang</p>
-          <p class="byline-meta">~10 min read</p>
+          <p class="byline-meta">~10 min read · hover any chart for tooltip details</p>
           <p class="story-intro">IKEA began with one global playbook: large suburban stores, flat-pack furniture, self-service, and affordability. Under different <strong>housing affordability pressure</strong> and different <strong>retail ecologies</strong>, that model appears to adapt differently across regions: <strong>Western markets extend the original model</strong> through <strong>city-format stores</strong> and services, while <strong>East Asian markets shift toward platforms</strong>, price pressure, localization, and <strong>city-store retreat</strong>.</p>
           <div class="hero-rule"></div>
         </section>
@@ -294,12 +294,24 @@
           </p>
         </section>
 
-        <!-- ===== 11  About authors ===== -->
-        <section class="step author-section" data-active-index="11" data-layout="full-text">
-          <div class="title">About the Authors</div>
-          <!-- Methodology + Limitations moved ABOVE the author cards
-               (was at the bottom of the section) so the back-matter
-               reader sees provenance before they see who wrote it. -->
+        <!-- ===== 11  Methodology & Limitations (own section, no viz) ===== -->
+        <section class="step act-divider-top" data-active-index="11" data-layout="full-text">
+          <div class="act-label">Backmatter</div>
+          <div class="title">Methodology &amp; Limitations</div>
+          <p class="pipeline-summary">
+            <strong>Data pipeline.</strong> Five datasets were hand-compiled from public
+            sources — IKEA newsrooms, Numbeo, national statistical agencies, ConCall
+            analyses of IKEA financials, Inter IKEA's FY24 yearly summary, and Nitori IR
+            — and stored as typed CSVs under <code>data/processed/</code>. At page load,
+            a lightweight loader streams those CSVs into memory and routes them to five
+            p5.js + Leaflet visualizations: the Act 1 store map, the Act 2 PTI bar
+            chart, the Act 3 event timeline, the Act 4 ecology matrix, and the Coda
+            playbook slope chart. The slope chart's priority intensities are computed
+            at render time: each priority's score for a region is the sum of supporting
+            dated events and external anchors, weighted by time-decay (τ = 6 years)
+            and parsed USD-equivalent magnitude, then min-max normalized within the
+            region so the West and East rankings sit on the same 0–5 scale.
+          </p>
           <div class="colophon">
             <div class="colophon-block">
               <h3 class="colophon-h">Methodology</h3>
@@ -327,6 +339,11 @@
               </p>
             </div>
           </div>
+        </section>
+
+        <!-- ===== 12  About authors ===== -->
+        <section class="step author-section" data-active-index="12" data-layout="full-text">
+          <div class="title">About the Authors</div>
           <div class="authors">
             <div class="author">
               <div class="author-name">Pengcheng Lu</div>
