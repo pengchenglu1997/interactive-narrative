@@ -45,21 +45,21 @@
     // Brand colour (IKEA yellow / IKEA blue) sits at L3 (High); L4
     // (Very high) goes DEEPER to communicate maximum challenge.
     function challengeColor(level, regime) {
-        // 4-step gradients chosen so white cell text stays readable
-        // at every tier (per user: 'put all the table text in white').
-        // Lightest tier is dark enough for white to read; deepest tier
-        // brought up from the previous near-black so very-high no
-        // longer looks black-deep.
+        // East yellow goes back lighter (per user: '黄色部分整体调整
+        // 再浅一点'). With a lighter yellow palette, dark text reads
+        // better than white — the classic 'yellow + dark ink' combo.
+        // West blue stays as the all-white-text palette since user
+        // explicitly asked for that earlier.
         if (regime === 'east_asia') {
-            if (level <= 1) return '#E0BC1A';                       // warm gold
-            if (level <= 2) return '#B58700';                       // amber
-            if (level <= 3) return '#876300';                       // deep amber
-            return '#5C4200';                                        // rich brown — depth
+            if (level <= 1) return '#FFEEB0';                       // pale yellow
+            if (level <= 2) return '#FFD647';                       // warm yellow
+            if (level <= 3) return '#E0A800';                       // amber
+            return '#8C6500';                                        // deep amber (not too black)
         }
         if (level <= 1) return '#5B9CD2';                           // medium-light blue
         if (level <= 2) return '#2870B5';                           // mid blue
         if (level <= 3) return '#0058AB';                           // IKEA blue
-        return '#002340';                                            // deep navy — depth
+        return '#002340';                                            // deep navy
     }
 
     function regimeColor(rt) {
@@ -222,12 +222,13 @@
                     var cellRectX = x + 3, cellRectY = innerT + i * rowH + 4;
                     var cellRectW = cellW - 6, cellRectH = rowH - 8;
                     p.rect(cellRectX, cellRectY, cellRectW, cellRectH, 4);
-                    // All cell text → WHITE. The new 4-step palette
-                    // (East gold→brown / West medium-blue→navy) is
-                    // dark enough at every tier for white text to
-                    // pass contrast. Per user: 'put all the table
-                    // text in white'.
-                    p.fill('#ffffff');
+                    // East yellow palette → DARK text (yellow + dark
+                    // ink is the most readable combo; the lighter
+                    // palette user asked for won't carry white).
+                    // West blue palette → WHITE text (all tiers dark
+                    // enough; matches the earlier 'all-white on West'
+                    // direction).
+                    p.fill(row.region_type === 'east_asia' ? '#1a1a1a' : '#ffffff');
                     p.textSize(12.5);
                     p.textAlign(p.CENTER, p.CENTER);
                     p.text((rawVal || '').replace(/_/g, ' '), x + cellW / 2, innerT + i * rowH + rowH / 2);
@@ -284,10 +285,10 @@
             // 4-level challenge scale; the legend says so explicitly
             // so a reader doesn't go hunting for 'weak' on a 4-step
             // ladder that previously only spelled 'Low'.
-            var l1 = regimeFilter === 'east_asia' ? '#E0BC1A' : '#5B9CD2';
-            var l2 = regimeFilter === 'east_asia' ? '#B58700' : '#2870B5';
-            var l3 = regimeFilter === 'east_asia' ? '#876300' : '#0058AB';
-            var l4 = regimeFilter === 'east_asia' ? '#5C4200' : '#002340';
+            var l1 = regimeFilter === 'east_asia' ? '#FFEEB0' : '#5B9CD2';
+            var l2 = regimeFilter === 'east_asia' ? '#FFD647' : '#2870B5';
+            var l3 = regimeFilter === 'east_asia' ? '#E0A800' : '#0058AB';
+            var l4 = regimeFilter === 'east_asia' ? '#8C6500' : '#002340';
             [
                 { c: l1, label: 'Low / Weak' },
                 { c: l2, label: 'Moderate' },
